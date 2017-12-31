@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
@@ -23,6 +24,10 @@
                     android:id="@+id/com_profs"
                     android:icon="@drawable/ic_com_profs"
                     android:title="Docenti" />
+                <item
+                    android:id="@+id/com_saved"
+                    android:icon="@drawable/ic_com_saved"
+                    android:title="Salvati" />
             </menu>
         </item>
 
