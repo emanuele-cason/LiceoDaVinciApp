@@ -72,7 +72,12 @@ public class DataFetcher {
     }
 
     private void fetchCommFailed() {
-
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                communicationsFragment.fetchFailed();
+            }
+        });
     }
 
     private void fetchCommComplete(final Communication[] result) {
@@ -80,7 +85,7 @@ public class DataFetcher {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-               communicationsFragment.responseJson(result);
+               communicationsFragment.fetchComplete(result);
             }
         });
 

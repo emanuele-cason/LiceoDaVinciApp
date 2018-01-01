@@ -10,9 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private DrawerLayout drawer;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,14 +25,13 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setCheckedItem(R.id.drawer_agenda);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         Fragment mainFragment = new CalendarFragment();
@@ -37,7 +40,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -71,6 +73,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
+        uncheckAllMenuItems(navigationView);
+        item.setChecked(true);
 
         Fragment selection = null;
 
@@ -92,14 +96,30 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        if (selection == null) return false;
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.empty_frame, selection)
-                .commit();
+        if (selection != null){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.empty_frame, selection)
+                    .commit();
+        }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void uncheckAllMenuItems(NavigationView navigationView) {
+        final Menu menu = navigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.hasSubMenu()) {
+                SubMenu subMenu = item.getSubMenu();
+                for (int j = 0; j < subMenu.size(); j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    subMenuItem.setChecked(false);
+                }
+            } else {
+                item.setChecked(false);
+            }
+        }
     }
 }

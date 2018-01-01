@@ -4,50 +4,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/drawer_agenda"
-            android:icon="@drawable/ic_agenda"
-            android:title="Agenda del liceo" />
+    <item
+        android:id="@+id/drawer_agenda"
+        android:icon="@drawable/ic_agenda"
+        android:title="Agenda del liceo" />
 
-        <item android:title="Comunicati">
-            <menu>
-                <item
-                    android:id="@+id/com_students"
-                    android:icon="@drawable/ic_com_students"
-                    android:title="Studenti" />
-                <item
-                    android:id="@+id/com_parents"
-                    android:icon="@drawable/ic_com_parents"
-                    android:title="Genitori" />
-                <item
-                    android:id="@+id/com_profs"
-                    android:icon="@drawable/ic_com_profs"
-                    android:title="Docenti" />
-                <item
-                    android:id="@+id/com_saved"
-                    android:icon="@drawable/ic_com_saved"
-                    android:title="Salvati" />
-            </menu>
-        </item>
+    <item android:title="Comunicati">
+        <menu>
+            <item
+                android:id="@+id/com_students"
+                android:icon="@drawable/ic_com_students"
+                android:title="Studenti" />
+            <item
+                android:id="@+id/com_parents"
+                android:icon="@drawable/ic_com_parents"
+                android:title="Genitori" />
+            <item
+                android:id="@+id/com_profs"
+                android:icon="@drawable/ic_com_profs"
+                android:title="Docenti" />
+            <item
+                android:id="@+id/com_saved"
+                android:icon="@drawable/ic_com_saved"
+                android:title="Salvati" />
+        </menu>
+    </item>
 
-        <item android:title="Utilità">
-            <menu>
-                <item
-                    android:id="@+id/drawer_settings"
-                    android:icon="@drawable/ic_settings"
-                    android:title="Impostazioni" />
-                <item
-                    android:id="@+id/drawer_share"
-                    android:icon="@drawable/ic_share"
-                    android:title="Condividi" />
-                <item
-                    android:id="@+id/drawer_contact_us"
-                    android:icon="@drawable/ic_send"
-                    android:title="Contattaci" />
-            </menu>
-        </item>
-
-    </group>
+    <item android:title="Utilità">
+        <menu>
+            <item
+                android:id="@+id/drawer_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="Impostazioni" />
+            <item
+                android:id="@+id/drawer_share"
+                android:icon="@drawable/ic_share"
+                android:title="Condividi" />
+            <item
+                android:id="@+id/drawer_contact_us"
+                android:icon="@drawable/ic_send"
+                android:title="Contattaci" />
+        </menu>
+    </item>
 
 </menu>

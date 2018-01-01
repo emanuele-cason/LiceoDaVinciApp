@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import java.io.IOException;
 
@@ -40,7 +42,10 @@ public class CommunicationsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         commRecyclerView = (RecyclerView) activity.findViewById(R.id.com_recyclerview);
+        fetch();
+    }
 
+    private void fetch(){
         DataFetcher df = new DataFetcher(this, activity);
         try {
             df.fetchCommunicationsJson(section);
@@ -49,8 +54,21 @@ public class CommunicationsFragment extends Fragment {
         }
     }
 
-    protected void responseJson(Communication[] communications) {
+    protected void fetchComplete(Communication[] communications) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
         commRecyclerView.setAdapter(new CommCardAdapter(communications));
+    }
+
+    protected void fetchFailed(){
+        RelativeLayout rl = (RelativeLayout)activity.findViewById(R.id.com_relative_layout);
+        Snackbar snackbar = Snackbar
+                .make(rl, "Errore di connessione. Riprova più tardi.", Snackbar.LENGTH_LONG)
+                .setAction("RIPROVA", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        fetch();
+                    }
+                });
+        snackbar.show();
     }
 }
