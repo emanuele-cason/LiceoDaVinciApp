@@ -1,7 +1,6 @@
 package davi.liceodavinci;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 
@@ -16,22 +15,31 @@ import okhttp3.ResponseBody;
  * Created by Emanuele on 31/12/2017 at 16:23.
  */
 
-public class DataFetcher {
-
-    /*
+/*
     * Questa classe fa le richieste all'api e le restituisce sotto forma di oggetto JSON, section è il parametro
     * che specifica la sezione dei comunicati (studenti --> 0; genitori --> 1; docenti --> 2). Una volta eseguito
     * il fetch, se questo avrà funzionato verrà chiamato il metodo fetchCommComplete(JSONArray result), altrimenti
      * fetchCommFailed().
+     *
+     * La stringa thisIsOnlyATest è una prova, rappresenta un Json sotto forma di stringa, esempio di array restituito
+     * dall'API. Da rimuovere e rimpiazzare con la stringa commentata (responseBody.string() --> il vero risultato dell'api).
     * */
 
-    private final String requestUrls [] = {"https://www.foaas.com/operations","http://192.168.1.5:8080/api/comunicati/genitori","http://192.168.1.5:8080/api/comunicati/docenti"};
+public class DataFetcher {
+
+    private CommunicationsFragment communicationsFragment;
+    private final String requestUrls [] = {"http://192.168.1.5:8080/api/comunicati/studenti","http://192.168.1.5:8080/api/comunicati/genitori","http://192.168.1.5:8080/api/comunicati/docenti"};
     OkHttpClient client = new OkHttpClient();
+
+    protected DataFetcher(CommunicationsFragment communicationsFragment){
+        this.communicationsFragment = communicationsFragment;
+    }
 
     protected void fetchCommunicationsJson(int section) throws IOException {
 
         Request request = new Request.Builder()
                 .url(requestUrls[section])
+                .addHeader("Accept","application/json")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -47,16 +55,10 @@ public class DataFetcher {
                         throw new IOException("Unexpected code " + response);
                     }
 
-                    String thisIsOnlyATest = "[ { \"Nome\": \"49.txt\", \"Data\": \"2017-12-31T13:53:57.418588286+01:00\", \"Tipo\": \"genitori\", \"URL\": \"http://liceodavinci.tv/sitoLiceo/images/comunicati/comunicati-genitori/49.txt\" }, { \"Nome\": \"84.txt\", \"Data\": \"2017-12-31T13:53:57.418588286+01:00\", \"Tipo\": \"genitori\", \"URL\": \"http://liceodavinci.tv/sitoLiceo/images/comunicati/comunicati-genitori/84.txt\" } ]";
+                    Gson gson = new Gson();
+                    Communication communications[] = gson.fromJson(responseBody.string(), Communication[].class);
 
-                    JSONArray jsonResponse = null;
-                    try {
-                        jsonResponse = new JSONArray(thisIsOnlyATest/*responseBody.string()*/);
-                    } catch (JSONException e) {
-                        fetchCommFailed();
-                    }
-
-                    fetchCommComplete(jsonResponse);
+                    fetchCommComplete(communications);
                 }
             }
         });
@@ -66,7 +68,7 @@ public class DataFetcher {
 
     }
 
-    private void fetchCommComplete(JSONArray result){
-
+    private void fetchCommComplete(Communication [] result){
+        communicationsFragment.responseJson(result);
     }
 }

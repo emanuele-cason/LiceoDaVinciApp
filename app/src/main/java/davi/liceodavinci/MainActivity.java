@@ -11,8 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.io.IOException;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -34,13 +32,6 @@ public class MainActivity extends AppCompatActivity
 
         Fragment mainFragment = new CalendarFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.empty_frame, mainFragment).commit();
-
-        DataFetcher df = new DataFetcher();
-        try {
-            df.fetchCommunicationsJson(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -80,19 +71,27 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /*if (id == R.id.) {
-            // Handle the camera action
-        } else if (id == R.id.) {
+        if (id == R.id.drawer_agenda) {
 
-        } else if (id == R.id.) {
+        } else if (id == R.id.com_students) {
+            CommunicationsFragment communicationsFragment = new CommunicationsFragment();
+            communicationsFragment.setSection(0);
+        } else if (id == R.id.com_parents) {
+            CommunicationsFragment communicationsFragment = new CommunicationsFragment();
+            communicationsFragment.setSection(1);
+        } else if (id == R.id.com_profs) {
+            CommunicationsFragment communicationsFragment = new CommunicationsFragment();
+            communicationsFragment.setSection(2);
+        } else if (id == R.id.com_saved) {
+            CommunicationsFragment communicationsFragment = new CommunicationsFragment();
+            communicationsFragment.setSection(3);
+        } else if (id == R.id.drawer_settings) {
 
-        } else if (id == R.id.) {
+        }else if (id == R.id.drawer_share) {
 
-        } else if (id == R.id.) {
+        }else if (id == R.id.drawer_contact_us) {
 
-        } else if (id == R.id.) {
-
-        }*/
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
