@@ -1,5 +1,7 @@
 package davi.liceodavinci;
 
+import android.app.Activity;
+
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -28,27 +30,32 @@ import okhttp3.ResponseBody;
 public class DataFetcher {
 
     private CommunicationsFragment communicationsFragment;
-    private final String requestUrls [] = {"http://192.168.1.5:8080/api/comunicati/studenti","http://192.168.1.5:8080/api/comunicati/genitori","http://192.168.1.5:8080/api/comunicati/docenti"};
-    OkHttpClient client = new OkHttpClient();
+    private final String requestUrls[] = {"http://192.168.1.5:8080/api/comunicati/studenti", "http://192.168.1.5:8080/api/comunicati/genitori", "http://192.168.1.5:8080/api/comunicati/docenti"};
+    private OkHttpClient client = new OkHttpClient();
+    private Activity activity;
 
-    protected DataFetcher(CommunicationsFragment communicationsFragment){
+
+    protected DataFetcher(CommunicationsFragment communicationsFragment, Activity activity) {
         this.communicationsFragment = communicationsFragment;
+        this.activity = activity;
     }
 
     protected void fetchCommunicationsJson(int section) throws IOException {
 
         Request request = new Request.Builder()
                 .url(requestUrls[section])
-                .addHeader("Accept","application/json")
+                .addHeader("Accept", "application/json")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
-            @Override public void onFailure(Call call, IOException e) {
+            @Override
+            public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
                 fetchCommFailed();
             }
 
-            @Override public void onResponse(Call call, Response response) throws IOException {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         fetchCommFailed();
@@ -64,11 +71,18 @@ public class DataFetcher {
         });
     }
 
-    private void fetchCommFailed(){
+    private void fetchCommFailed() {
 
     }
 
-    private void fetchCommComplete(Communication [] result){
-        communicationsFragment.responseJson(result);
+    private void fetchCommComplete(final Communication[] result) {
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+               communicationsFragment.responseJson(result);
+            }
+        });
+
     }
 }

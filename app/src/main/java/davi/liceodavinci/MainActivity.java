@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setCheckedItem(R.id.drawer_agenda);
         navigationView.setNavigationItemSelectedListener(this);
 
         Fragment mainFragment = new CalendarFragment();
@@ -71,27 +72,31 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        Fragment selection = null;
+
         if (id == R.id.drawer_agenda) {
 
         } else if (id == R.id.com_students) {
-            CommunicationsFragment communicationsFragment = new CommunicationsFragment();
-            communicationsFragment.setSection(0);
+            selection = new CommunicationsFragment(this, 0);
         } else if (id == R.id.com_parents) {
-            CommunicationsFragment communicationsFragment = new CommunicationsFragment();
-            communicationsFragment.setSection(1);
+            selection = new CommunicationsFragment(this, 1);
         } else if (id == R.id.com_profs) {
-            CommunicationsFragment communicationsFragment = new CommunicationsFragment();
-            communicationsFragment.setSection(2);
+            selection = new CommunicationsFragment(this, 2);
         } else if (id == R.id.com_saved) {
-            CommunicationsFragment communicationsFragment = new CommunicationsFragment();
-            communicationsFragment.setSection(3);
+            selection = new CommunicationsFragment(this, 3);
         } else if (id == R.id.drawer_settings) {
 
-        }else if (id == R.id.drawer_share) {
+        } else if (id == R.id.drawer_share) {
 
-        }else if (id == R.id.drawer_contact_us) {
+        } else if (id == R.id.drawer_contact_us) {
 
         }
+
+        if (selection == null) return false;
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.empty_frame, selection)
+                .commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

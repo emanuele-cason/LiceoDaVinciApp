@@ -6,31 +6,42 @@ package davi.liceodavinci;
 
 public class Communication {
 
-    private String Nome;
-    private String Data;
-    private String Tipo;
+    private String nome;
+    private String data;
+    private String tipo;
     private String url;
 
     public Communication(String name, String data, String type, String url) {
-        this.Nome = name;
-        this.Data = data;
-        this.Tipo = type;
+        this.nome = name;
+        this.data = data;
+        this.tipo = type;
         this.url = url;
     }
 
     public String getName() {
-        return Nome;
+        return nome;
     }
 
     public String getData() {
-        return Data;
+        return data;
     }
 
     public String getType() {
-        return Tipo;
+        return tipo;
     }
 
     public String getUrl() {
         return url;
+    }
+
+    public int getId() {
+        try {
+            return Integer.valueOf(nome.split("\\-")[0]);
+        }catch (Exception e){
+            try {
+                return Integer.valueOf(nome.substring(0,3));
+            }catch (Exception o){}
+        }
+        return 0;
     }
 }

@@ -4,12 +4,13 @@
     android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:layout_marginTop="0dp"
+    android:layout_marginTop="4dp"
     android:layout_marginLeft="12dp"
     android:layout_marginRight="12dp"
     android:layout_marginBottom="0dp"
     app:contentPadding="5dp"
-    app:cardCornerRadius="2dp">
+    app:cardCornerRadius="2dp"
+    android:id="@+id/com_cardview">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -23,7 +24,7 @@
         android:minHeight="72dp">
 
         <TextView
-            android:id="@+id/list_card_id"
+            android:id="@+id/com_card_id"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight=".35"
@@ -38,7 +39,7 @@
             android:background="?android:attr/listDivider" />
 
         <TextView
-            android:id="@+id/list_card_nome"
+            android:id="@+id/com_card_name"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
