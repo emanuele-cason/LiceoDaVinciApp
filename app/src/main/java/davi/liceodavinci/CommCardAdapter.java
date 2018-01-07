@@ -9,11 +9,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Emanuele on 01/01/2018 at 15:21.
@@ -21,14 +25,16 @@ import java.util.Date;
 
 public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Communication[] communications;
+    private List<Communication> communications = new ArrayList<>();
     private Activity activity;
     private SwipeRefreshLayout layout;
+    private int section;
 
-    protected CommCardAdapter(Activity activity, SwipeRefreshLayout layout, Communication[] communications) {
+    protected CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment,SwipeRefreshLayout layout, List<Communication> communications, int section) {
         this.communications = communications;
         this.activity = activity;
         this.layout = layout;
+        this.section = section;
     }
 
     @Override
@@ -41,14 +47,14 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((Item) holder).nameTV.setText(communications[position].getName());
-        if (communications[position].getId() != 0)
-            ((Item) holder).idTV.setText(String.valueOf(communications[position].getId()));
+        ((Item) holder).nameTV.setText(communications.get(position).getName());
+        if (communications.get(position).getId() != 0)
+            ((Item) holder).idTV.setText(String.valueOf(communications.get(position).getId()));
         else ((Item) holder).idTV.setText("?");
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSSSSS");
         try {
-            Date date = format.parse(communications[position].getData());
+            Date date = format.parse(communications.get(position).getData());
             ((Item) holder).dataTV.setText(String.format("%td-%<tM-%<tY\n%<tH:%<tM", date));
         } catch (ParseException e) {
             e.printStackTrace();
@@ -57,7 +63,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
-        return communications.length;
+        return communications.size();
     }
 
     private class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -66,6 +72,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         TextView idTV;
         TextView dataTV;
         CardView recycler_row;
+        ImageButton download;
 
         Item(View itemView) {
             super(itemView);
@@ -74,6 +81,47 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             idTV = (TextView) itemView.findViewById(R.id.com_card_id);
             dataTV = (TextView) itemView.findViewById(R.id.com_card_data);
             recycler_row.setOnClickListener(this);
+            download = (ImageButton) itemView.findViewById(R.id.com_save_button);
+
+            if (section == 3) {
+                download.setImageResource(R.drawable.ic_delete);
+                download.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        new File(activity.getFilesDir().getPath().concat("/").concat(communications.get(getLayoutPosition()).getName())).delete();
+                        communications.remove(getLayoutPosition());
+                        notifyItemRemoved(getLayoutPosition());
+                        notifyItemRangeChanged(getLayoutPosition(), communications.size());
+                    }
+                });
+            }
+
+            if (section < 3){
+                download.setImageResource(R.drawable.ic_file_download);
+                download.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ProgressDialog progressDialog;
+
+                        progressDialog = new ProgressDialog(activity);
+                        progressDialog.setMessage("Download in corso");
+                        progressDialog.setIndeterminate(true);
+                        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                        progressDialog.setCancelable(true);
+
+                        final CommDownload downloadTask = new CommDownload(activity, layout, progressDialog, true);
+                        downloadTask.execute(communications.get(getLayoutPosition()));
+
+                        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                downloadTask.cancel(true);
+                            }
+                        });
+                    }
+                });
+            }
+
         }
 
         @Override
@@ -87,7 +135,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             progressDialog.setCancelable(true);
 
             final CommDownload downloadTask = new CommDownload(activity, layout, progressDialog, false);
-            downloadTask.execute(communications[this.getLayoutPosition()]);
+            downloadTask.execute(communications.get(this.getLayoutPosition()));
 
             progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 @Override

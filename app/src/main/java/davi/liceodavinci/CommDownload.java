@@ -130,5 +130,4 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
                 .make(layout, "Impossibile salvare il comunicato", Snackbar.LENGTH_LONG);
         snackbar.show();
     }
-
 }

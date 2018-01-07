@@ -61,6 +61,7 @@
             android:textSize="12sp"/>
 
         <ImageButton
+            android:id="@+id/com_save_button"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/ic_file_download"

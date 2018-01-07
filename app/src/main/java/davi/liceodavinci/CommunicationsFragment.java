@@ -13,7 +13,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Emanuele on 30/12/2017 at 23:25.
@@ -48,11 +53,26 @@ public class CommunicationsFragment extends Fragment {
         swipeRefreshCom.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fetch();
+                if (section < 3) fetch();
+                if (section == 3) fetchSavedComms();
             }
         });
 
-        fetch();
+        if (section < 3) fetch();
+        if (section == 3) fetchSavedComms();
+    }
+    
+    private void fetchSavedComms(){
+        List<Communication> communications = new ArrayList<>();
+        for (File file:new File(activity.getFilesDir().getPath()).listFiles()){
+            if (file.getName().endsWith(".pdf")){
+                communications.add(new Communication(file.getName(), "", "", ""));
+            }
+        }
+
+        Communication [] communicationsArr = new Communication[communications.size()];
+        communicationsArr = communications.toArray(communicationsArr);
+        fetchComplete(communicationsArr);
     }
 
     private void fetch(){
@@ -67,7 +87,7 @@ public class CommunicationsFragment extends Fragment {
 
     protected void fetchComplete(Communication[] communications) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        commRecyclerView.setAdapter(new CommCardAdapter(activity, swipeRefreshCom,communications));
+        commRecyclerView.setAdapter(new CommCardAdapter(activity,this, swipeRefreshCom, new LinkedList<>(Arrays.asList(communications)), section));
         swipeRefreshCom.setRefreshing(false);
     }
 
