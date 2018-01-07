@@ -41,6 +41,8 @@ public class PdfRender extends Fragment{
         PDFView pdfView = (PDFView) activity.findViewById(R.id.pdf_render);
         pdfView.fromFile(new File(activity.getCacheDir().getPath().concat("/").concat(fileName)))
                 .defaultPage(1)
-                .showMinimap(false).enableSwipe(true).load();
+                .showMinimap(true)
+                .enableSwipe(false)
+                .load();
     }
 }
