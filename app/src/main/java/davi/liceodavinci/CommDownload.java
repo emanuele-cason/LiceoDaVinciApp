@@ -1,10 +1,12 @@
 package davi.liceodavinci;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import java.io.File;
@@ -17,14 +19,15 @@ import java.net.URL;
 
 class CommDownload extends AsyncTask<Communication, Integer, String> {
 
-    private Context context;
+    private Activity activity;
     private PowerManager.WakeLock mWakeLock;
     private ProgressDialog progressDialog;
     private boolean permanent;
     private SwipeRefreshLayout layout;
+    private Communication comm;
 
-    public CommDownload(Context context, SwipeRefreshLayout layout, ProgressDialog progressDialog, boolean permanent) {
-        this.context = context;
+    public CommDownload(Activity activity, SwipeRefreshLayout layout, ProgressDialog progressDialog, boolean permanent) {
+        this.activity = activity;
         this.progressDialog = progressDialog;
         this.permanent = permanent;
         this.layout = layout;
@@ -32,6 +35,7 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
 
     @Override
     protected String doInBackground(Communication... comms) {
+        this.comm = comms[0];
         InputStream input = null;
         OutputStream output = null;
         HttpURLConnection connection = null;
@@ -49,8 +53,8 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
 
             String path;
             if (permanent)
-                path = context.getFilesDir().getPath().concat("/").concat(comms[0].getName());
-            else path = context.getCacheDir().getPath().concat("/").concat(comms[0].getName());
+                path = activity.getFilesDir().getPath().concat("/").concat(comms[0].getName());
+            else path = activity.getCacheDir().getPath().concat("/").concat(comms[0].getName());
 
             File file = new File(path);
 
@@ -92,7 +96,7 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 getClass().getName());
         mWakeLock.acquire();
@@ -122,6 +126,12 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
             Snackbar snackbar = Snackbar
                     .make(layout, "Il comunicato è stato salvato offline", Snackbar.LENGTH_LONG);
             snackbar.show();
+        }else {
+            ((FragmentActivity)activity)
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.empty_frame, new PdfRender(activity, comm.getName()))
+                    .commit();
         }
     }
 

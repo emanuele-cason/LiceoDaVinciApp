@@ -32,7 +32,6 @@ public class CommunicationsFragment extends Fragment {
     private RecyclerView commRecyclerView;
     private SwipeRefreshLayout swipeRefreshCom;
 
-
     @SuppressLint("ValidFragment")
     public CommunicationsFragment(Activity activity, int section){
         this.activity = activity;

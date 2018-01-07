@@ -89,8 +89,8 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     @Override
                     public void onClick(View view) {
                         new File(activity.getFilesDir().getPath().concat("/").concat(communications.get(getLayoutPosition()).getName())).delete();
-                        communications.remove(getLayoutPosition());
                         notifyItemRemoved(getLayoutPosition());
+                        communications.remove(getLayoutPosition());
                         notifyItemRangeChanged(getLayoutPosition(), communications.size());
                     }
                 });
