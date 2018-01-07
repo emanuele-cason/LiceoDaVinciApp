@@ -44,4 +44,8 @@ public class Communication {
         }
         return 0;
     }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

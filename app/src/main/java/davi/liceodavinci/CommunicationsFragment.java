@@ -6,12 +6,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import java.io.IOException;
 
@@ -25,6 +25,8 @@ public class CommunicationsFragment extends Fragment {
     private int section = 0;
     private Activity activity;
     private RecyclerView commRecyclerView;
+    private SwipeRefreshLayout swipeRefreshCom;
+
 
     @SuppressLint("ValidFragment")
     public CommunicationsFragment(Activity activity, int section){
@@ -42,10 +44,19 @@ public class CommunicationsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         commRecyclerView = (RecyclerView) activity.findViewById(R.id.com_recyclerview);
+        swipeRefreshCom = (SwipeRefreshLayout) activity.findViewById(R.id.com_swipe_refresh_layout);
+        swipeRefreshCom.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetch();
+            }
+        });
+
         fetch();
     }
 
     private void fetch(){
+        swipeRefreshCom.setRefreshing(true);
         DataFetcher df = new DataFetcher(this, activity);
         try {
             df.fetchCommunicationsJson(section);
@@ -56,13 +67,14 @@ public class CommunicationsFragment extends Fragment {
 
     protected void fetchComplete(Communication[] communications) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        commRecyclerView.setAdapter(new CommCardAdapter(communications));
+        commRecyclerView.setAdapter(new CommCardAdapter(activity, swipeRefreshCom,communications));
+        swipeRefreshCom.setRefreshing(false);
     }
 
     protected void fetchFailed(){
-        RelativeLayout rl = (RelativeLayout)activity.findViewById(R.id.com_relative_layout);
+        swipeRefreshCom.setRefreshing(false);
         Snackbar snackbar = Snackbar
-                .make(rl, "Errore di connessione. Riprova più tardi.", Snackbar.LENGTH_LONG)
+                .make(swipeRefreshCom, "Errore di connessione", Snackbar.LENGTH_LONG)
                 .setAction("RIPROVA", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

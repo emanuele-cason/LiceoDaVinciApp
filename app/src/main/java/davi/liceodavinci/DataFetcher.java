@@ -64,7 +64,6 @@ public class DataFetcher {
 
                     Gson gson = new Gson();
                     Communication communications[] = gson.fromJson(responseBody.string(), Communication[].class);
-
                     fetchCommComplete(communications);
                 }
             }
@@ -85,7 +84,10 @@ public class DataFetcher {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-               communicationsFragment.fetchComplete(result);
+                for (Communication comm:result) {
+                    comm.setUrl(comm.getUrl().replaceAll(" ", "%20"));
+                }
+                communicationsFragment.fetchComplete(result);
             }
         });
 
