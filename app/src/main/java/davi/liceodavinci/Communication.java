@@ -11,6 +11,11 @@ public class Communication {
     private String tipo;
     private String url;
 
+    public static final int COMM_STUDENTS = 0;
+    public static final int COMM_PARENTS = 1;
+    public static final int COMM_PROFS = 2;
+    public static final int COMM_SAVED = 3;
+
     public Communication(String name, String data, String type, String url) {
         this.nome = name;
         this.data = data;

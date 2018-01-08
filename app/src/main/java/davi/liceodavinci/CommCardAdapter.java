@@ -83,7 +83,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             recycler_row.setOnClickListener(this);
             download = (ImageButton) itemView.findViewById(R.id.com_save_button);
 
-            if (section == 3) {
+            if (section == Communication.COMM_SAVED) {
                 download.setImageResource(R.drawable.ic_delete);
                 download.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -96,7 +96,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 });
             }
 
-            if (section < 3){
+            if (section < Communication.COMM_SAVED){
                 download.setImageResource(R.drawable.ic_file_download);
                 download.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -121,7 +121,6 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     }
                 });
             }
-
         }
 
         @Override

@@ -28,6 +28,7 @@ import java.util.List;
 public class CommunicationsFragment extends Fragment {
 
     private int section = 0;
+
     private Activity activity;
     private RecyclerView commRecyclerView;
     private SwipeRefreshLayout swipeRefreshCom;
@@ -52,13 +53,13 @@ public class CommunicationsFragment extends Fragment {
         swipeRefreshCom.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (section < 3) fetch();
-                if (section == 3) fetchSavedComms();
+                if (section <= Communication.COMM_PROFS) fetch();
+                if (section == Communication.COMM_SAVED) fetchSavedComms();
             }
         });
 
-        if (section < 3) fetch();
-        if (section == 3) fetchSavedComms();
+        if (section < Communication.COMM_SAVED) fetch();
+        if (section == Communication.COMM_SAVED) fetchSavedComms();
     }
     
     private void fetchSavedComms(){
