@@ -7,8 +7,6 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:listDivider">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:actionBarDivider">@null</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

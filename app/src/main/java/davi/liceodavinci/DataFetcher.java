@@ -30,7 +30,7 @@ import okhttp3.ResponseBody;
 public class DataFetcher {
 
     private CommunicationsFragment communicationsFragment;
-    private final String requestUrls[] = new String[0];
+    private final String requestUrls[] = new String[3];
     private OkHttpClient client = new OkHttpClient();
     private Activity activity;
 
