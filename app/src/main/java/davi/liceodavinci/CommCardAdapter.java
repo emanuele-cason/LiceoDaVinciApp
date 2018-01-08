@@ -55,7 +55,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSSSSS");
         try {
             Date date = format.parse(communications.get(position).getData());
-            ((Item) holder).dataTV.setText(String.format("%td-%<tM-%<tY\n%<tH:%<tM", date));
+            ((Item) holder).dataTV.setText(String.format("%td-%<tm-%<tY\n%<tH:%<tM", date));
         } catch (ParseException e) {
             e.printStackTrace();
         }
