@@ -3,6 +3,7 @@ package davi.liceodavinci;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -30,7 +31,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private SwipeRefreshLayout layout;
     private int section;
 
-    protected CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment,SwipeRefreshLayout layout, List<Communication> communications, int section) {
+    protected CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment, SwipeRefreshLayout layout, List<Communication> communications, int section) {
         this.communications = communications;
         this.activity = activity;
         this.layout = layout;
@@ -96,7 +97,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 });
             }
 
-            if (section < Communication.COMM_SAVED){
+            if (section < Communication.COMM_SAVED) {
                 download.setImageResource(R.drawable.ic_file_download);
                 download.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -125,23 +126,31 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @Override
         public void onClick(View v) {
-            ProgressDialog progressDialog;
+            if (section < Communication.COMM_SAVED) {
+                ProgressDialog progressDialog;
 
-            progressDialog = new ProgressDialog(activity);
-            progressDialog.setMessage("Apertura in corso");
-            progressDialog.setIndeterminate(true);
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            progressDialog.setCancelable(true);
+                progressDialog = new ProgressDialog(activity);
+                progressDialog.setMessage("Apertura in corso");
+                progressDialog.setIndeterminate(true);
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setCancelable(true);
 
-            final CommDownload downloadTask = new CommDownload(activity, layout, progressDialog, false);
-            downloadTask.execute(communications.get(this.getLayoutPosition()));
+                final CommDownload downloadTask = new CommDownload(activity, layout, progressDialog, false);
+                downloadTask.execute(communications.get(this.getLayoutPosition()));
 
-            progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    downloadTask.cancel(true);
-                }
-            });
+                progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        downloadTask.cancel(true);
+                    }
+                });
+            }else if(section == Communication.COMM_SAVED) {
+                ((FragmentActivity)activity)
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.empty_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()).getName(), Communication.DOWNLOADED))
+                        .commit();
+            }
         }
     }
 }

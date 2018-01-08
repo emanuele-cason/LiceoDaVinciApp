@@ -27,7 +27,7 @@ import java.util.List;
 @SuppressLint("ValidFragment")
 public class CommunicationsFragment extends Fragment {
 
-    private int section = 0;
+    private int section = Communication.COMM_STUDENTS;
 
     private Activity activity;
     private RecyclerView commRecyclerView;

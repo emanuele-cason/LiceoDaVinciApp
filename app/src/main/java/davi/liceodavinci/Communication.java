@@ -11,12 +11,15 @@ public class Communication {
     private String tipo;
     private String url;
 
-    public static final int COMM_STUDENTS = 0;
-    public static final int COMM_PARENTS = 1;
-    public static final int COMM_PROFS = 2;
-    public static final int COMM_SAVED = 3;
+    static final int COMM_STUDENTS = 0;
+    static final int COMM_PARENTS = 1;
+    static final int COMM_PROFS = 2;
+    static final int COMM_SAVED = 3;
 
-    public Communication(String name, String data, String type, String url) {
+    static final int DOWNLOADED = 0;
+    static final int CACHED = 1;
+
+    Communication(String name, String data, String type, String url) {
         this.nome = name;
         this.data = data;
         this.tipo = type;
@@ -35,7 +38,7 @@ public class Communication {
         return tipo;
     }
 
-    public String getUrl() {
+    String getUrl() {
         return url;
     }
 
@@ -50,7 +53,7 @@ public class Communication {
         return 0;
     }
 
-    public void setUrl(String url) {
+    void setUrl(String url) {
         this.url = url;
     }
 }

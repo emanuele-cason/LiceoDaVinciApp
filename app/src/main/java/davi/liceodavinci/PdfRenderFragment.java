@@ -18,15 +18,17 @@ import java.io.File;
  */
 
 @SuppressLint("ValidFragment")
-public class PdfRender extends Fragment{
+public class PdfRenderFragment extends Fragment{
 
     private Activity activity;
     private String fileName;
+    private int savingMode;
 
     @SuppressLint("ValidFragment")
-    protected PdfRender(Activity activity, String fileName){
+    protected PdfRenderFragment(Activity activity, String fileName, int savingMode){
         this.activity = activity;
         this.fileName = fileName;
+        this.savingMode = savingMode;
     }
 
     @Override
@@ -38,11 +40,23 @@ public class PdfRender extends Fragment{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        PDFView pdfView = (PDFView) activity.findViewById(R.id.pdf_render);
-        pdfView.fromFile(new File(activity.getCacheDir().getPath().concat("/").concat(fileName)))
-                .defaultPage(1)
-                .showMinimap(true)
-                .enableSwipe(false)
-                .load();
+        if (savingMode == Communication.CACHED){
+            PDFView pdfView = (PDFView) activity.findViewById(R.id.pdf_render);
+            pdfView.fromFile(new File(activity.getCacheDir().getPath().concat("/").concat(fileName)))
+                    .defaultPage(1)
+                    .showMinimap(true)
+                    .enableSwipe(false)
+                    .load();
+        }
+
+        if (savingMode == Communication.DOWNLOADED){
+            PDFView pdfView = (PDFView) activity.findViewById(R.id.pdf_render);
+            pdfView.fromFile(new File(activity.getFilesDir().getPath().concat("/").concat(fileName)))
+                    .defaultPage(1)
+                    .showMinimap(true)
+                    .enableSwipe(false)
+                    .load();
+        }
+
     }
 }
