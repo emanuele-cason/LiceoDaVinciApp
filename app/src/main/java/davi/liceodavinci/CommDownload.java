@@ -129,7 +129,7 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
         }else {
             ((FragmentActivity)activity)
                     .getSupportFragmentManager()
-                    .beginTransaction()
+                    .beginTransaction().addToBackStack("pdf-render")
                     .replace(R.id.empty_frame, new PdfRenderFragment(activity, comm.getName(), Communication.CACHED))
                     .commit();
         }

@@ -148,6 +148,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 ((FragmentActivity)activity)
                         .getSupportFragmentManager()
                         .beginTransaction()
+                        .addToBackStack("pdf-render")
                         .replace(R.id.empty_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()).getName(), Communication.DOWNLOADED))
                         .commit();
             }
