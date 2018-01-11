@@ -99,6 +99,5 @@ public class DataFetcher {
                 communicationsFragment.fetchComplete(result);
             }
         });
-
     }
 }
