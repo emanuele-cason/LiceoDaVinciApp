@@ -10,14 +10,14 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,7 +40,14 @@ public class CommunicationsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.communications_fragment, container, false);
     }
 
@@ -61,7 +68,13 @@ public class CommunicationsFragment extends Fragment {
         if (section < Communication.COMM_SAVED) fetch();
         if (section == Communication.COMM_SAVED) fetchSavedComms();
     }
-    
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.comm_actionbar_menu, menu);
+    }
+
     private void fetchSavedComms(){
         List<Communication> communications = new ArrayList<>();
         for (File file:new File(activity.getFilesDir().getPath()).listFiles()){
@@ -70,9 +83,7 @@ public class CommunicationsFragment extends Fragment {
             }
         }
 
-        Communication [] communicationsArr = new Communication[communications.size()];
-        communicationsArr = communications.toArray(communicationsArr);
-        fetchComplete(communicationsArr);
+        fetchComplete(communications);
     }
 
     private void fetch(){
@@ -85,9 +96,9 @@ public class CommunicationsFragment extends Fragment {
         }
     }
 
-    protected void fetchComplete(Communication[] communications) {
+    protected void fetchComplete(List<Communication> communications) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        commRecyclerView.setAdapter(new CommCardAdapter(activity,this, swipeRefreshCom, new LinkedList<>(Arrays.asList(communications)), section));
+        commRecyclerView.setAdapter(new CommCardAdapter(activity,this, swipeRefreshCom, communications, section));
         swipeRefreshCom.setRefreshing(false);
     }
 

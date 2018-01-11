@@ -3,8 +3,12 @@ package davi.liceodavinci;
 import android.app.Activity;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -39,9 +43,9 @@ public class DataFetcher {
         this.communicationsFragment = communicationsFragment;
         this.activity = activity;
 
-        requestUrls[Communication.COMM_STUDENTS] = "http://192.168.1.5:8080/api/comunicati/studenti";
-        requestUrls[Communication.COMM_PARENTS] = "http://192.168.1.5:8080/api/comunicati/genitori";
-        requestUrls[Communication.COMM_PROFS] = "http://192.168.1.5:8080/api/comunicati/docenti";
+        requestUrls[Communication.COMM_STUDENTS] = "http://192.168.56.2:8080/api/comunicati/studenti";
+        requestUrls[Communication.COMM_PARENTS] = "http://192.168.56.2:8080/api/comunicati/genitori";
+        requestUrls[Communication.COMM_PROFS] = "http://192.168.56.2:8080/api/comunicati/docenti";
     }
 
     protected void fetchCommunicationsJson(int section) throws IOException {
@@ -67,7 +71,8 @@ public class DataFetcher {
                     }
 
                     Gson gson = new Gson();
-                    Communication communications[] = gson.fromJson(responseBody.string(), Communication[].class);
+                    Type listType = new TypeToken<ArrayList<Communication>>(){}.getType();
+                    List<Communication> communications = gson.fromJson(responseBody.string(), listType);
                     fetchCommComplete(communications);
                 }
             }
@@ -83,13 +88,13 @@ public class DataFetcher {
         });
     }
 
-    private void fetchCommComplete(final Communication[] result) {
+    private void fetchCommComplete(final List<Communication> result) {
 
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                for (Communication comm:result) {
-                    comm.setUrl(comm.getUrl().replaceAll(" ", "%20"));
+                for (int i = 0; i < result.size(); i++) {
+                    result.get(i).setUrl(result.get(i).getUrl().replaceAll(" ", "%20"));
                 }
                 communicationsFragment.fetchComplete(result);
             }
