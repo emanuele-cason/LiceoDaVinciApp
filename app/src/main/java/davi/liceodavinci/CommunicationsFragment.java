@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +34,8 @@ public class CommunicationsFragment extends Fragment {
     private Activity activity;
     private RecyclerView commRecyclerView;
     private SwipeRefreshLayout swipeRefreshCom;
+    private List<Communication> communications;
+    private SearchView searchView;
 
     @SuppressLint("ValidFragment")
     public CommunicationsFragment(Activity activity, int section){
@@ -50,6 +53,27 @@ public class CommunicationsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.communications_fragment, container, false);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.comm_actionbar_menu, menu);
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                setResult(searchByName(query));
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                setResult(searchByName(newText));
+                return false;
+            }
+        });
     }
 
     @Override
@@ -71,14 +95,21 @@ public class CommunicationsFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.comm_actionbar_menu, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    private List<Communication> searchByName(String query){
+        ArrayList<Communication> result = new ArrayList<>();
+        if(query.equals("")) return communications;
+
+        for(Communication comm: communications){
+            if (comm.getName().toLowerCase().contains(query.toLowerCase())){
+                result.add(comm);
+            }
+        }
+
+        return result;
     }
 
     private void fetchSavedComms(){
@@ -102,10 +133,22 @@ public class CommunicationsFragment extends Fragment {
         }
     }
 
+    private void setResult(List<Communication> communications){
+        if (searchView.getQuery().toString().equals("")){
+            commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
+            commRecyclerView.setAdapter(new CommCardAdapter(activity,this, swipeRefreshCom, communications, section));
+            swipeRefreshCom.setRefreshing(false);
+        }
+        else {
+            commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
+            commRecyclerView.setAdapter(new CommCardAdapter(activity,this, swipeRefreshCom, searchByName(searchView.getQuery().toString()), section));
+            swipeRefreshCom.setRefreshing(false);
+        }
+    }
+
     protected void fetchComplete(List<Communication> communications) {
-        commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        commRecyclerView.setAdapter(new CommCardAdapter(activity,this, swipeRefreshCom, communications, section));
-        swipeRefreshCom.setRefreshing(false);
+        this.communications = communications;
+        setResult(communications);
     }
 
     protected void fetchFailed(){

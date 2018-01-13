@@ -43,9 +43,9 @@ public class DataFetcher {
         this.communicationsFragment = communicationsFragment;
         this.activity = activity;
 
-        requestUrls[Communication.COMM_STUDENTS] = "http://192.168.56.2:8080/api/comunicati/studenti";
-        requestUrls[Communication.COMM_PARENTS] = "http://192.168.56.2:8080/api/comunicati/genitori";
-        requestUrls[Communication.COMM_PROFS] = "http://192.168.56.2:8080/api/comunicati/docenti";
+        requestUrls[Communication.COMM_STUDENTS] = "http://192.168.1.5:8080/api/comunicati/studenti";
+        requestUrls[Communication.COMM_PARENTS] = "http://192.168.1.5:8080/api/comunicati/genitori";
+        requestUrls[Communication.COMM_PROFS] = "http://192.168.1.5:8080/api/comunicati/docenti";
     }
 
     protected void fetchCommunicationsJson(int section) throws IOException {

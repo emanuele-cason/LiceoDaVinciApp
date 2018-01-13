@@ -31,3 +31,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
 }
+
+
+apply plugin: 'com.google.gms.google-services'
