@@ -2,6 +2,7 @@ package davi.liceodavinci;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -13,9 +14,9 @@ import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Emanuele on 30/12/2017 at 23:25.
+ * Created by Emanuele on 30/12/2017 at 23:25 at 20:20 at 20:21!
  */
 
 @SuppressLint("ValidFragment")
@@ -38,7 +39,7 @@ public class CommunicationsFragment extends Fragment {
     private SearchView searchView;
 
     @SuppressLint("ValidFragment")
-    public CommunicationsFragment(Activity activity, int section){
+    public CommunicationsFragment(Activity activity, int section) {
         this.activity = activity;
         this.section = section;
     }
@@ -64,13 +65,13 @@ public class CommunicationsFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                setResult(searchByName(query));
+                setResult(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                setResult(searchByName(newText));
+                setResult(newText);
                 return false;
             }
         });
@@ -80,8 +81,8 @@ public class CommunicationsFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        commRecyclerView = (RecyclerView) activity.findViewById(R.id.com_recyclerview);
-        swipeRefreshCom = (SwipeRefreshLayout) activity.findViewById(R.id.com_swipe_refresh_layout);
+        commRecyclerView = activity.findViewById(R.id.com_recyclerview);
+        swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
         swipeRefreshCom.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -95,35 +96,30 @@ public class CommunicationsFragment extends Fragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
+    public void onDestroyView() {
+        super.onDestroyView();
 
-    private List<Communication> searchByName(String query){
-        ArrayList<Communication> result = new ArrayList<>();
-        if(query.equals("")) return communications;
-
-        for(Communication comm: communications){
-            if (comm.getName().toLowerCase().contains(query.toLowerCase())){
-                result.add(comm);
-            }
+        View view = activity.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            assert imm != null;
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-
-        return result;
     }
 
-    private void fetchSavedComms(){
+    private void fetchSavedComms() {
         List<Communication> communications = new ArrayList<>();
-        for (File file:new File(activity.getFilesDir().getPath()).listFiles()){
-            if (file.getName().endsWith(".pdf")){
+        for (File file : new File(activity.getFilesDir().getPath()).listFiles()) {
+            if (file.getName().endsWith(".pdf")) {
                 communications.add(new Communication(file.getName(), "", "", ""));
             }
         }
 
-        fetchComplete(communications);
+        this.communications = communications;
+        setResult(null);
     }
 
-    private void fetch(){
+    private void fetch() {
         swipeRefreshCom.setRefreshing(true);
         DataFetcher df = new DataFetcher(this, activity);
         try {
@@ -133,25 +129,18 @@ public class CommunicationsFragment extends Fragment {
         }
     }
 
-    private void setResult(List<Communication> communications){
-        if (searchView.getQuery().toString().equals("")){
-            commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-            commRecyclerView.setAdapter(new CommCardAdapter(activity,this, swipeRefreshCom, communications, section));
-            swipeRefreshCom.setRefreshing(false);
-        }
-        else {
-            commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-            commRecyclerView.setAdapter(new CommCardAdapter(activity,this, swipeRefreshCom, searchByName(searchView.getQuery().toString()), section));
-            swipeRefreshCom.setRefreshing(false);
-        }
+    private void setResult(String query) {
+        commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
+        commRecyclerView.setAdapter(new CommCardAdapter(activity, this, swipeRefreshCom, searchByName(query), section));
+        swipeRefreshCom.setRefreshing(false);
     }
 
     protected void fetchComplete(List<Communication> communications) {
         this.communications = communications;
-        setResult(communications);
+        setResult(searchView.getQuery().toString());
     }
 
-    protected void fetchFailed(){
+    protected void fetchFailed() {
         swipeRefreshCom.setRefreshing(false);
         Snackbar snackbar = Snackbar
                 .make(swipeRefreshCom, "Errore di connessione", Snackbar.LENGTH_LONG)
@@ -162,5 +151,20 @@ public class CommunicationsFragment extends Fragment {
                     }
                 });
         snackbar.show();
+    }
+
+    private List<Communication> searchByName(String query) {
+        ArrayList<Communication> result = new ArrayList<>();
+
+        if (query == null) return communications;
+        if (query.isEmpty()) return communications;
+
+        for (Communication comm : communications) {
+            if (comm.getName().toLowerCase().contains(query.toLowerCase())) {
+                result.add(comm);
+            }
+        }
+
+        return result;
     }
 }

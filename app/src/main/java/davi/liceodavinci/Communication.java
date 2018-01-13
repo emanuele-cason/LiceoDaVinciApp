@@ -1,7 +1,7 @@
 package davi.liceodavinci;
 
 /**
- * Created by Emanuele on 31/12/2017 at 19:31.
+ * Created by Emanuele on 31/12/2017 at 19:31 at 20:24!
  */
 
 public class Communication {
@@ -34,21 +34,17 @@ public class Communication {
         return data;
     }
 
-    public String getType() {
-        return tipo;
-    }
-
     String getUrl() {
         return url;
     }
 
     public int getId() {
         try {
-            return Integer.valueOf(nome.split("\\-")[0]);
+            return Integer.valueOf(nome.split("-")[0]);
         }catch (Exception e){
             try {
                 return Integer.valueOf(nome.substring(0,3));
-            }catch (Exception o){}
+            }catch (Exception ignored){}
         }
         return 0;
     }

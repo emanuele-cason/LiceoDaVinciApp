@@ -1,6 +1,7 @@
 package davi.liceodavinci;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -18,7 +19,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 /**
- * Created by Emanuele on 31/12/2017 at 16:23.
+ * Created by Emanuele on 31/12/2017 at 16:23 at 20:23!
  */
 
 /*
@@ -31,7 +32,7 @@ import okhttp3.ResponseBody;
      * dall'API. Da rimuovere e rimpiazzare con la stringa commentata (responseBody.string() --> il vero risultato dell'api).
     * */
 
-public class DataFetcher {
+class DataFetcher {
 
     private CommunicationsFragment communicationsFragment;
     private final String requestUrls[] = new String[3];
@@ -39,7 +40,7 @@ public class DataFetcher {
     private Activity activity;
 
 
-    protected DataFetcher(CommunicationsFragment communicationsFragment, Activity activity) {
+    DataFetcher(CommunicationsFragment communicationsFragment, Activity activity) {
         this.communicationsFragment = communicationsFragment;
         this.activity = activity;
 
@@ -48,7 +49,7 @@ public class DataFetcher {
         requestUrls[Communication.COMM_PROFS] = "http://192.168.1.5:8080/api/comunicati/docenti";
     }
 
-    protected void fetchCommunicationsJson(int section) throws IOException {
+    void fetchCommunicationsJson(int section) throws IOException {
 
         Request request = new Request.Builder()
                 .url(requestUrls[section])
@@ -57,13 +58,13 @@ public class DataFetcher {
 
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
                 fetchCommFailed();
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         fetchCommFailed();
@@ -72,6 +73,7 @@ public class DataFetcher {
 
                     Gson gson = new Gson();
                     Type listType = new TypeToken<ArrayList<Communication>>(){}.getType();
+                    assert responseBody != null;
                     List<Communication> communications = gson.fromJson(responseBody.string(), listType);
                     fetchCommComplete(communications);
                 }
