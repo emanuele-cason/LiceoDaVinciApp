@@ -1,4 +1,5 @@
 # Da fare #
+* Aggiungere tasti di cambio pagina
 * Aggiungere una simbologia per avvenuta presa visione del comunicato
 * Aggiungere "Apri con", "condividi" e "stampa" nei comuunicati
 * Aggiungere impostazioni
