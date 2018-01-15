@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.joanzapata.pdfview.PDFView;
+import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
 
@@ -43,18 +43,16 @@ public class PdfRenderFragment extends Fragment{
         if (savingMode == Communication.CACHED){
             PDFView pdfView = activity.findViewById(R.id.pdf_render);
             pdfView.fromFile(new File(activity.getCacheDir().getPath().concat("/").concat(fileName)))
-                    .defaultPage(1)
-                    .showMinimap(true)
-                    .enableSwipe(false)
+                    .enableDoubletap(true)
+                    .swipeHorizontal(true)
                     .load();
         }
 
         if (savingMode == Communication.DOWNLOADED){
-            PDFView pdfView = activity.findViewById(R.id.pdf_render);
+            final PDFView pdfView = activity.findViewById(R.id.pdf_render);
             pdfView.fromFile(new File(activity.getFilesDir().getPath().concat("/").concat(fileName)))
-                    .defaultPage(1)
-                    .showMinimap(true)
-                    .enableSwipe(false)
+                    .enableDoubletap(true)
+                    .swipeHorizontal(true)
                     .load();
         }
 
