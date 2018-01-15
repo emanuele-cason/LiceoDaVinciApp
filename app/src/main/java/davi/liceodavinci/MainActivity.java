@@ -75,12 +75,16 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.com_students) {
             selection = new CommunicationsFragment(this, 0);
+            getSupportActionBar().setTitle("Comunicati studenti");
         } else if (id == R.id.com_parents) {
             selection = new CommunicationsFragment(this, 1);
+            getSupportActionBar().setTitle("Comunicati genitori");
         } else if (id == R.id.com_profs) {
             selection = new CommunicationsFragment(this, 2);
+            getSupportActionBar().setTitle("Comunicati docenti");
         } else if (id == R.id.com_saved) {
             selection = new CommunicationsFragment(this, 3);
+            getSupportActionBar().setTitle("Comunicati salvati");
         } else if (id == R.id.drawer_settings) {
 
         } else if (id == R.id.drawer_share) {
