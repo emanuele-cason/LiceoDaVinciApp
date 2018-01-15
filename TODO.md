@@ -1,7 +1,8 @@
 # Da fare #
 * Sistemare swipe orizzontale
-* Aggiungere una simbologia per avvenuta presa visione del comunicato
-* Aggiungere "Apri con", "condividi" e "stampa" nei comuunicati
+* Salvare informazioni (data e url/oggetto comunicato/visualizzato o no) dei comunicati salvati
+	- Risolvere problema nel condividi dei comunicati salvati (che non ha informazioni sull'url)
+	- Aggiungere una simbologia per avvenuta presa visione del comunicato
 * Aggiungere impostazioni
 * Aggiungere area contattaci/about
 * Aggiungere agenda del liceo, orario classi, orario docenti, laboratori prenotati
