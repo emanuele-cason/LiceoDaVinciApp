@@ -28,14 +28,12 @@ import java.io.File;
 public class PdfRenderFragment extends Fragment {
 
     private Activity activity;
-    private Communication communication;
-    private int savingMode;
+    private Communication.CommunicationStored communication;
 
     @SuppressLint("ValidFragment")
-    protected PdfRenderFragment(Activity activity, Communication communication, int savingMode) {
+    protected PdfRenderFragment(Activity activity, Communication.CommunicationStored communication) {
         this.activity = activity;
         this.communication = communication;
-        this.savingMode = savingMode;
     }
 
     @Override
@@ -59,7 +57,7 @@ public class PdfRenderFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (savingMode == Communication.CACHED) {
+        if (communication.getStatus() == Communication.CACHED) {
             PDFView pdfView = activity.findViewById(R.id.pdf_render);
             pdfView.fromFile(new File(activity.getCacheDir().getPath().concat("/").concat(communication.getName())))
                     .enableDoubletap(true)
@@ -67,7 +65,7 @@ public class PdfRenderFragment extends Fragment {
                     .load();
         }
 
-        if (savingMode == Communication.DOWNLOADED) {
+        if (communication.getStatus() == Communication.DOWNLOADED) {
             final PDFView pdfView = activity.findViewById(R.id.pdf_render);
             pdfView.fromFile(new File(activity.getFilesDir().getPath().concat("/").concat(communication.getName())))
                     .enableDoubletap(true)

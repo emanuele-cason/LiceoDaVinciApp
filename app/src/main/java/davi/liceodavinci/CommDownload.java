@@ -7,7 +7,7 @@ import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,28 +17,38 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static davi.liceodavinci.Communication.CACHED;
+import static davi.liceodavinci.Communication.DOWNLOADED;
+
 class CommDownload extends AsyncTask<Communication, Integer, String> {
 
     private Activity activity;
     private PowerManager.WakeLock mWakeLock;
     private ProgressDialog progressDialog;
-    private boolean permanent;
-    private SwipeRefreshLayout layout;
+    private int savingMode;
+    private boolean openOnFinish;
     private Communication comm;
+    private Communication.CommunicationStored commStored;
 
-    public CommDownload(Activity activity, SwipeRefreshLayout layout, ProgressDialog progressDialog, boolean permanent) {
+    static final int DOWNLOAD = DOWNLOADED;
+    static final int CACHE = CACHED;
+
+    CommDownload(Activity activity, ProgressDialog progressDialog, int savingMode, boolean openOnFinish) {
         this.activity = activity;
         this.progressDialog = progressDialog;
-        this.permanent = permanent;
-        this.layout = layout;
+        this.savingMode = savingMode;
+        this.openOnFinish = openOnFinish;
     }
 
     @Override
     protected String doInBackground(Communication... comms) {
         this.comm = comms[0];
+        this.commStored = comm.new CommunicationStored(comm);
+
         InputStream input = null;
         OutputStream output = null;
         HttpURLConnection connection = null;
+
         try {
             URL url = new URL(comms[0].getUrl());
             connection = (HttpURLConnection) url.openConnection();
@@ -52,9 +62,14 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
             int fileLength = connection.getContentLength();
 
             String path;
-            if (permanent)
+            if (savingMode == DOWNLOAD) {
                 path = activity.getFilesDir().getPath().concat("/").concat(comms[0].getName());
-            else path = activity.getCacheDir().getPath().concat("/").concat(comms[0].getName());
+                this.commStored.setStatus(DOWNLOADED);
+            } else {
+                if (savingMode != CACHE) Log.d("Errore", "Il valore di savingMode non è valido");
+                path = activity.getCacheDir().getPath().concat("/").concat(comms[0].getName());
+                this.commStored.setStatus(CACHED);
+            }
 
             File file = new File(path);
 
@@ -122,22 +137,26 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
     }
 
     private void downloadComplete() {
-        if (permanent) {
-            Snackbar snackbar = Snackbar
-                    .make(layout, "Il comunicato è stato salvato offline", Snackbar.LENGTH_LONG);
-            snackbar.show();
-        }else {
-            ((FragmentActivity)activity)
+        if (!openOnFinish) {
+            if (savingMode == DOWNLOAD) {
+                Snackbar snackbar = Snackbar
+                        .make(activity.getCurrentFocus(), "Il comunicato è stato salvato offline", Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        } else {
+            ((FragmentActivity) activity)
                     .getSupportFragmentManager()
                     .beginTransaction().addToBackStack("pdf-render")
-                    .replace(R.id.empty_frame, new PdfRenderFragment(activity, comm, Communication.CACHED))
+                    .replace(R.id.empty_frame, new PdfRenderFragment(activity, commStored))
                     .commit();
         }
+
+        ConfigurationManager.getIstance().addCommunication(commStored);
     }
 
     private void downloadFailed() {
         Snackbar snackbar = Snackbar
-                .make(layout, "Impossibile salvare il comunicato", Snackbar.LENGTH_LONG);
+                .make(activity.getCurrentFocus(), "Impossibile salvare il comunicato", Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 }

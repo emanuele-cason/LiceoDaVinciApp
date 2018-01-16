@@ -97,7 +97,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 });
             }
 
-            if (section < Communication.COMM_SAVED) {
+            if (section <= Communication.COMM_PROFS) {
                 download.setImageResource(R.drawable.ic_file_download);
                 download.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -110,7 +110,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                         progressDialog.setCancelable(true);
 
-                        final CommDownload downloadTask = new CommDownload(activity, layout, progressDialog, true);
+                        final CommDownload downloadTask = new CommDownload(activity, progressDialog, CommDownload.DOWNLOAD,false);
                         downloadTask.execute(communications.get(getLayoutPosition()));
 
                         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -126,7 +126,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @Override
         public void onClick(View v) {
-            if (section < Communication.COMM_SAVED) {
+            if (section <= Communication.COMM_PROFS) {
                 ProgressDialog progressDialog;
 
                 progressDialog = new ProgressDialog(activity);
@@ -135,7 +135,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 progressDialog.setCancelable(true);
 
-                final CommDownload downloadTask = new CommDownload(activity, layout, progressDialog, false);
+                final CommDownload downloadTask = new CommDownload(activity, progressDialog, CommDownload.CACHE, true);
                 downloadTask.execute(communications.get(this.getLayoutPosition()));
 
                 progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -149,7 +149,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         .getSupportFragmentManager()
                         .beginTransaction()
                         .addToBackStack("pdf-render")
-                        .replace(R.id.empty_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()), Communication.DOWNLOADED))
+                        .replace(R.id.empty_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()).new CommunicationStored(communications.get(this.getLayoutPosition()),Communication.DOWNLOADED, false)))
                         .commit();
             }
         }
