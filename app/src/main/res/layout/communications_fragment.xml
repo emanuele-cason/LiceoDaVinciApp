@@ -8,12 +8,49 @@
     android:paddingRight="16dp"
     android:background="@color/colorPrimary">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/com_recyclerview"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:paddingBottom="8dp"
-        android:clipToPadding="false"/>
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/com_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp" />
+
+        <LinearLayout
+            android:id="@+id/nothing_here_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:src="@drawable/ic_error" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="48dp"
+                android:textSize="20sp"
+                android:textColor="#303f9f"
+                android:text="Ancora nessun comunicato!\nI comunicati salvati compariranno qui"
+                android:textAlignment="center"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+
+
+    </RelativeLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>

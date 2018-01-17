@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -34,6 +35,10 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.communications = communications;
         this.activity = activity;
         this.section = section;
+
+        LinearLayout nothingHere = (LinearLayout)activity.findViewById(R.id.nothing_here_layout);
+        if ((communications.size() == 0) && (section == Communication.COMM_SAVED)) nothingHere.setVisibility(View.VISIBLE);
+        else nothingHere.setVisibility(View.GONE);
     }
 
     @Override
