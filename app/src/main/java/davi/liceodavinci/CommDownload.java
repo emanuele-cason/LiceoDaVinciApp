@@ -150,7 +150,7 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
                     .commit();
         }
 
-        ConfigurationManager.getIstance().addCommunication(localComm);
+        ConfigurationManager.getIstance().loadCommunication(localComm);
     }
 
     private void downloadFailed() {

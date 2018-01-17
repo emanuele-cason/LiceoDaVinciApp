@@ -72,6 +72,9 @@ public class PdfRenderFragment extends Fragment {
                     .swipeHorizontal(true)
                     .load();
         }
+
+        communication.setSeen(true);
+        ConfigurationManager.getIstance().loadCommunication(communication);
     }
 
     @Override
