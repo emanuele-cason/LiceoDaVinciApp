@@ -1,29 +1,13 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### TODO ###
 
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+* Sistemare swipe orizzontale pdf
+* Aggiungere sort dei comunicati
+* Aggiungere una simbologia per avvenuta presa visione del comunicato
+* Aggiungere impostazioni (notifiche, marchia comunicati letti o non letti)
+* Aggiungere area contattaci/about
+* Aggiungere agenda del liceo, orario classi, orario docenti, laboratori prenotati
+* Trovare icona per l'applicazione
+* Risolvere errore problema grafico in Android Lollipop: immagine dell'header in bassa definizione
+* Sistema di notifica
