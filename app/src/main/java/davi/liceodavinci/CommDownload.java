@@ -27,8 +27,7 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
     private ProgressDialog progressDialog;
     private int savingMode;
     private boolean openOnFinish;
-    private Communication comm;
-    private Communication.CommunicationStored commStored;
+    private Communication.LocalCommunication localComm;
 
     static final int DOWNLOAD = DOWNLOADED;
     static final int CACHE = CACHED;
@@ -42,8 +41,8 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
 
     @Override
     protected String doInBackground(Communication... comms) {
-        this.comm = comms[0];
-        this.commStored = comm.new CommunicationStored(comm);
+        Communication comm = comms[0];
+        this.localComm = comm.new LocalCommunication(comm);
 
         InputStream input = null;
         OutputStream output = null;
@@ -64,11 +63,11 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
             String path;
             if (savingMode == DOWNLOAD) {
                 path = activity.getFilesDir().getPath().concat("/").concat(comms[0].getName());
-                this.commStored.setStatus(DOWNLOADED);
+                this.localComm.setStatus(DOWNLOADED);
             } else {
                 if (savingMode != CACHE) Log.d("Errore", "Il valore di savingMode non è valido");
                 path = activity.getCacheDir().getPath().concat("/").concat(comms[0].getName());
-                this.commStored.setStatus(CACHED);
+                this.localComm.setStatus(CACHED);
             }
 
             File file = new File(path);
@@ -147,11 +146,11 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
             ((FragmentActivity) activity)
                     .getSupportFragmentManager()
                     .beginTransaction().addToBackStack("pdf-render")
-                    .replace(R.id.empty_frame, new PdfRenderFragment(activity, commStored))
+                    .replace(R.id.empty_frame, new PdfRenderFragment(activity, localComm))
                     .commit();
         }
 
-        ConfigurationManager.getIstance().addCommunication(commStored);
+        ConfigurationManager.getIstance().addCommunication(localComm);
     }
 
     private void downloadFailed() {

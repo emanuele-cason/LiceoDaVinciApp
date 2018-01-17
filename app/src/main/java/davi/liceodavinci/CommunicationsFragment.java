@@ -35,7 +35,6 @@ public class CommunicationsFragment extends Fragment {
     private Activity activity;
     private RecyclerView commRecyclerView;
     private SwipeRefreshLayout swipeRefreshCom;
-    private List<Communication> communications;
     private SearchView searchView;
 
     @SuppressLint("ValidFragment")
@@ -63,15 +62,14 @@ public class CommunicationsFragment extends Fragment {
         searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
             @Override
             public boolean onQueryTextSubmit(String query) {
-                setResult(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                setResult(newText);
                 return false;
             }
         });
@@ -108,15 +106,15 @@ public class CommunicationsFragment extends Fragment {
     }
 
     private void fetchSavedComms() {
-        List<Communication> communications = new ArrayList<>();
+        List<Communication.LocalCommunication> communications = new ArrayList<>();
+
         for (File file : new File(activity.getFilesDir().getPath()).listFiles()) {
             if (file.getName().endsWith(".pdf")) {
-                communications.add(new Communication(file.getName(), "", "", ""));
+                communications.add(new Communication(file.getName(), "", "", "").new LocalCommunication(new Communication(file.getName(), "", "", "")));
             }
         }
 
-        this.communications = communications;
-        setResult(null);
+        setResult(mergeCommWithSPref(communications), null);
     }
 
     private void fetch() {
@@ -129,15 +127,13 @@ public class CommunicationsFragment extends Fragment {
         }
     }
 
-    private void setResult(String query) {
-        commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        commRecyclerView.setAdapter(new CommCardAdapter(activity, this, swipeRefreshCom, searchByName(query), section));
-        swipeRefreshCom.setRefreshing(false);
-    }
-
     protected void fetchComplete(List<Communication> communications) {
-        this.communications = communications;
-        setResult(searchView.getQuery().toString());
+        List<Communication.LocalCommunication> localCommunications = new ArrayList<>();
+
+        for (Communication comm : communications)
+            localCommunications.add(comm.new LocalCommunication(comm));
+
+        setResult(mergeCommWithSPref(localCommunications), searchView.getQuery().toString());
     }
 
     protected void fetchFailed() {
@@ -153,15 +149,37 @@ public class CommunicationsFragment extends Fragment {
         snackbar.show();
     }
 
-    private List<Communication> searchByName(String query) {
-        ArrayList<Communication> result = new ArrayList<>();
+    private void setResult(List<Communication.LocalCommunication> communications , String query) {
+        commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
+        commRecyclerView.setAdapter(new CommCardAdapter(activity, searchByName(communications, query), section));
+        swipeRefreshCom.setRefreshing(false);
+    }
+
+    private List<Communication.LocalCommunication> mergeCommWithSPref(List<Communication.LocalCommunication> queryResult) {
+        List<Communication.LocalCommunication> result = new ArrayList<>();
+
+        if (ConfigurationManager.getIstance().getListFromSavedJSON() != null) {
+            for (Communication.LocalCommunication queryComm : queryResult) {
+                for (Communication.LocalCommunication savedComm : ConfigurationManager.getIstance().getListFromSavedJSON()) {
+                    if (queryComm.getName().equals(savedComm.getName()))
+                        result.add(savedComm);
+                }
+                if (result.size() == 0 || (!result.get(result.size() - 1).getName().equals(queryComm.getName())))result.add(queryComm);
+            }
+        }else return queryResult;
+
+        return result;
+    }
+
+    private List<Communication.LocalCommunication> searchByName(List<Communication.LocalCommunication>communications, String query) {
+        ArrayList<Communication.LocalCommunication> result = new ArrayList<>();
 
         if (query == null) return communications;
         if (query.isEmpty()) return communications;
 
         for (Communication comm : communications) {
             if (comm.getName().toLowerCase().contains(query.toLowerCase())) {
-                result.add(comm);
+                result.add(comm.new LocalCommunication(comm));
             }
         }
 

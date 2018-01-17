@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,15 +25,13 @@ import java.util.List;
 
 public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<Communication> communications = new ArrayList<>();
+    private List<Communication.LocalCommunication> communications = new ArrayList<>();
     private Activity activity;
-    private SwipeRefreshLayout layout;
     private int section;
 
-    protected CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment, SwipeRefreshLayout layout, List<Communication> communications, int section) {
+    CommCardAdapter(Activity activity, List<Communication.LocalCommunication> communications, int section) {
         this.communications = communications;
         this.activity = activity;
-        this.layout = layout;
         this.section = section;
     }
 
@@ -95,6 +92,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         notifyItemRangeChanged(getLayoutPosition(), communications.size());
                     }
                 });
+
             }
 
             if (section <= Communication.COMM_PROFS) {
@@ -149,7 +147,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         .getSupportFragmentManager()
                         .beginTransaction()
                         .addToBackStack("pdf-render")
-                        .replace(R.id.empty_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()).new CommunicationStored(communications.get(this.getLayoutPosition()),Communication.DOWNLOADED, false)))
+                        .replace(R.id.empty_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()).new LocalCommunication(communications.get(this.getLayoutPosition()), Communication.DOWNLOADED, false)))
                         .commit();
             }
         }

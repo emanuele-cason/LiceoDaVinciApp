@@ -74,8 +74,8 @@ class DataFetcher {
                     Gson gson = new Gson();
                     Type listType = new TypeToken<ArrayList<Communication>>(){}.getType();
                     assert responseBody != null;
-                    List<Communication> communications = gson.fromJson(responseBody.string(), listType);
-                    fetchCommComplete(communications);
+                    List<Communication> communicationsAPI = gson.fromJson(responseBody.string(), listType);
+                    fetchCommComplete(communicationsAPI);
                 }
             }
         });

@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item){
         int id = item.getItemId();
         uncheckAllMenuItems(navigationView);
         item.setChecked(true);

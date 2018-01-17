@@ -28,10 +28,10 @@ import java.io.File;
 public class PdfRenderFragment extends Fragment {
 
     private Activity activity;
-    private Communication.CommunicationStored communication;
+    private Communication.LocalCommunication communication;
 
     @SuppressLint("ValidFragment")
-    protected PdfRenderFragment(Activity activity, Communication.CommunicationStored communication) {
+    protected PdfRenderFragment(Activity activity, Communication.LocalCommunication communication) {
         this.activity = activity;
         this.communication = communication;
     }

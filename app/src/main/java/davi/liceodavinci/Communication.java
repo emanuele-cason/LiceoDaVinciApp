@@ -27,23 +27,23 @@ public class Communication {
         url = URL;
     }
 
-    class CommunicationStored extends Communication{
+    class LocalCommunication extends davi.liceodavinci.Communication {
         private int status;
         private boolean seen;
 
-        CommunicationStored(String name, String date, String type, String URL, int status, boolean seen){
+        LocalCommunication(String name, String date, String type, String URL, int status, boolean seen){
             super(name, date, type, URL);
             this.status = status;
             this.seen = seen;
         }
 
-        CommunicationStored(Communication communication, int status, boolean seen){
+        LocalCommunication(davi.liceodavinci.Communication communication, int status, boolean seen){
             super(communication.getName(), communication.getData(), communication.getType(), communication.getUrl());
             this.status = status;
             this.seen = seen;
         }
 
-        CommunicationStored(Communication communication){
+        LocalCommunication(davi.liceodavinci.Communication communication){
             super(communication.getName(), communication.getData(), communication.getType(), communication.getUrl());
             this.status = REMOTE;
             this.seen = false;

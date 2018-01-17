@@ -19,27 +19,25 @@ import java.util.List;
 public class ConfigurationManager {
     private static ConfigurationManager configurationManager;
     private SharedPreferences sharedPreferences;
-    private Activity activity;
 
     private final String STORED_COMM_KEY = "comm-stored-list";
 
     ConfigurationManager(Activity activity) {
-        this.activity = activity;
         configurationManager = this;
         this.sharedPreferences = activity.getPreferences(Context.MODE_PRIVATE);
     }
 
-    protected static ConfigurationManager getIstance() {
+    static ConfigurationManager getIstance() {
         return configurationManager;
     }
 
-    protected void addCommunication(Communication.CommunicationStored communication) {
+    void addCommunication(Communication.LocalCommunication communication) {
 
-        List<Communication.CommunicationStored> communications = new ArrayList<>();
+        List<Communication.LocalCommunication> communications = new ArrayList<>();
 
         if (!(getListFromSavedJSON() == null)) {
             communications = getListFromSavedJSON();
-            for (Communication.CommunicationStored comm : communications) {
+            for (Communication.LocalCommunication comm : communications) {
                 if (comm.getName().equals(communication.getName())) return;
             }
 
@@ -49,32 +47,32 @@ public class ConfigurationManager {
         saveJSONFromList(communications);
     }
 
-    protected void removeCommunication(Communication.CommunicationStored communication) {
+    protected void removeCommunication(Communication.LocalCommunication communication) {
 
-        List<Communication.CommunicationStored> communications = new ArrayList<>();
+        List<Communication.LocalCommunication> communications = new ArrayList<>();
 
         if (!(getListFromSavedJSON() == null)) {
             communications = getListFromSavedJSON();
-            for (Communication.CommunicationStored comm : communications) {
+            for (Communication.LocalCommunication comm : communications) {
                 if (comm.getName().equals(communication.getName())) communications.remove(comm);
             }
         }
     }
 
-    protected void setCommSeen(Communication.CommunicationStored communication, boolean seen) {
+    protected void setCommSeen(Communication.LocalCommunication communication, boolean seen) {
 
-        List<Communication.CommunicationStored> communications = new ArrayList<>();
+        List<Communication.LocalCommunication> communications = new ArrayList<>();
 
         if (!(getListFromSavedJSON() == null)) {
             communications = getListFromSavedJSON();
-            for (Communication.CommunicationStored comm : communications) {
+            for (Communication.LocalCommunication comm : communications) {
                 if (comm.getName().equals(communication.getName())) comm.setSeen(seen);
             }
             saveJSONFromList(communications);
         }
     }
 
-    private void saveJSONFromList(List<Communication.CommunicationStored> communications) {
+    private void saveJSONFromList(List<Communication.LocalCommunication> communications) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -83,10 +81,10 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    protected List<Communication.CommunicationStored> getListFromSavedJSON() {
+    protected List<Communication.LocalCommunication> getListFromSavedJSON() {
         String json = sharedPreferences.getString(STORED_COMM_KEY, "");
         Gson gson = new Gson();
-        Type listType = new TypeToken<ArrayList<Communication.CommunicationStored>>() {
+        Type listType = new TypeToken<ArrayList<Communication.LocalCommunication>>() {
         }.getType();
 
         return gson.fromJson(json, listType);
