@@ -14,6 +14,7 @@ import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -21,6 +22,8 @@ import android.view.inputmethod.InputMethodManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -94,6 +97,52 @@ public class CommunicationsFragment extends Fragment {
 
         if (section < Communication.COMM_SAVED) fetch();
         if (section == Communication.COMM_SAVED) fetchSavedComms();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case (R.id.action_sort_by_name): {
+                if (!communications.isEmpty()) {
+                    Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
+                        @Override
+                        public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
+                            return c1.getNameFormatted().compareTo(c2.getNameFormatted());
+                        }
+                    });
+                }
+                break;
+            }
+
+            case (R.id.action_sort_by_date): {
+                if (!communications.isEmpty()) {
+                    Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
+                        @Override
+                        public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
+                            return c1.getDataObject().compareTo(c2.getDataObject());
+                        }
+                    });
+                }
+                break;
+            }
+
+            case (R.id.action_sort_by_id): {
+                if (!communications.isEmpty()) {
+                    Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
+                        @Override
+                        public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
+                            return Long.valueOf(c1.getId()).compareTo((long) c2.getId());
+                        }
+                    });
+                }
+                break;
+            }
+        }
+
+        setResult(this.communications, searchView.getQuery().toString());
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

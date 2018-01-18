@@ -1,5 +1,11 @@
 package davi.liceodavinci;
 
+import android.annotation.SuppressLint;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by Emanuele on 31/12/2017 at 19:31 at 20:24!
  */
@@ -16,9 +22,9 @@ public class Communication {
     static final int COMM_PROFS = 2;
     static final int COMM_SAVED = 3;
 
-    static final int DOWNLOADED = 0;
+    static final int REMOTE = 0;
     static final int CACHED = 1;
-    static final int REMOTE = 2;
+    static final int DOWNLOADED = 2;
 
     Communication(String name, String date, String type, String URL) {
         nome = name;
@@ -60,17 +66,38 @@ public class Communication {
         }
     }
 
-    public String getName() {
+    String getName() {
         return nome;
     }
 
-    public String getData() {
+    String getNameFormatted(){
+        if ((nome.indexOf('-') < 5) && (nome.indexOf('-') != -1)){
+            if(nome.charAt(nome.indexOf('-') + 2) == ' ') return this.nome.substring(nome.indexOf('-') + 2);
+            return this.nome.substring(nome.indexOf('-') + 1);
+        } else return this.nome.substring(3);
+    }
+
+    String getData() {
         return data;
     }
 
-    public String getType(){return tipo;}
+    Date getDataObject(){
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSSSSS");
 
-    public String getUrl() {
+        Date date = null;
+        try {
+            date = format.parse(data);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return date;
+    }
+
+    String getType(){return tipo;}
+
+    String getUrl() {
         return url;
     }
 

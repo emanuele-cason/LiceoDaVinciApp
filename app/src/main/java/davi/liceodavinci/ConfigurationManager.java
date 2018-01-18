@@ -37,8 +37,11 @@ class ConfigurationManager {
         if (!(getListFromSavedJSON() == null)) {
             communications = getListFromSavedJSON();
             for (Communication.LocalCommunication comm : communications) {
-                if (comm.getName().equals(communication.getName())) communications.remove(communications.indexOf(comm));
-                break;
+                if (comm.getName().equals(communication.getName())){
+                    communications.remove(communications.indexOf(comm));
+                    break;
+                }
+
             }
 
         }
@@ -59,6 +62,23 @@ class ConfigurationManager {
                 }
             }
         }
+
+        saveJSONFromList(communications);
+    }
+
+    void setCacheDeleted(){
+        List<Communication.LocalCommunication> communications = new ArrayList<>();
+
+        if (!(getListFromSavedJSON() == null)) {
+            communications = getListFromSavedJSON();
+            for (Communication.LocalCommunication comm : communications) {
+                if (comm.getStatus()==Communication.CACHED){
+                    comm.setStatus(Communication.REMOTE);
+                }
+            }
+        }
+
+        saveJSONFromList(communications);
     }
 
     private void saveJSONFromList(List<Communication.LocalCommunication> communications) {
@@ -70,7 +90,7 @@ class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    protected List<Communication.LocalCommunication> getListFromSavedJSON() {
+    List<Communication.LocalCommunication> getListFromSavedJSON() {
         String json = sharedPreferences.getString(STORED_COMM_KEY, "");
         Gson gson = new Gson();
         Type listType = new TypeToken<ArrayList<Communication.LocalCommunication>>() {}.getType();

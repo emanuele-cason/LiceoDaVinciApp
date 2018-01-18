@@ -2,8 +2,6 @@ package davi.liceodavinci;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -15,10 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,8 +31,9 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.activity = activity;
         this.section = section;
 
-        LinearLayout nothingHere = (LinearLayout)activity.findViewById(R.id.nothing_here_layout);
-        if ((communications.size() == 0) && (section == Communication.COMM_SAVED)) nothingHere.setVisibility(View.VISIBLE);
+        LinearLayout nothingHere = (LinearLayout) activity.findViewById(R.id.nothing_here_layout);
+        if ((communications.size() == 0) && (section == Communication.COMM_SAVED))
+            nothingHere.setVisibility(View.VISIBLE);
         else nothingHere.setVisibility(View.GONE);
     }
 
@@ -52,20 +48,12 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((Item) holder).nameTV.setText(communications.get(position).getName());
+        ((Item) holder).nameTV.setText(communications.get(position).getNameFormatted());
         if (communications.get(position).getId() != 0)
             ((Item) holder).idTV.setText(String.valueOf(communications.get(position).getId()));
         else ((Item) holder).idTV.setText("?");
 
-        @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSSSSS");
-
-        try {
-            Date date = format.parse(communications.get(position).getData());
-            ((Item) holder).dataTV.setText(String.format("%td-%<tm-%<tY\n%<tH:%<tM", date));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        ((Item) holder).dataTV.setText(String.format("%td-%<tm-%<tY\n%<tH:%<tM", communications.get(position).getDataObject()));
     }
 
     @Override
@@ -110,23 +98,8 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 download.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ProgressDialog progressDialog;
-
-                        progressDialog = new ProgressDialog(activity);
-                        progressDialog.setMessage("Download in corso");
-                        progressDialog.setIndeterminate(true);
-                        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                        progressDialog.setCancelable(true);
-
-                        final CommDownload downloadTask = new CommDownload(activity, progressDialog, CommDownload.DOWNLOAD,false);
-                        downloadTask.execute(communications.get(getLayoutPosition()));
-
-                        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialog) {
-                                downloadTask.cancel(true);
-                            }
-                        });
+                        final CommDownload downloadTask = new CommDownload(activity, communications.get(getLayoutPosition()), CommDownload.DOWNLOAD, false);
+                        downloadTask.execute();
                     }
                 });
             }
@@ -135,25 +108,10 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Override
         public void onClick(View v) {
             if (section <= Communication.COMM_PROFS) {
-                ProgressDialog progressDialog;
-
-                progressDialog = new ProgressDialog(activity);
-                progressDialog.setMessage("Apertura in corso");
-                progressDialog.setIndeterminate(true);
-                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                progressDialog.setCancelable(true);
-
-                final CommDownload downloadTask = new CommDownload(activity, progressDialog, CommDownload.CACHE, true);
-                downloadTask.execute(communications.get(this.getLayoutPosition()));
-
-                progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        downloadTask.cancel(true);
-                    }
-                });
-            }else if(section == Communication.COMM_SAVED) {
-                ((FragmentActivity)activity)
+                final CommDownload downloadTask = new CommDownload(activity, communications.get(this.getLayoutPosition()), CommDownload.CACHE, true);
+                downloadTask.execute();
+            } else if (section == Communication.COMM_SAVED) {
+                ((FragmentActivity) activity)
                         .getSupportFragmentManager()
                         .beginTransaction()
                         .addToBackStack("pdf-render")

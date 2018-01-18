@@ -1,8 +1,10 @@
 package davi.liceodavinci;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.support.design.widget.Snackbar;
@@ -20,36 +22,68 @@ import java.net.URL;
 import static davi.liceodavinci.Communication.CACHED;
 import static davi.liceodavinci.Communication.DOWNLOADED;
 
-class CommDownload extends AsyncTask<Communication, Integer, String> {
+class CommDownload extends AsyncTask<Void, Integer, String> {
 
+    @SuppressLint("StaticFieldLeak")
     private Activity activity;
     private PowerManager.WakeLock mWakeLock;
     private ProgressDialog progressDialog;
     private int savingMode;
     private boolean openOnFinish;
-    private Communication.LocalCommunication localComm;
+    private Communication.LocalCommunication communication;
 
     static final int DOWNLOAD = DOWNLOADED;
     static final int CACHE = CACHED;
 
-    CommDownload(Activity activity, ProgressDialog progressDialog, int savingMode, boolean openOnFinish) {
+    CommDownload(Activity activity, Communication.LocalCommunication communication, int savingMode, boolean openOnFinish) {
         this.activity = activity;
-        this.progressDialog = progressDialog;
         this.savingMode = savingMode;
         this.openOnFinish = openOnFinish;
+        this.communication = communication;
     }
 
     @Override
-    protected String doInBackground(Communication... comms) {
-        Communication comm = comms[0];
-        this.localComm = comm.new LocalCommunication(comm);
+    protected void onPreExecute() {
+        super.onPreExecute();
+        PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+        assert pm != null;
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                getClass().getName());
+        mWakeLock.acquire(30*1000L /*10 minutes*/);
+
+        progressDialog = new ProgressDialog(activity);
+
+        if (savingMode == CACHE) progressDialog.setMessage("Apertura in corso...");
+        else if (savingMode == DOWNLOAD)progressDialog.setMessage("Download in corso...");
+
+        progressDialog.setIndeterminate(true);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCancelable(true);
+
+        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                cancel(true);
+            }
+        });
+
+        progressDialog.show();
+    }
+
+    @Override
+    protected String doInBackground(Void... voids) {
+
+        if (communication.getStatus() == savingMode){
+            progressDialog.dismiss();
+            return null;
+        }
 
         InputStream input = null;
         OutputStream output = null;
         HttpURLConnection connection = null;
 
         try {
-            URL url = new URL(comms[0].getUrl());
+            URL url = new URL(communication.getUrl());
             connection = (HttpURLConnection) url.openConnection();
             connection.connect();
 
@@ -62,12 +96,12 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
 
             String path;
             if (savingMode == DOWNLOAD) {
-                path = activity.getFilesDir().getPath().concat("/").concat(comms[0].getName());
-                this.localComm.setStatus(DOWNLOADED);
+                path = activity.getFilesDir().getPath().concat("/").concat(communication.getName());
+                this.communication.setStatus(DOWNLOADED);
             } else {
                 if (savingMode != CACHE) Log.d("Errore", "Il valore di savingMode non è valido");
-                path = activity.getCacheDir().getPath().concat("/").concat(comms[0].getName());
-                this.localComm.setStatus(CACHED);
+                path = activity.getCacheDir().getPath().concat("/").concat(communication.getName());
+                this.communication.setStatus(CACHED);
             }
 
             File file = new File(path);
@@ -108,16 +142,6 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
     }
 
     @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                getClass().getName());
-        mWakeLock.acquire();
-        progressDialog.show();
-    }
-
-    @Override
     protected void onProgressUpdate(Integer... progress) {
         super.onProgressUpdate(progress);
         progressDialog.setIndeterminate(false);
@@ -146,14 +170,16 @@ class CommDownload extends AsyncTask<Communication, Integer, String> {
             ((FragmentActivity) activity)
                     .getSupportFragmentManager()
                     .beginTransaction().addToBackStack("pdf-render")
-                    .replace(R.id.empty_frame, new PdfRenderFragment(activity, localComm))
+                    .replace(R.id.empty_frame, new PdfRenderFragment(activity, communication))
                     .commit();
         }
 
-        ConfigurationManager.getIstance().loadCommunication(localComm);
+        ConfigurationManager.getIstance().loadCommunication(communication);
     }
 
     private void downloadFailed() {
+        communication.setStatus(Communication.REMOTE);
+        ConfigurationManager.getIstance().loadCommunication(communication);
         Snackbar snackbar = Snackbar
                 .make(activity.getCurrentFocus(), "Impossibile salvare il comunicato", Snackbar.LENGTH_LONG);
         snackbar.show();
