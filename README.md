@@ -3,6 +3,7 @@
 ### TODO ###
 
 * Sistemare swipe orizzontale pdf
+* Risolvere bug caricamento al cambio di sezione
 * Aggiungere sort dei comunicati
 * Aggiungere una simbologia per avvenuta presa visione del comunicato
 * Aggiungere impostazioni (notifiche, marchia comunicati letti o non letti)
