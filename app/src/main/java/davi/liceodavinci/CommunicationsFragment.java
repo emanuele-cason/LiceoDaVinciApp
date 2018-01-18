@@ -36,6 +36,7 @@ public class CommunicationsFragment extends Fragment {
     private RecyclerView commRecyclerView;
     private SwipeRefreshLayout swipeRefreshCom;
     private SearchView searchView;
+    private List<Communication.LocalCommunication> communications;
 
     @SuppressLint("ValidFragment")
     public CommunicationsFragment(Activity activity, int section) {
@@ -65,11 +66,13 @@ public class CommunicationsFragment extends Fragment {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
+                setResult(communications, query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                setResult(communications, newText);
                 return false;
             }
         });
@@ -114,7 +117,8 @@ public class CommunicationsFragment extends Fragment {
             }
         }
 
-        setResult(mergeCommWithSPref(communications), null);
+        this.communications = mergeCommWithSPref(communications);
+        setResult(this.communications, null);
     }
 
     private void fetch() {
@@ -133,7 +137,8 @@ public class CommunicationsFragment extends Fragment {
         for (Communication comm : communications)
             localCommunications.add(comm.new LocalCommunication(comm));
 
-        setResult(mergeCommWithSPref(localCommunications), searchView.getQuery().toString());
+        this.communications = mergeCommWithSPref(localCommunications);
+        setResult(this.communications, searchView.getQuery().toString());
     }
 
     protected void fetchFailed() {
@@ -149,7 +154,7 @@ public class CommunicationsFragment extends Fragment {
         snackbar.show();
     }
 
-    private void setResult(List<Communication.LocalCommunication> communications , String query) {
+    private void setResult(List<Communication.LocalCommunication> communications, String query) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
         commRecyclerView.setAdapter(new CommCardAdapter(activity, searchByName(communications, query), section));
         swipeRefreshCom.setRefreshing(false);
@@ -161,17 +166,20 @@ public class CommunicationsFragment extends Fragment {
         if (ConfigurationManager.getIstance().getListFromSavedJSON() != null) {
             for (Communication.LocalCommunication queryComm : queryResult) {
                 for (Communication.LocalCommunication savedComm : ConfigurationManager.getIstance().getListFromSavedJSON()) {
-                    if (queryComm.getName().equals(savedComm.getName()))
+                    if (queryComm.getName().equals(savedComm.getName())) {
                         result.add(savedComm);
+                        break;
+                    }
                 }
-                if (result.size() == 0 || (!result.get(result.size() - 1).getName().equals(queryComm.getName())))result.add(queryComm);
+                if (result.size() == 0 || (!result.get(result.size() - 1).getName().equals(queryComm.getName())))
+                    result.add(queryComm);
             }
-        }else return queryResult;
+        } else return queryResult;
 
         return result;
     }
 
-    private List<Communication.LocalCommunication> searchByName(List<Communication.LocalCommunication>communications, String query) {
+    private List<Communication.LocalCommunication> searchByName(List<Communication.LocalCommunication> communications, String query) {
         ArrayList<Communication.LocalCommunication> result = new ArrayList<>();
 
         if (query == null) return communications;
