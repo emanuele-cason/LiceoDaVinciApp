@@ -142,6 +142,7 @@ public class CommunicationsFragment extends Fragment {
     }
 
     protected void fetchFailed() {
+        swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
         swipeRefreshCom.setRefreshing(false);
         Snackbar snackbar = Snackbar
                 .make(swipeRefreshCom, "Errore di connessione", Snackbar.LENGTH_LONG)
