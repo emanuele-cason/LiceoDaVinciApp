@@ -83,7 +83,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 download.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        new File(activity.getFilesDir().getPath().concat("/").concat(communications.get(getLayoutPosition()).getName())).delete();
+                        new File(activity.getFilesDir(), communications.get(getLayoutPosition()).getName()).delete();
                         ConfigurationManager.getIstance().removeCommunication(communications.get(getLayoutPosition()));
                         notifyItemRemoved(getLayoutPosition());
                         communications.remove(getLayoutPosition());

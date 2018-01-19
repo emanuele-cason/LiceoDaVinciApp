@@ -133,7 +133,7 @@ public class CommunicationsFragment extends Fragment {
                     Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
                         @Override
                         public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
-                            return Long.valueOf(c1.getId()).compareTo((long) c2.getId());
+                            return Integer.valueOf(c2.getId()).compareTo((Integer) c1.getId());
                         }
                     });
                 }

@@ -2,13 +2,13 @@ package davi.liceodavinci;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -59,7 +59,7 @@ public class PdfRenderFragment extends Fragment {
 
         if (communication.getStatus() == Communication.CACHED) {
             PDFView pdfView = activity.findViewById(R.id.pdf_render);
-            pdfView.fromFile(new File(activity.getCacheDir().getPath().concat("/").concat(communication.getName())))
+            pdfView.fromFile(new File(activity.getCacheDir(),communication.getName()))
                     .enableDoubletap(true)
                     .swipeHorizontal(true)
                     .load();
@@ -67,7 +67,7 @@ public class PdfRenderFragment extends Fragment {
 
         if (communication.getStatus() == Communication.DOWNLOADED) {
             final PDFView pdfView = activity.findViewById(R.id.pdf_render);
-            pdfView.fromFile(new File(activity.getFilesDir().getPath().concat("/").concat(communication.getName())))
+            pdfView.fromFile(new File(activity.getFilesDir(),communication.getName()))
                     .enableDoubletap(true)
                     .swipeHorizontal(true)
                     .load();
@@ -80,24 +80,28 @@ public class PdfRenderFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.pdf_menu_share){
+        if (item.getItemId() == R.id.pdf_menu_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT, String.format("Liceo \"L. Da Vinci\" - Comunicato %d: %s", communication.getId(), communication.getUrl()));
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         }
-        if (item.getItemId() == R.id.pdf_menu_open_with){
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.fromFile(new File(activity.getCacheDir().getPath().concat("/").concat(communication.getName()))), "application/pdf");
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (item.getItemId() == R.id.pdf_menu_open_with) {
 
-            try {
+            try{
+                File file = new File(activity.getCacheDir(), communication.getName());
+                Uri uri = FileProvider.getUriForFile(activity, "davi.liceodavinci", file);
+
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setDataAndType(uri, "application/pdf");
+
                 startActivity(intent);
-            }
-            catch (ActivityNotFoundException e) {
+            }catch (Exception e){
                 Snackbar snackbar = Snackbar
-                        .make(activity.getCurrentFocus(), "Nessuna applicazione installata può aprire questo tipo di file", Snackbar.LENGTH_LONG);
+                        .make(activity.findViewById(R.id.empty_frame), "Nessuna applicazione installata può aprire questo file", Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
         }

@@ -96,11 +96,11 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
 
             String path;
             if (savingMode == DOWNLOAD) {
-                path = activity.getFilesDir().getPath().concat("/").concat(communication.getName());
+                path = new File(activity.getFilesDir(),communication.getName()).getPath();
                 this.communication.setStatus(DOWNLOADED);
             } else {
                 if (savingMode != CACHE) Log.d("Errore", "Il valore di savingMode non è valido");
-                path = activity.getCacheDir().getPath().concat("/").concat(communication.getName());
+                path = new File(activity.getCacheDir(),communication.getName()).getPath();
                 this.communication.setStatus(CACHED);
             }
 
@@ -163,7 +163,7 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
         if (!openOnFinish) {
             if (savingMode == DOWNLOAD) {
                 Snackbar snackbar = Snackbar
-                        .make(activity.getCurrentFocus(), "Il comunicato è stato salvato offline", Snackbar.LENGTH_LONG);
+                        .make(activity.findViewById(R.id.empty_frame), "Il comunicato è stato salvato offline", Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
         } else {
@@ -181,7 +181,7 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
         communication.setStatus(Communication.REMOTE);
         ConfigurationManager.getIstance().loadCommunication(communication);
         Snackbar snackbar = Snackbar
-                .make(activity.getCurrentFocus(), "Impossibile salvare il comunicato", Snackbar.LENGTH_LONG);
+                .make(activity.findViewById(R.id.empty_frame), "Impossibile salvare il comunicato", Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 }

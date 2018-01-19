@@ -41,7 +41,7 @@
             android:layout_marginRight="60dp"
             android:textSize="16sp"
             android:ellipsize="end"
-            android:maxLines="3"
+            android:maxLines="2"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/layout_com_card_id"/>
 
