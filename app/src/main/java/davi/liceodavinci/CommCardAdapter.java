@@ -30,7 +30,10 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.communications = communications;
         this.activity = activity;
         this.section = section;
+        updateNothingHere();
+    }
 
+    private void updateNothingHere(){
         LinearLayout nothingHere = (LinearLayout) activity.findViewById(R.id.nothing_here_layout);
         if ((communications.size() == 0) && (section == Communication.COMM_SAVED))
             nothingHere.setVisibility(View.VISIBLE);
@@ -88,6 +91,8 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         notifyItemRemoved(getLayoutPosition());
                         communications.remove(getLayoutPosition());
                         notifyItemRangeChanged(getLayoutPosition(), communications.size());
+
+                        updateNothingHere();
                     }
                 });
 

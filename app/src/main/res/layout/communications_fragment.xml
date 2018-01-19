@@ -34,7 +34,7 @@
             <ImageView
                 android:layout_width="96dp"
                 android:layout_height="96dp"
-                android:src="@drawable/ic_error" />
+                android:src="@drawable/ic_communication" />
 
             <TextView
                 android:layout_width="match_parent"
