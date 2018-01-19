@@ -121,7 +121,7 @@ public class CommunicationsFragment extends Fragment {
                     Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
                         @Override
                         public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
-                            return c1.getDataObject().compareTo(c2.getDataObject());
+                            return c2.getDataObject().compareTo(c1.getDataObject());
                         }
                     });
                 }
@@ -133,7 +133,7 @@ public class CommunicationsFragment extends Fragment {
                     Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
                         @Override
                         public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
-                            return Integer.valueOf(c2.getId()).compareTo((Integer) c1.getId());
+                            return Integer.valueOf(c2.getId()).compareTo(c1.getId());
                         }
                     });
                 }
@@ -194,7 +194,7 @@ public class CommunicationsFragment extends Fragment {
         swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
         swipeRefreshCom.setRefreshing(false);
         Snackbar snackbar = Snackbar
-                .make(swipeRefreshCom, "Errore di connessione", Snackbar.LENGTH_LONG)
+                .make(activity.findViewById(R.id.empty_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
                 .setAction("RIPROVA", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

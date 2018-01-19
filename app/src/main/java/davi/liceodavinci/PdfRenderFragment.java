@@ -77,6 +77,7 @@ public class PdfRenderFragment extends Fragment {
         ConfigurationManager.getIstance().loadCommunication(communication);
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
