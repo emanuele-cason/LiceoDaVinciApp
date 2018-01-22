@@ -14,6 +14,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity
@@ -44,6 +46,10 @@ public class MainActivity extends AppCompatActivity
 
         Fragment mainFragment = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
         getSupportFragmentManager().beginTransaction().replace(R.id.empty_frame, mainFragment).commit();
+
+        FirebaseMessaging.getInstance().subscribeToTopic("comunicati-studenti");
+        FirebaseMessaging.getInstance().subscribeToTopic("comunicati-genitori");
+        FirebaseMessaging.getInstance().subscribeToTopic("comunicati-docenti");
     }
 
     @Override
