@@ -82,8 +82,8 @@ public class CommunicationsFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onResume() {
+        super.onResume();
 
         commRecyclerView = activity.findViewById(R.id.com_recyclerview);
         swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
@@ -187,7 +187,8 @@ public class CommunicationsFragment extends Fragment {
             localCommunications.add(comm.new LocalCommunication(comm));
 
         this.communications = mergeCommWithSPref(localCommunications);
-        setResult(this.communications, searchView.getQuery().toString());
+        String searchQuery = String.valueOf((searchView != null) ? searchView.getQuery() : null);
+        setResult(this.communications, searchQuery);
     }
 
     protected void fetchFailed() {

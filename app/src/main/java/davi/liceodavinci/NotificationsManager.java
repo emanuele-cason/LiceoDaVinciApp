@@ -1,8 +1,8 @@
 package davi.liceodavinci;
 
 
-import android.app.NotificationManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -20,14 +20,16 @@ public class NotificationsManager extends FirebaseMessagingService {
         if (remoteMessage.getNotification().getTitle().contains("genitori")) topicID = Communication.COMM_PARENTS;
         if (remoteMessage.getNotification().getTitle().contains("docenti")) topicID = Communication.COMM_PROFS;
 
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this, "comunicati")
                         .setSmallIcon(R.drawable.ic_menu_send)
                         .setContentTitle(remoteMessage.getNotification().getTitle() == null ? "" : remoteMessage.getNotification().getTitle())
-                        .setContentText(remoteMessage.getNotification().getBody())
                         .setGroup(String.valueOf(topicID))
-                        .setGroupSummary(true);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                        .setGroupSummary(true)
+                        .setOnlyAlertOnce(true)
+                        .setContentText(remoteMessage.getNotification().getBody());
         notificationManager.notify(topicID, mBuilder.build());
     }
 }

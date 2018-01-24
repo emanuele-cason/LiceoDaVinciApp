@@ -44,12 +44,17 @@ public class MainActivity extends AppCompatActivity
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Fragment mainFragment = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
-        getSupportFragmentManager().beginTransaction().replace(R.id.empty_frame, mainFragment).commit();
-
         FirebaseMessaging.getInstance().subscribeToTopic("comunicati-studenti");
         FirebaseMessaging.getInstance().subscribeToTopic("comunicati-genitori");
         FirebaseMessaging.getInstance().subscribeToTopic("comunicati-docenti");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Fragment mainFragment = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
+        getSupportFragmentManager().beginTransaction().replace(R.id.empty_frame, mainFragment).commit();
     }
 
     @Override

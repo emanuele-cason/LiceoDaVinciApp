@@ -61,7 +61,10 @@ public class PdfRenderFragment extends Fragment {
             PDFView pdfView = activity.findViewById(R.id.pdf_render);
             pdfView.fromFile(new File(activity.getCacheDir(),communication.getName()))
                     .enableDoubletap(true)
-                    .swipeHorizontal(true)
+                    .swipeHorizontal(false)
+                    .scrollHandle(new PdfScrollHandle(activity))
+                    .enableAntialiasing(true)
+                    .spacing(1)
                     .load();
         }
 
