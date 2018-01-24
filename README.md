@@ -2,7 +2,6 @@
 
 ### TODO ###
 
-* Sistemare swipe orizzontale pdf (e indicatore di pagina)
 * Aggiungere una simbologia per avvenuta presa visione del comunicato
 * Aggiungere impostazioni (notifiche, marchia comunicati letti o non letti)
 * Aggiungere area contattaci/about
