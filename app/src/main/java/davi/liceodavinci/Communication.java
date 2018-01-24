@@ -37,12 +37,6 @@ public class Communication {
         private int status;
         private boolean seen;
 
-        LocalCommunication(String name, String date, String type, String URL, int status, boolean seen){
-            super(name, date, type, URL);
-            this.status = status;
-            this.seen = seen;
-        }
-
         LocalCommunication(davi.liceodavinci.Communication communication, int status, boolean seen){
             super(communication.getName(), communication.getData(), communication.getType(), communication.getUrl());
             this.status = status;
@@ -56,6 +50,8 @@ public class Communication {
         }
 
         void setSeen(boolean seen){this.seen = seen;}
+
+        boolean isSeen(){return seen;}
 
         void setStatus(int status){
             if (status == DOWNLOADED || status == CACHED || status == REMOTE) this.status = status;
@@ -95,7 +91,7 @@ public class Communication {
         return date;
     }
 
-    String getType(){return tipo;}
+    private String getType(){return tipo;}
 
     String getUrl() {
         return url;

@@ -2,6 +2,7 @@ package davi.liceodavinci;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -56,7 +57,10 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((Item) holder).idTV.setText(String.valueOf(communications.get(position).getId()));
         else ((Item) holder).idTV.setText("?");
 
-        ((Item) holder).dataTV.setText(String.format("%td-%<tm-%<tY\n%<tH:%<tM", communications.get(position).getDataObject()));
+        ((Item) holder).dataTV.setText(String.format("%td %<tb %<tY\n%<tH:%<tM", communications.get(position).getDataObject()));
+
+        if (!communications.get(position).isSeen()) ((Item)holder).nameTV.setTypeface(Typeface.DEFAULT_BOLD);
+        else ((Item)holder).nameTV.setTypeface(Typeface.DEFAULT);
     }
 
     @Override
