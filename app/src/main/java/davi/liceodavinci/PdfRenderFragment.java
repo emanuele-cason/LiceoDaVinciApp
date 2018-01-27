@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -105,7 +105,7 @@ public class PdfRenderFragment extends Fragment {
                 startActivity(intent);
             }catch (Exception e){
                 Snackbar snackbar = Snackbar
-                        .make(activity.findViewById(R.id.empty_frame), "Nessuna applicazione installata può aprire questo file", Snackbar.LENGTH_LONG);
+                        .make(activity.findViewById(R.id.main_frame), "Nessuna applicazione installata può aprire questo file", Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
         }

@@ -6,30 +6,46 @@ import android.support.v4.app.NotificationManagerCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
 /**
  * Created by Emanuele on 15/01/2018 at 20:06!
  */
 
 public class NotificationsManager extends FirebaseMessagingService {
 
+    static final String COMM_STUDENTS_TOPIC = "comunicati-studenti";
+    static final String COMM_PARENTS_TOPIC = "comunicati-genitori";
+    static final String COMM_PROFS_TOPIC = "comunicati-docenti";
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
         int topicID = -1;
-        if (remoteMessage.getNotification().getTitle().contains("studenti")) topicID = Communication.COMM_STUDENTS;
-        if (remoteMessage.getNotification().getTitle().contains("genitori")) topicID = Communication.COMM_PARENTS;
-        if (remoteMessage.getNotification().getTitle().contains("docenti")) topicID = Communication.COMM_PROFS;
+        if (remoteMessage.getNotification().getTitle().contains("studenti")) {
+            if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_STUDENTS))
+                topicID = Communication.COMM_STUDENTS;
+        }
+        if (remoteMessage.getNotification().getTitle().contains("genitori")) {
+            if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PARENTS))
+                topicID = Communication.COMM_PARENTS;
+        }
+        if (remoteMessage.getNotification().getTitle().contains("docenti")) {
+            if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PROFS))
+                topicID = Communication.COMM_PROFS;
+        }
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this, "comunicati")
-                        .setSmallIcon(R.drawable.ic_menu_send)
-                        .setContentTitle(remoteMessage.getNotification().getTitle() == null ? "" : remoteMessage.getNotification().getTitle())
-                        .setGroup(String.valueOf(topicID))
-                        .setGroupSummary(true)
-                        .setOnlyAlertOnce(true)
-                        .setContentText(remoteMessage.getNotification().getBody());
-        notificationManager.notify(topicID, mBuilder.build());
+        if (topicID != -1){
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(this, "comunicati")
+                            .setSmallIcon(R.drawable.ic_menu_send)
+                            .setContentTitle(remoteMessage.getNotification().getTitle() == null ? "" : remoteMessage.getNotification().getTitle())
+                            .setGroup(String.valueOf(topicID))
+                            .setGroupSummary(true)
+                            .setOnlyAlertOnce(true)
+                            .setContentText(remoteMessage.getNotification().getBody());
+            notificationManager.notify(topicID, mBuilder.build());
+        }
     }
 }

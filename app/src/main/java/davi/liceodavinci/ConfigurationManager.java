@@ -19,10 +19,10 @@ import java.util.List;
 class ConfigurationManager {
     private static ConfigurationManager configurationManager;
     private SharedPreferences sharedPreferences;
-
-    private final String STORED_COMM_KEY = "comm-stored-list";
+    private Activity activity;
 
     ConfigurationManager(Activity activity) {
+        this.activity = activity;
         configurationManager = this;
         this.sharedPreferences = activity.getPreferences(Context.MODE_PRIVATE);
     }
@@ -81,17 +81,33 @@ class ConfigurationManager {
         saveJSONFromList(communications);
     }
 
+    boolean getCommNotificationEnabled(int commType){
+        switch (commType){
+            case Communication.COMM_STUDENTS:{
+                return sharedPreferences.getBoolean(activity.getString(R.string.notifications_enabled_comm_students), false);
+            }
+            case Communication.COMM_PARENTS:{
+                return sharedPreferences.getBoolean(activity.getString(R.string.notifications_enabled_comm_parents), false);
+            }
+            case Communication.COMM_PROFS:{
+                return sharedPreferences.getBoolean(activity.getString(R.string.notifications_enabled_comm_profs), false);
+            }
+        }
+
+        return false;
+    }
+
     private void saveJSONFromList(List<Communication.LocalCommunication> communications) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(communications);
-        prefsEditor.putString(STORED_COMM_KEY, json);
+        prefsEditor.putString(activity.getString(R.string.stored_comm_list_key), json);
         prefsEditor.apply();
     }
 
     List<Communication.LocalCommunication> getListFromSavedJSON() {
-        String json = sharedPreferences.getString(STORED_COMM_KEY, "");
+        String json = sharedPreferences.getString(activity.getString(R.string.stored_comm_list_key), "");
         Gson gson = new Gson();
         Type listType = new TypeToken<ArrayList<Communication.LocalCommunication>>() {}.getType();
 

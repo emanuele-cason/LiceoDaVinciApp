@@ -121,10 +121,10 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 downloadTask.execute();
             } else if (section == Communication.COMM_SAVED) {
                 ((FragmentActivity) activity)
-                        .getSupportFragmentManager()
+                        .getFragmentManager()
                         .beginTransaction()
                         .addToBackStack("pdf-render")
-                        .replace(R.id.empty_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()).new LocalCommunication(communications.get(this.getLayoutPosition()), Communication.DOWNLOADED, false)))
+                        .replace(R.id.main_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()).new LocalCommunication(communications.get(this.getLayoutPosition()), Communication.DOWNLOADED, false)))
                         .commit();
             }
         }

@@ -6,7 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -195,7 +195,7 @@ public class CommunicationsFragment extends Fragment {
         swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
         swipeRefreshCom.setRefreshing(false);
         Snackbar snackbar = Snackbar
-                .make(activity.findViewById(R.id.empty_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
                 .setAction("RIPROVA", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

@@ -163,14 +163,14 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
         if (!openOnFinish) {
             if (savingMode == DOWNLOAD) {
                 Snackbar snackbar = Snackbar
-                        .make(activity.findViewById(R.id.empty_frame), "Il comunicato è stato salvato offline", Snackbar.LENGTH_LONG);
+                        .make(activity.findViewById(R.id.main_frame), "Il comunicato è stato salvato offline", Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
         } else {
             ((FragmentActivity) activity)
-                    .getSupportFragmentManager()
+                    .getFragmentManager()
                     .beginTransaction().addToBackStack("pdf-render")
-                    .replace(R.id.empty_frame, new PdfRenderFragment(activity, communication))
+                    .replace(R.id.main_frame, new PdfRenderFragment(activity, communication))
                     .commit();
         }
 
@@ -181,7 +181,7 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
         communication.setStatus(Communication.REMOTE);
         ConfigurationManager.getIstance().loadCommunication(communication);
         Snackbar snackbar = Snackbar
-                .make(activity.findViewById(R.id.empty_frame), "Impossibile salvare il comunicato", Snackbar.LENGTH_LONG);
+                .make(activity.findViewById(R.id.main_frame), "Impossibile salvare il comunicato", Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 }

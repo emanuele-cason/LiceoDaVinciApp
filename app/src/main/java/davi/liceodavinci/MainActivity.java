@@ -1,10 +1,10 @@
 package davi.liceodavinci;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -44,17 +44,27 @@ public class MainActivity extends AppCompatActivity
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        FirebaseMessaging.getInstance().subscribeToTopic("comunicati-studenti");
-        FirebaseMessaging.getInstance().subscribeToTopic("comunicati-genitori");
-        FirebaseMessaging.getInstance().subscribeToTopic("comunicati-docenti");
+        if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_STUDENTS))
+            FirebaseMessaging.getInstance().subscribeToTopic(NotificationsManager.COMM_STUDENTS_TOPIC);
+        else FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_STUDENTS_TOPIC);
+
+        if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PARENTS))
+            FirebaseMessaging.getInstance().subscribeToTopic(NotificationsManager.COMM_PARENTS_TOPIC);
+        else FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PARENTS_TOPIC);
+
+        if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PROFS))
+            FirebaseMessaging.getInstance().subscribeToTopic(NotificationsManager.COMM_PROFS_TOPIC);
+        else FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PROFS_TOPIC);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        Fragment mainFragment = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
-        getSupportFragmentManager().beginTransaction().replace(R.id.empty_frame, mainFragment).commit();
+        getFragmentManager()
+                .beginTransaction()
+                .add(R.id.main_frame, new CommunicationsFragment(this, Communication.COMM_STUDENTS))
+                .commit();
     }
 
     @Override
@@ -102,7 +112,8 @@ public class MainActivity extends AppCompatActivity
             selection = new CommunicationsFragment(this, 3);
             getSupportActionBar().setTitle("Comunicati salvati");
         } else if (id == R.id.drawer_settings) {
-
+            selection = new SettingsFragment();
+            getSupportActionBar().setTitle("Impostazioni");
         } else if (id == R.id.drawer_share) {
 
         } else if (id == R.id.drawer_contact_us) {
@@ -110,9 +121,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (selection != null){
-            getSupportFragmentManager()
+            getFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.empty_frame, selection)
+                    .replace(R.id.main_frame, selection)
                     .commit();
         }
 

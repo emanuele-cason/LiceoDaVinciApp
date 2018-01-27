@@ -67,10 +67,7 @@ public class Communication {
     }
 
     String getNameFormatted(){
-        if ((nome.indexOf('-') < 5) && (nome.indexOf('-') != -1)){
-            if(nome.charAt(nome.indexOf('-') + 2) == ' ') return this.nome.substring(nome.indexOf('-') + 2);
-            return this.nome.substring(nome.indexOf('-') + 1);
-        } else return this.nome.substring(3);
+        return nome;
     }
 
     String getData() {

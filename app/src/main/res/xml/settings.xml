@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Ricevi notifiche">
+
+        <CheckBoxPreference
+            android:title="Comunicati studenti"
+            android:defaultValue="false"
+            android:key="pref_comm_students_notifications"
+            android:summary="Notifiche per ogni comunicato indirizzato agli studenti"/>
+
+        <CheckBoxPreference
+            android:title="Comunicati genitori"
+            android:defaultValue="false"
+            android:key="pref_comm_parents_notifications"
+            android:summary="Notifiche per ogni comunicato indirizzato agli genitori"/>
+
+        <CheckBoxPreference
+            android:title="Comunicati docenti"
+            android:defaultValue="false"
+            android:key="pref_comm_profs_notifications"
+            android:summary="Notifiche per ogni comunicato indirizzato agli docenti"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stored_comm_list_key">stored_comm_list</string>
+    <string name="notifications_enabled_comm_students">notifications_students</string>
+    <string name="notifications_enabled_comm_parents">notifications_parents</string>
+    <string name="notifications_enabled_comm_profs">notifications_prof</string>
+</resources>
