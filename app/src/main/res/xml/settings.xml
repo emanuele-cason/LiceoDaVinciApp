@@ -8,6 +8,7 @@
             android:title="Comunicati studenti"
             android:defaultValue="false"
             android:key="pref_comm_students_notifications"
+            android:persistent="true"
             android:summary="Notifiche per ogni comunicato indirizzato agli studenti"/>
 
         <CheckBoxPreference

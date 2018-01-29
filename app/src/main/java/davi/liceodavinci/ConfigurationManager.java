@@ -37,7 +37,7 @@ class ConfigurationManager {
         if (!(getListFromSavedJSON() == null)) {
             communications = getListFromSavedJSON();
             for (Communication.LocalCommunication comm : communications) {
-                if (comm.getName().equals(communication.getName())){
+                if (comm.getName().equals(communication.getName())) {
                     communications.remove(communications.indexOf(comm));
                     break;
                 }
@@ -66,13 +66,13 @@ class ConfigurationManager {
         saveJSONFromList(communications);
     }
 
-    void setCacheDeleted(){
+    void setCacheDeleted() {
         List<Communication.LocalCommunication> communications = new ArrayList<>();
 
         if (!(getListFromSavedJSON() == null)) {
             communications = getListFromSavedJSON();
             for (Communication.LocalCommunication comm : communications) {
-                if (comm.getStatus()==Communication.CACHED){
+                if (comm.getStatus() == Communication.CACHED) {
                     comm.setStatus(Communication.REMOTE);
                 }
             }
@@ -81,15 +81,31 @@ class ConfigurationManager {
         saveJSONFromList(communications);
     }
 
-    boolean getCommNotificationEnabled(int commType){
-        switch (commType){
-            case Communication.COMM_STUDENTS:{
+    void setCommStatus(Communication.LocalCommunication communication, int status){
+        List<Communication.LocalCommunication> communications = new ArrayList<>();
+
+        if (!(getListFromSavedJSON() == null)) {
+            communications = getListFromSavedJSON();
+            for (Communication.LocalCommunication comm : communications) {
+                if (comm.getName().equals(communication.getName())) {
+                    comm.setStatus(status);
+                    break;
+                }
+            }
+        }
+
+        saveJSONFromList(communications);
+    }
+
+    boolean getCommNotificationEnabled(int commType) {
+        switch (commType) {
+            case Communication.COMM_STUDENTS: {
                 return sharedPreferences.getBoolean(activity.getString(R.string.notifications_enabled_comm_students), false);
             }
-            case Communication.COMM_PARENTS:{
+            case Communication.COMM_PARENTS: {
                 return sharedPreferences.getBoolean(activity.getString(R.string.notifications_enabled_comm_parents), false);
             }
-            case Communication.COMM_PROFS:{
+            case Communication.COMM_PROFS: {
                 return sharedPreferences.getBoolean(activity.getString(R.string.notifications_enabled_comm_profs), false);
             }
         }
@@ -109,7 +125,8 @@ class ConfigurationManager {
     List<Communication.LocalCommunication> getListFromSavedJSON() {
         String json = sharedPreferences.getString(activity.getString(R.string.stored_comm_list_key), "");
         Gson gson = new Gson();
-        Type listType = new TypeToken<ArrayList<Communication.LocalCommunication>>() {}.getType();
+        Type listType = new TypeToken<ArrayList<Communication.LocalCommunication>>() {
+        }.getType();
 
         return gson.fromJson(json, listType);
     }

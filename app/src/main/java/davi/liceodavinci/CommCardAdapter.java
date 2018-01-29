@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -31,14 +30,6 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.communications = communications;
         this.activity = activity;
         this.section = section;
-        updateNothingHere();
-    }
-
-    private void updateNothingHere(){
-        LinearLayout nothingHere = (LinearLayout) activity.findViewById(R.id.nothing_here_layout);
-        if ((communications.size() == 0) && (section == Communication.COMM_SAVED))
-            nothingHere.setVisibility(View.VISIBLE);
-        else nothingHere.setVisibility(View.GONE);
     }
 
     @Override
@@ -59,8 +50,9 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         ((Item) holder).dataTV.setText(String.format("%td %<tb %<tY\n%<tH:%<tM", communications.get(position).getDataObject()));
 
-        if (!communications.get(position).isSeen()) ((Item)holder).nameTV.setTypeface(Typeface.DEFAULT_BOLD);
-        else ((Item)holder).nameTV.setTypeface(Typeface.DEFAULT);
+        if (!communications.get(position).isSeen())
+            ((Item) holder).nameTV.setTypeface(Typeface.DEFAULT_BOLD);
+        else ((Item) holder).nameTV.setTypeface(Typeface.DEFAULT);
     }
 
     @Override
@@ -91,12 +83,10 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     @Override
                     public void onClick(View view) {
                         new File(activity.getFilesDir(), communications.get(getLayoutPosition()).getName()).delete();
-                        ConfigurationManager.getIstance().removeCommunication(communications.get(getLayoutPosition()));
+                        ConfigurationManager.getIstance().setCommStatus(communications.get(getLayoutPosition()), Communication.REMOTE);
                         notifyItemRemoved(getLayoutPosition());
                         communications.remove(getLayoutPosition());
                         notifyItemRangeChanged(getLayoutPosition(), communications.size());
-
-                        updateNothingHere();
                     }
                 });
 

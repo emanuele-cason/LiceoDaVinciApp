@@ -2,11 +2,11 @@ package davi.liceodavinci;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 
 import java.io.File;
 import java.io.IOException;
@@ -159,6 +160,7 @@ public class CommunicationsFragment extends Fragment {
 
     private void fetchSavedComms() {
         List<Communication.LocalCommunication> communications = new ArrayList<>();
+        LinearLayout nothingHere = activity.findViewById(R.id.nothing_here_layout);
 
         for (File file : new File(activity.getFilesDir().getPath()).listFiles()) {
             if (file.getName().endsWith(".pdf")) {
@@ -166,8 +168,14 @@ public class CommunicationsFragment extends Fragment {
             }
         }
 
-        this.communications = mergeCommWithSPref(communications);
-        setResult(this.communications, null);
+        if (communications.size() == 0){
+            nothingHere.setVisibility(View.VISIBLE);
+            swipeRefreshCom.setRefreshing(false);
+        }else {
+            nothingHere.setVisibility(View.GONE);
+            this.communications = mergeCommWithSPref(communications);
+            setResult(this.communications, null);
+        }
     }
 
     private void fetch() {
@@ -207,7 +215,8 @@ public class CommunicationsFragment extends Fragment {
 
     private void setResult(List<Communication.LocalCommunication> communications, String query) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        commRecyclerView.setAdapter(new CommCardAdapter(activity, searchByName(communications, query), section));
+        if ((communications != null) && (communications.size() != 0))
+            commRecyclerView.setAdapter(new CommCardAdapter(activity, searchByName(communications, query), section));
         swipeRefreshCom.setRefreshing(false);
     }
 
@@ -236,9 +245,9 @@ public class CommunicationsFragment extends Fragment {
         if (query == null) return communications;
         if (query.isEmpty()) return communications;
 
-        for (Communication comm : communications) {
+        for (Communication.LocalCommunication comm : communications) {
             if (comm.getName().toLowerCase().contains(query.toLowerCase())) {
-                result.add(comm.new LocalCommunication(comm));
+                result.add(comm);
             }
         }
 
