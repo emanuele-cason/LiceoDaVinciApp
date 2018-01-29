@@ -1,8 +1,8 @@
 package davi.liceodavinci;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -24,7 +24,7 @@ class ConfigurationManager {
     ConfigurationManager(Activity activity) {
         this.activity = activity;
         configurationManager = this;
-        this.sharedPreferences = activity.getPreferences(Context.MODE_PRIVATE);
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
     }
 
     static ConfigurationManager getIstance() {
@@ -38,12 +38,11 @@ class ConfigurationManager {
             communications = getListFromSavedJSON();
             for (Communication.LocalCommunication comm : communications) {
                 if (comm.getName().equals(communication.getName())) {
+                    if (comm.getStatus() == Communication.DOWNLOADED) communication.setStatus(Communication.DOWNLOADED);
                     communications.remove(communications.indexOf(comm));
                     break;
                 }
-
             }
-
         }
 
         communications.add(communication);

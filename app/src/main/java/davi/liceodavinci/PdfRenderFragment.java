@@ -2,12 +2,12 @@ package davi.liceodavinci;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -69,7 +69,7 @@ public class PdfRenderFragment extends Fragment {
         }
 
         if (communication.getStatus() == Communication.DOWNLOADED) {
-            final PDFView pdfView = activity.findViewById(R.id.pdf_render);
+            PDFView pdfView = activity.findViewById(R.id.pdf_render);
             pdfView.fromFile(new File(activity.getFilesDir(),communication.getName()))
                     .enableDoubletap(true)
                     .swipeHorizontal(true)

@@ -73,7 +73,7 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
     @Override
     protected String doInBackground(Void... voids) {
 
-        if (communication.getStatus() == savingMode){
+        if ((communication.getStatus() == savingMode)||(communication.getStatus() == Communication.DOWNLOADED)){
             progressDialog.dismiss();
             return null;
         }
@@ -181,7 +181,7 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
         communication.setStatus(Communication.REMOTE);
         ConfigurationManager.getIstance().loadCommunication(communication);
         Snackbar snackbar = Snackbar
-                .make(activity.findViewById(R.id.main_frame), "Impossibile salvare il comunicato", Snackbar.LENGTH_LONG);
+                .make(activity.findViewById(R.id.main_frame), String.format("Impossibile %s il comunicato", (openOnFinish) ? "aprire" : "salvare"), Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 }

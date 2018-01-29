@@ -53,6 +53,16 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (!communications.get(position).isSeen())
             ((Item) holder).nameTV.setTypeface(Typeface.DEFAULT_BOLD);
         else ((Item) holder).nameTV.setTypeface(Typeface.DEFAULT);
+
+        if ((communications.get(position).getStatus() == Communication.DOWNLOADED)&&(section != Communication.COMM_SAVED)){
+            ((Item)holder).download.setImageResource(R.drawable.ic_done);
+            ((Item)holder).download.setClickable(false);
+            ((Item) holder).download.setBackground(null);
+        }
+        if ((communications.get(position).getStatus() != Communication.DOWNLOADED)&&(section != Communication.COMM_SAVED))
+            ((Item)holder).download.setImageResource(R.drawable.ic_file_download);
+        if (section == Communication.COMM_SAVED) ((Item)holder).download.setImageResource(R.drawable.ic_delete);
+
     }
 
     @Override
@@ -78,7 +88,6 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             download = itemView.findViewById(R.id.com_save_button);
 
             if (section == Communication.COMM_SAVED) {
-                download.setImageResource(R.drawable.ic_delete);
                 download.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -93,7 +102,6 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             if (section <= Communication.COMM_PROFS) {
-                download.setImageResource(R.drawable.ic_file_download);
                 download.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

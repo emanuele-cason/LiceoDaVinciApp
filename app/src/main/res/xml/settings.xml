@@ -2,26 +2,22 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="Ricevi notifiche">
+        android:title="Attiva notifiche">
 
         <CheckBoxPreference
             android:title="Comunicati studenti"
-            android:defaultValue="false"
-            android:key="pref_comm_students_notifications"
-            android:persistent="true"
-            android:summary="Notifiche per ogni comunicato indirizzato agli studenti"/>
+            android:key="@string/notifications_enabled_comm_students"
+            android:singleLine="true"/>
 
         <CheckBoxPreference
             android:title="Comunicati genitori"
-            android:defaultValue="false"
-            android:key="pref_comm_parents_notifications"
-            android:summary="Notifiche per ogni comunicato indirizzato agli genitori"/>
+            android:key="@string/notifications_enabled_comm_parents"
+            android:singleLine="true"/>
 
         <CheckBoxPreference
             android:title="Comunicati docenti"
-            android:defaultValue="false"
-            android:key="pref_comm_profs_notifications"
-            android:summary="Notifiche per ogni comunicato indirizzato agli docenti"/>
+            android:key="@string/notifications_enabled_comm_profs"
+            android:singleLine="true"/>
 
     </PreferenceCategory>
 
