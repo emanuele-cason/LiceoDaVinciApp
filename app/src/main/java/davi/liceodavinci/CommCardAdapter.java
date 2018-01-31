@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +26,22 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<Communication.LocalCommunication> communications = new ArrayList<>();
     private Activity activity;
     private int section;
+    private CommunicationsFragment communicationsFragment;
+    private int startPostion;
 
-    CommCardAdapter(Activity activity, List<Communication.LocalCommunication> communications, int section) {
+    CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment, List<Communication.LocalCommunication> communications, int section) {
         this.communications = communications;
         this.activity = activity;
         this.section = section;
+        this.communicationsFragment = communicationsFragment;
+    }
+
+    CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment, List<Communication.LocalCommunication> communications, int section, int startPosition) {
+        this.communications = communications;
+        this.activity = activity;
+        this.section = section;
+        this.communicationsFragment = communicationsFragment;
+        this.startPostion = startPosition;
     }
 
     @Override
@@ -38,6 +50,13 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         View row = inflater.inflate(R.layout.com_recyclerview_item, parent, false);
 
         return new Item(row);
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+
+        recyclerView.smoothScrollToPosition(startPostion + 3);
     }
 
     @SuppressLint("DefaultLocale")
@@ -54,15 +73,15 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((Item) holder).nameTV.setTypeface(Typeface.DEFAULT_BOLD);
         else ((Item) holder).nameTV.setTypeface(Typeface.DEFAULT);
 
-        if ((communications.get(position).getStatus() == Communication.DOWNLOADED)&&(section != Communication.COMM_SAVED)){
-            ((Item)holder).download.setImageResource(R.drawable.ic_done);
-            ((Item)holder).download.setClickable(false);
+        if ((communications.get(position).getStatus() == Communication.DOWNLOADED) && (section != Communication.COMM_SAVED)) {
+            ((Item) holder).download.setImageResource(R.drawable.ic_done);
+            ((Item) holder).download.setClickable(false);
             ((Item) holder).download.setBackground(null);
         }
-        if ((communications.get(position).getStatus() != Communication.DOWNLOADED)&&(section != Communication.COMM_SAVED))
-            ((Item)holder).download.setImageResource(R.drawable.ic_file_download);
-        if (section == Communication.COMM_SAVED) ((Item)holder).download.setImageResource(R.drawable.ic_delete);
-
+        if ((communications.get(position).getStatus() != Communication.DOWNLOADED) && (section != Communication.COMM_SAVED))
+            ((Item) holder).download.setImageResource(R.drawable.ic_file_download);
+        if (section == Communication.COMM_SAVED)
+            ((Item) holder).download.setImageResource(R.drawable.ic_delete);
     }
 
     @Override
@@ -105,7 +124,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 download.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        final CommDownload downloadTask = new CommDownload(activity, communications.get(getLayoutPosition()), CommDownload.DOWNLOAD, false);
+                        final CommDownload downloadTask = new CommDownload(activity, communicationsFragment, communications.get(getLayoutPosition()), CommDownload.DOWNLOAD, false);
                         downloadTask.execute();
                     }
                 });
@@ -115,7 +134,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Override
         public void onClick(View v) {
             if (section <= Communication.COMM_PROFS) {
-                final CommDownload downloadTask = new CommDownload(activity, communications.get(this.getLayoutPosition()), CommDownload.CACHE, true);
+                final CommDownload downloadTask = new CommDownload(activity, null, communications.get(this.getLayoutPosition()), CommDownload.CACHE, true);
                 downloadTask.execute();
             } else if (section == Communication.COMM_SAVED) {
                 ((FragmentActivity) activity)
@@ -125,6 +144,9 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         .replace(R.id.main_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()).new LocalCommunication(communications.get(this.getLayoutPosition()), Communication.DOWNLOADED, false)))
                         .commit();
             }
+
+            communicationsFragment.setScrollPosition(this.getAdapterPosition());
+            Log.d("pos", String.valueOf(this.getAdapterPosition()));
         }
     }
 }

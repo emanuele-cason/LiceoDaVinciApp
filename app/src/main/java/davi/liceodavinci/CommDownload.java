@@ -31,15 +31,17 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
     private int savingMode;
     private boolean openOnFinish;
     private Communication.LocalCommunication communication;
+    private CommunicationsFragment communicationFragment;
 
     static final int DOWNLOAD = DOWNLOADED;
     static final int CACHE = CACHED;
 
-    CommDownload(Activity activity, Communication.LocalCommunication communication, int savingMode, boolean openOnFinish) {
+    CommDownload(Activity activity, CommunicationsFragment communicationsFragment, Communication.LocalCommunication communication, int savingMode, boolean openOnFinish) {
         this.activity = activity;
         this.savingMode = savingMode;
         this.openOnFinish = openOnFinish;
         this.communication = communication;
+        this.communicationFragment = communicationsFragment;
     }
 
     @Override
@@ -162,10 +164,9 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
     private void downloadComplete() {
         if (!openOnFinish) {
             if (savingMode == DOWNLOAD) {
-                Snackbar snackbar = Snackbar
-                        .make(activity.findViewById(R.id.main_frame), "Il comunicato è stato salvato offline", Snackbar.LENGTH_LONG);
-                snackbar.show();
+
             }
+            if (communicationFragment != null) communicationFragment.fetch();
         } else {
             ((FragmentActivity) activity)
                     .getFragmentManager()

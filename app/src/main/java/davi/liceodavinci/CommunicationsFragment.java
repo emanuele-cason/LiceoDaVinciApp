@@ -41,6 +41,7 @@ public class CommunicationsFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshCom;
     private SearchView searchView;
     private List<Communication.LocalCommunication> communications;
+    private int scrollPosition;
 
     @SuppressLint("ValidFragment")
     public CommunicationsFragment(Activity activity, int section) {
@@ -58,6 +59,24 @@ public class CommunicationsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.communications_fragment, container, false);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        commRecyclerView = activity.findViewById(R.id.com_recyclerview);
+        swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
+        swipeRefreshCom.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (section <= Communication.COMM_PROFS) fetch();
+                if (section == Communication.COMM_SAVED) fetchSavedComms();
+            }
+        });
+
+        if (section < Communication.COMM_SAVED) fetch();
+        if (section == Communication.COMM_SAVED) fetchSavedComms();
     }
 
     @Override
@@ -80,24 +99,6 @@ public class CommunicationsFragment extends Fragment {
                 return false;
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        commRecyclerView = activity.findViewById(R.id.com_recyclerview);
-        swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
-        swipeRefreshCom.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (section <= Communication.COMM_PROFS) fetch();
-                if (section == Communication.COMM_SAVED) fetchSavedComms();
-            }
-        });
-
-        if (section < Communication.COMM_SAVED) fetch();
-        if (section == Communication.COMM_SAVED) fetchSavedComms();
     }
 
     @Override
@@ -178,7 +179,7 @@ public class CommunicationsFragment extends Fragment {
         }
     }
 
-    private void fetch() {
+    protected void fetch() {
         swipeRefreshCom.setRefreshing(true);
         DataFetcher df = new DataFetcher(this, activity);
         try {
@@ -216,7 +217,7 @@ public class CommunicationsFragment extends Fragment {
     private void setResult(List<Communication.LocalCommunication> communications, String query) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
         if ((communications != null) && (communications.size() != 0))
-            commRecyclerView.setAdapter(new CommCardAdapter(activity, searchByName(communications, query), section));
+            commRecyclerView.setAdapter(new CommCardAdapter(activity, this,searchByName(communications, query), section, scrollPosition));
         swipeRefreshCom.setRefreshing(false);
     }
 
@@ -252,5 +253,9 @@ public class CommunicationsFragment extends Fragment {
         }
 
         return result;
+    }
+
+    protected void setScrollPosition(int pos){
+        this.scrollPosition = pos;
     }
 }
