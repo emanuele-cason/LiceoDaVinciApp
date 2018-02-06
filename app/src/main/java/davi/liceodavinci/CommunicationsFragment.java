@@ -82,6 +82,7 @@ public class CommunicationsFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
         inflater.inflate(R.menu.comm_actionbar_menu, menu);
         searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 

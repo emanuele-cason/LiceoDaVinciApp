@@ -45,6 +45,7 @@ public class PdfRenderFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
         inflater.inflate(R.menu.comm_pdf_viewer_menu, menu);
     }
 
@@ -72,7 +73,10 @@ public class PdfRenderFragment extends Fragment {
             PDFView pdfView = activity.findViewById(R.id.pdf_render);
             pdfView.fromFile(new File(activity.getFilesDir(),communication.getName()))
                     .enableDoubletap(true)
-                    .swipeHorizontal(true)
+                    .swipeHorizontal(false)
+                    .scrollHandle(new PdfScrollHandle(activity))
+                    .enableAntialiasing(true)
+                    .spacing(1)
                     .load();
         }
 

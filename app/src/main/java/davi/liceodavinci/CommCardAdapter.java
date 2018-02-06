@@ -6,7 +6,6 @@ import android.graphics.Typeface;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,6 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Activity activity;
     private int section;
     private CommunicationsFragment communicationsFragment;
-    private int startPostion;
 
     CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment, List<Communication.LocalCommunication> communications, int section) {
         this.communications = communications;
@@ -41,7 +39,6 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.activity = activity;
         this.section = section;
         this.communicationsFragment = communicationsFragment;
-        this.startPostion = startPosition;
     }
 
     @Override
@@ -55,8 +52,6 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-
-        recyclerView.smoothScrollToPosition(startPostion + 3);
     }
 
     @SuppressLint("DefaultLocale")
@@ -141,12 +136,11 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         .getFragmentManager()
                         .beginTransaction()
                         .addToBackStack("pdf-render")
-                        .replace(R.id.main_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition()).new LocalCommunication(communications.get(this.getLayoutPosition()), Communication.DOWNLOADED, false)))
+                        .replace(R.id.main_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition())))
                         .commit();
             }
 
             communicationsFragment.setScrollPosition(this.getAdapterPosition());
-            Log.d("pos", String.valueOf(this.getAdapterPosition()));
         }
     }
 }

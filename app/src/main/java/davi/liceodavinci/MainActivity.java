@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity
 
     private DrawerLayout drawer;
     private NavigationView navigationView;
+    private Fragment selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,16 +64,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        getFragmentManager()
-                .beginTransaction()
-                .add(R.id.main_frame, new CommunicationsFragment(this, Communication.COMM_STUDENTS))
-                .commit();
-    }
-
-    @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -93,6 +84,20 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (selection != null){
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_frame, selection)
+                    .commit();
+        }
+
+        drawer.closeDrawer(GravityCompat.START);
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item){
@@ -100,21 +105,19 @@ public class MainActivity extends AppCompatActivity
         uncheckAllMenuItems(navigationView);
         item.setChecked(true);
 
-        Fragment selection = null;
-
         if (id == R.id.drawer_agenda) {
 
         } else if (id == R.id.com_students) {
-            selection = new CommunicationsFragment(this, 0);
+            selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
             getSupportActionBar().setTitle("Comunicati studenti");
         } else if (id == R.id.com_parents) {
-            selection = new CommunicationsFragment(this, 1);
+            selection = new CommunicationsFragment(this, Communication.COMM_PARENTS);
             getSupportActionBar().setTitle("Comunicati genitori");
         } else if (id == R.id.com_profs) {
-            selection = new CommunicationsFragment(this, 2);
+            selection = new CommunicationsFragment(this, Communication.COMM_PROFS);
             getSupportActionBar().setTitle("Comunicati docenti");
         } else if (id == R.id.com_saved) {
-            selection = new CommunicationsFragment(this, 3);
+            selection = new CommunicationsFragment(this, Communication.COMM_SAVED);
             getSupportActionBar().setTitle("Comunicati salvati");
         } else if (id == R.id.drawer_settings) {
             selection = new SettingsFragment();
