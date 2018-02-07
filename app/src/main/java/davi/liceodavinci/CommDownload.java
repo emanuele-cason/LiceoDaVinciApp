@@ -166,7 +166,7 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
             if (savingMode == DOWNLOAD) {
 
             }
-            if (communicationFragment != null) communicationFragment.fetch();
+            if (communicationFragment != null) communicationFragment.updateItem(communication);
         } else {
             ((FragmentActivity) activity)
                     .getFragmentManager()

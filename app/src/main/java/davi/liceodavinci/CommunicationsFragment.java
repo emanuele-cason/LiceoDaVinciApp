@@ -190,6 +190,16 @@ public class CommunicationsFragment extends Fragment {
         }
     }
 
+    protected void updateItem (Communication.LocalCommunication communication){
+        for (Communication.LocalCommunication comm : this.communications){
+            if (comm.getName().equals(communication.getName())){
+                commRecyclerView.getAdapter().notifyItemChanged(this.communications.indexOf(comm), comm);
+                this.communications.set(this.communications.indexOf(comm), communication);
+            }
+        }
+    }
+
+
     protected void fetchComplete(List<Communication> communications) {
         List<Communication.LocalCommunication> localCommunications = new ArrayList<>();
 

@@ -9,6 +9,12 @@
         android:icon="@drawable/ic_agenda"
         android:title="Agenda del liceo" />
 
+    <item
+        android:id="@+id/drawer_schedule"
+        android:icon="@drawable/ic_schedule"
+        android:title="Orari">
+    </item>
+
     <item android:title="Comunicati">
         <menu>
             <item
@@ -36,14 +42,6 @@
                 android:id="@+id/drawer_settings"
                 android:icon="@drawable/ic_settings"
                 android:title="Impostazioni" />
-            <item
-                android:id="@+id/drawer_share"
-                android:icon="@drawable/ic_share"
-                android:title="Condividi" />
-            <item
-                android:id="@+id/drawer_contact_us"
-                android:icon="@drawable/ic_send"
-                android:title="Contattaci" />
         </menu>
     </item>
 

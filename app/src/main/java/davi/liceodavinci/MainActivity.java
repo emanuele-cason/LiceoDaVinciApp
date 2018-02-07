@@ -24,7 +24,8 @@ public class MainActivity extends AppCompatActivity
 
     private DrawerLayout drawer;
     private NavigationView navigationView;
-    private Fragment selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);;
+    private Fragment selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
+    ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +49,18 @@ public class MainActivity extends AppCompatActivity
 
         if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_STUDENTS))
             FirebaseMessaging.getInstance().subscribeToTopic(NotificationsManager.COMM_STUDENTS_TOPIC);
-        else FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_STUDENTS_TOPIC);
+        else
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_STUDENTS_TOPIC);
 
         if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PARENTS))
             FirebaseMessaging.getInstance().subscribeToTopic(NotificationsManager.COMM_PARENTS_TOPIC);
-        else FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PARENTS_TOPIC);
+        else
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PARENTS_TOPIC);
 
         if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PROFS))
             FirebaseMessaging.getInstance().subscribeToTopic(NotificationsManager.COMM_PROFS_TOPIC);
-        else FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PROFS_TOPIC);
+        else
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PROFS_TOPIC);
 
         Log.d("comm-stu", String.valueOf(ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_STUDENTS)));
         Log.d("comm-par", String.valueOf(ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PARENTS)));
@@ -88,7 +92,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
-        if (selection != null){
+        if (selection != null) {
             getFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_frame, selection)
@@ -100,12 +104,14 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item){
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         uncheckAllMenuItems(navigationView);
         item.setChecked(true);
 
         if (id == R.id.drawer_agenda) {
+
+        } else if (id == R.id.drawer_schedule) {
 
         } else if (id == R.id.com_students) {
             selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
@@ -122,13 +128,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.drawer_settings) {
             selection = new SettingsFragment();
             getSupportActionBar().setTitle("Impostazioni");
-        } else if (id == R.id.drawer_share) {
-
-        } else if (id == R.id.drawer_contact_us) {
-
         }
 
-        if (selection != null){
+        if (selection != null) {
             getFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_frame, selection)
@@ -159,7 +161,8 @@ public class MainActivity extends AppCompatActivity
         try {
             File dir = context.getCacheDir();
             deleteDir(dir);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     private boolean deleteDir(File dir) {

@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Emanuele on 31/12/2017 at 19:31 at 20:24!
@@ -67,7 +69,15 @@ public class Communication {
     }
 
     String getNameFormatted(){
-        return nome;
+        //^(?:(\d+)\s*[-|_]+\s*(com.)*\s*)+    regex originale
+
+        String regex = "^(?:(\\d+)\\s*[-|_]+\\s*(com.)*\\s*)+";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(nome);
+
+        if (matcher.matches()){
+            return nome;        //DA SISTEMARE
+        }else return nome;
     }
 
     String getData() {
