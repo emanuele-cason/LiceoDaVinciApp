@@ -41,7 +41,6 @@ public class CommunicationsFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshCom;
     private SearchView searchView;
     private List<Communication.LocalCommunication> communications;
-    private int scrollPosition;
 
     @SuppressLint("ValidFragment")
     public CommunicationsFragment(Activity activity, int section) {
@@ -182,7 +181,7 @@ public class CommunicationsFragment extends Fragment {
 
     protected void fetch() {
         swipeRefreshCom.setRefreshing(true);
-        DataFetcher df = new DataFetcher(this, activity);
+        CommDataFetcher df = new CommDataFetcher(this, activity);
         try {
             df.fetchCommunicationsJson(section);
         } catch (IOException e) {
@@ -228,16 +227,16 @@ public class CommunicationsFragment extends Fragment {
     private void setResult(List<Communication.LocalCommunication> communications, String query) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
         if ((communications != null) && (communications.size() != 0))
-            commRecyclerView.setAdapter(new CommCardAdapter(activity, this,searchByName(communications, query), section, scrollPosition));
+            commRecyclerView.setAdapter(new CommCardAdapter(activity, this,searchByName(communications, query), section));
         swipeRefreshCom.setRefreshing(false);
     }
 
     private List<Communication.LocalCommunication> mergeCommWithSPref(List<Communication.LocalCommunication> queryResult) {
         List<Communication.LocalCommunication> result = new ArrayList<>();
 
-        if (ConfigurationManager.getIstance().getListFromSavedJSON() != null) {
+        if (ConfigurationManager.getIstance().getCommListFromSavedJSON() != null) {
             for (Communication.LocalCommunication queryComm : queryResult) {
-                for (Communication.LocalCommunication savedComm : ConfigurationManager.getIstance().getListFromSavedJSON()) {
+                for (Communication.LocalCommunication savedComm : ConfigurationManager.getIstance().getCommListFromSavedJSON()) {
                     if (queryComm.getName().equals(savedComm.getName())) {
                         result.add(savedComm);
                         break;
@@ -266,7 +265,4 @@ public class CommunicationsFragment extends Fragment {
         return result;
     }
 
-    protected void setScrollPosition(int pos){
-        this.scrollPosition = pos;
-    }
 }

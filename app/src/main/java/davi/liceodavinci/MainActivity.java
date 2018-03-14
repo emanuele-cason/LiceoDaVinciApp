@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private Fragment selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
-    ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +111,8 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.drawer_agenda) {
 
         } else if (id == R.id.drawer_schedule) {
-
+            selection = new ScheduleFragment(this);
+            getSupportActionBar().setTitle("Orario personale");
         } else if (id == R.id.com_students) {
             selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
             getSupportActionBar().setTitle("Comunicati studenti");

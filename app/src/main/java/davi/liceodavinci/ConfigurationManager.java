@@ -34,8 +34,8 @@ class ConfigurationManager {
     void loadCommunication(Communication.LocalCommunication communication) {
         List<Communication.LocalCommunication> communications = new ArrayList<>();
 
-        if (!(getListFromSavedJSON() == null)) {
-            communications = getListFromSavedJSON();
+        if (!(getCommListFromSavedJSON() == null)) {
+            communications = getCommListFromSavedJSON();
             for (Communication.LocalCommunication comm : communications) {
                 if (comm.getName().equals(communication.getName())) {
                     if (comm.getStatus() == Communication.DOWNLOADED) communication.setStatus(Communication.DOWNLOADED);
@@ -46,14 +46,14 @@ class ConfigurationManager {
         }
 
         communications.add(communication);
-        saveJSONFromList(communications);
+        saveCommJSONFromList(communications);
     }
 
     void removeCommunication(Communication.LocalCommunication communication) {
         List<Communication.LocalCommunication> communications = new ArrayList<>();
 
-        if (!(getListFromSavedJSON() == null)) {
-            communications = getListFromSavedJSON();
+        if (!(getCommListFromSavedJSON() == null)) {
+            communications = getCommListFromSavedJSON();
             for (Communication.LocalCommunication comm : communications) {
                 if (comm.getName().equals(communication.getName())) {
                     communications.remove(comm);
@@ -62,14 +62,14 @@ class ConfigurationManager {
             }
         }
 
-        saveJSONFromList(communications);
+        saveCommJSONFromList(communications);
     }
 
     void setCacheDeleted() {
         List<Communication.LocalCommunication> communications = new ArrayList<>();
 
-        if (!(getListFromSavedJSON() == null)) {
-            communications = getListFromSavedJSON();
+        if (!(getCommListFromSavedJSON() == null)) {
+            communications = getCommListFromSavedJSON();
             for (Communication.LocalCommunication comm : communications) {
                 if (comm.getStatus() == Communication.CACHED) {
                     comm.setStatus(Communication.REMOTE);
@@ -77,14 +77,14 @@ class ConfigurationManager {
             }
         }
 
-        saveJSONFromList(communications);
+        saveCommJSONFromList(communications);
     }
 
     void setCommStatus(Communication.LocalCommunication communication, int status){
         List<Communication.LocalCommunication> communications = new ArrayList<>();
 
-        if (!(getListFromSavedJSON() == null)) {
-            communications = getListFromSavedJSON();
+        if (!(getCommListFromSavedJSON() == null)) {
+            communications = getCommListFromSavedJSON();
             for (Communication.LocalCommunication comm : communications) {
                 if (comm.getName().equals(communication.getName())) {
                     comm.setStatus(status);
@@ -93,7 +93,7 @@ class ConfigurationManager {
             }
         }
 
-        saveJSONFromList(communications);
+        saveCommJSONFromList(communications);
     }
 
     boolean getCommNotificationEnabled(int commType) {
@@ -112,7 +112,7 @@ class ConfigurationManager {
         return false;
     }
 
-    private void saveJSONFromList(List<Communication.LocalCommunication> communications) {
+    private void saveCommJSONFromList(List<Communication.LocalCommunication> communications) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -121,12 +121,26 @@ class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    List<Communication.LocalCommunication> getListFromSavedJSON() {
+    List<Communication.LocalCommunication> getCommListFromSavedJSON() {
         String json = sharedPreferences.getString(activity.getString(R.string.stored_comm_list_key), "");
         Gson gson = new Gson();
         Type listType = new TypeToken<ArrayList<Communication.LocalCommunication>>() {
         }.getType();
 
         return gson.fromJson(json, listType);
+    }
+
+    void saveClassesList(List<String> classes){
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(classes);
+        prefsEditor.putString(activity.getString(R.string.stored_class_list_key), json);
+        prefsEditor.apply();
+    }
+
+    List<String> getClassesListFromSavedJSON(){
+        String json = sharedPreferences.getString(activity.getString(R.string.stored_class_list_key), "");
+        Gson gson = new Gson();
+        return gson.fromJson(json, List.class);
     }
 }

@@ -32,15 +32,14 @@ import okhttp3.ResponseBody;
      * dall'API. Da rimuovere e rimpiazzare con la stringa commentata (responseBody.string() --> il vero risultato dell'api).
     * */
 
-class DataFetcher {
+class CommDataFetcher {
 
     private CommunicationsFragment communicationsFragment;
     private final String requestUrls[] = new String[3];
     private OkHttpClient client = new OkHttpClient();
     private Activity activity;
 
-
-    DataFetcher(CommunicationsFragment communicationsFragment, Activity activity) {
+    CommDataFetcher(CommunicationsFragment communicationsFragment, Activity activity) {
         this.communicationsFragment = communicationsFragment;
         this.activity = activity;
 

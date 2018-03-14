@@ -34,13 +34,6 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.communicationsFragment = communicationsFragment;
     }
 
-    CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment, List<Communication.LocalCommunication> communications, int section, int startPosition) {
-        this.communications = communications;
-        this.activity = activity;
-        this.section = section;
-        this.communicationsFragment = communicationsFragment;
-    }
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -139,8 +132,6 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         .replace(R.id.main_frame, new PdfRenderFragment(activity, communications.get(this.getLayoutPosition())))
                         .commit();
             }
-
-            communicationsFragment.setScrollPosition(this.getAdapterPosition());
         }
     }
 }
