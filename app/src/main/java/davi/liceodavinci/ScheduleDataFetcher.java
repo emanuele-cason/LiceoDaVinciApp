@@ -39,9 +39,9 @@ class ScheduleDataFetcher {
     private OkHttpClient client = new OkHttpClient();
     private Activity activity;
 
-    public final int GET_CLASSES = 0;
-    public final int GET_CLASS = 1;
-    public final int GET_PROFS = 2;
+    private final int GET_CLASSES = 0;
+    private final int GET_CLASS = 1;
+    private final int GET_PROFS = 2;
 
     ScheduleDataFetcher(Activity activity, ScheduleFragment scheduleFragment) {
         this.activity = activity;
@@ -80,10 +80,10 @@ class ScheduleDataFetcher {
         });
     }
 
-    void fetchClassSchedule(int classNum, String classSection) throws IOException {
+    void fetchClassSchedule(final String classNum, final String classSection) throws IOException {
 
         Request request = new Request.Builder()
-                .url(requestUrls[GET_CLASS].concat(String.valueOf(classNum)).concat(classSection))
+                .url(requestUrls[GET_CLASS].concat(classNum).concat(classSection))
                 .addHeader("Accept", "application/json")
                 .build();
 
@@ -91,14 +91,14 @@ class ScheduleDataFetcher {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
-                fetchClassFailed();
+                scheduleFragment.renderSchedule();
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
-                        fetchClassFailed();
+                        scheduleFragment.renderSchedule();
                         throw new IOException("Unexpected code " + response);
                     }
 
@@ -107,27 +107,18 @@ class ScheduleDataFetcher {
                     }.getType();
                     assert responseBody != null;
                     List<ScheduleActivity> classScheduleAPI = gson.fromJson(responseBody.string(), listType);
-                    fetchClassComplete(classScheduleAPI);
+                    fetchClassComplete(classScheduleAPI, classNum.concat(classSection));
                 }
             }
         });
     }
 
-    private void fetchClassFailed() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //qualcosa.fetchFailed();
-            }
-        });
-    }
-
-    private void fetchClassComplete(final List<ScheduleActivity> result) {
+    private void fetchClassComplete(final List<ScheduleActivity> result, final String classId) {
 
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //qualcosa.fetchComplete(result);
+                scheduleFragment.fetchClassComplete(result, classId);
             }
         });
     }

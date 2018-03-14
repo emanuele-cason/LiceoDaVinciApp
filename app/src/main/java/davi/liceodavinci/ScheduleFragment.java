@@ -20,6 +20,7 @@ import android.widget.Spinner;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,10 +39,12 @@ public class ScheduleFragment extends Fragment {
     private Activity activity;
     private int currentSchedule = 0;
     private List<String> classes;
-    private String[] classesNum = {"1","2","3","4","5"};
+    private String[] classesNum = {"1", "2", "3", "4", "5"};
 
     @SuppressLint("ValidFragment")
-    ScheduleFragment(Activity activity){ this.activity = activity;}
+    ScheduleFragment(Activity activity) {
+        this.activity = activity;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,19 +65,20 @@ public class ScheduleFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
 
-        switch (currentSchedule){
-            case PERSONAL_SCHEDULE:{
+        switch (currentSchedule) {
+            case PERSONAL_SCHEDULE: {
 
                 break;
             }
-            case CLASSES_SCHEDULE:{
+            case CLASSES_SCHEDULE: {
+                final ScheduleDataFetcher scheduleDataFetcher = new ScheduleDataFetcher(activity, this);
 
                 inflater.inflate(R.menu.schedule_actionbar, menu);
 
                 MenuItem itemSpinner1 = menu.findItem(R.id.first_spinner);
                 final Spinner firstSpinner = (Spinner) MenuItemCompat.getActionView(itemSpinner1);
 
-                ArrayAdapter<String> firstAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item_style, classesNum);
+                final ArrayAdapter<String> firstAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item_style, classesNum);
                 firstAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_style);
                 firstSpinner.setAdapter(firstAdapter);
 
@@ -85,7 +89,9 @@ public class ScheduleFragment extends Fragment {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         List<String> sections = new ArrayList<>();
-                        for (String cl : classes) if (cl.contains(firstSpinner.getSelectedItem().toString())) sections.add(String.valueOf(cl.charAt(1)));
+                        for (String cl : classes)
+                            if (cl.contains(firstSpinner.getSelectedItem().toString()))
+                                sections.add(String.valueOf(cl.charAt(1)));
                         java.util.Collections.sort(sections);
 
                         final ArrayAdapter<String> secondAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item_style, sections);
@@ -99,9 +105,25 @@ public class ScheduleFragment extends Fragment {
                     }
                 });
 
+                secondSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        try {
+                            scheduleDataFetcher.fetchClassSchedule(firstSpinner.getSelectedItem().toString(), secondSpinner.getSelectedItem().toString());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+
                 break;
             }
-            case PROFS_SCHEDULE:{
+            case PROFS_SCHEDULE: {
                 break;
             }
         }
@@ -146,14 +168,13 @@ public class ScheduleFragment extends Fragment {
                 currentSchedule = position;
                 getActivity().invalidateOptionsMenu();
 
-                switch (position){
+                switch (position) {
                     case PERSONAL_SCHEDULE: {
                         ((MainActivity) activity).getSupportActionBar().setTitle("Orario personale");
                         break;
                     }
                     case CLASSES_SCHEDULE: {
                         ((MainActivity) activity).getSupportActionBar().setTitle("Orario classe");
-                        classSchedule();
                         break;
                     }
                     case PROFS_SCHEDULE: {
@@ -166,11 +187,19 @@ public class ScheduleFragment extends Fragment {
         });
     }
 
-    public void fetchClassesComplete(List<String> result){
+    public void fetchClassesComplete(List<String> result) {
         ConfigurationManager.getIstance().saveClassesList(result);
     }
 
-    private void classSchedule() {
+    public void fetchClassComplete(List<ScheduleActivity> activities, String classId) {
+        ConfigurationManager.getIstance().saveSchedule(activities, classId);
+        renderSchedule();
+    }
 
+    public void renderSchedule(){
+
+        //controlla se la sezione (personale, classi, docente) è cambiata
+        //se no si prende l'orario dalle shared
+        //se non ce --> snackbar con errore connessione
     }
 }

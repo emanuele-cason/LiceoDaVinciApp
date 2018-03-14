@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layout_week"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:background="#fcfcfc"
+        android:paddingLeft="24dp">
+
+        <TextView
+            android:id="@+id/tvMonday"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="top|bottom|left|right|center_vertical|fill_vertical|center_horizontal|fill_horizontal|center|fill|start|end"
+            android:text="Lun"
+            android:textColor="@color/secondary_text"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tvTuesday"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="top|bottom|left|right|center_vertical|fill_vertical|center_horizontal|fill_horizontal|center|fill|start|end"
+            android:text="Mar"
+            android:textColor="@color/secondary_text"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tvWednesday"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="top|bottom|left|right|center_vertical|fill_vertical|center_horizontal|fill_horizontal|center|fill|start|end"
+            android:text="Mer"
+            android:textColor="@color/secondary_text"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tvThursday"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="top|bottom|left|right|center_vertical|fill_vertical|center_horizontal|fill_horizontal|center|fill|start|end"
+            android:text="Gio"
+            android:textColor="@color/secondary_text"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tvFriday"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="top|bottom|left|right|center_vertical|fill_vertical|center_horizontal|fill_horizontal|center|fill|start|end"
+            android:text="Ven"
+            android:textColor="@color/secondary_text"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tvSaturday"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="top|bottom|left|right|center_vertical|fill_vertical|center_horizontal|fill_horizontal|center|fill|start|end"
+            android:text="Sab"
+            android:textColor="@color/secondary_text"
+            android:textSize="13sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/layout_week"
+        android:background="@color/divider">
+
+    </LinearLayout>
+
+
+</RelativeLayout>

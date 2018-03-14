@@ -11,6 +11,8 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_navigation">
 
+        <include layout="@layout/schedule_week_view"/>
+
     </FrameLayout>
 
     <com.aurelhubert.ahbottomnavigation.AHBottomNavigation

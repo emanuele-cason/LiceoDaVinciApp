@@ -18,4 +18,7 @@ public class ScheduleActivity {
     private String inizio;
     private String sede;
 
+    public String getMateria() {
+        return materia;
+    }
 }

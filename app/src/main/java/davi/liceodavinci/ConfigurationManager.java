@@ -113,7 +113,6 @@ class ConfigurationManager {
     }
 
     private void saveCommJSONFromList(List<Communication.LocalCommunication> communications) {
-
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(communications);
@@ -142,5 +141,22 @@ class ConfigurationManager {
         String json = sharedPreferences.getString(activity.getString(R.string.stored_class_list_key), "");
         Gson gson = new Gson();
         return gson.fromJson(json, List.class);
+    }
+
+    void saveSchedule(List<ScheduleActivity> scheduleActivities, String key){
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(scheduleActivities);
+        prefsEditor.putString(key.toLowerCase(), json);
+        prefsEditor.apply();
+    }
+
+    List<ScheduleActivity> getScheduleListFromSavedJSON(String key){
+        String json = sharedPreferences.getString(key.toLowerCase(), "");
+        Gson gson = new Gson();
+        Type listType = new TypeToken<ArrayList<ScheduleActivity>>() {
+        }.getType();
+
+        return gson.fromJson(json, listType);
     }
 }
