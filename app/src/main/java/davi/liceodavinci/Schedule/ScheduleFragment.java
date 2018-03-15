@@ -1,4 +1,4 @@
-package davi.liceodavinci;
+package davi.liceodavinci.Schedule;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -7,6 +7,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +26,13 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import davi.liceodavinci.ConfigurationManager;
+import davi.liceodavinci.MainActivity;
+import davi.liceodavinci.R;
 
 /**
  * Created by Emanuele on 07/02/2018 at 16:36!
@@ -42,7 +51,7 @@ public class ScheduleFragment extends Fragment {
     private String[] classesNum = {"1", "2", "3", "4", "5"};
 
     @SuppressLint("ValidFragment")
-    ScheduleFragment(Activity activity) {
+    public ScheduleFragment(Activity activity) {
         this.activity = activity;
     }
 
@@ -193,13 +202,50 @@ public class ScheduleFragment extends Fragment {
 
     public void fetchClassComplete(List<ScheduleActivity> activities, String classId) {
         ConfigurationManager.getIstance().saveSchedule(activities, classId);
-        renderSchedule();
+        renderSchedule(classId);
     }
 
-    public void renderSchedule(){
+    public void renderSchedule(String classId){
+
+        RecyclerView[] scheduleRecyclerViews = new RecyclerView[6];
+        scheduleRecyclerViews[ScheduleActivity.MON] = getActivity().findViewById(R.id.schedule_mon_recyclerview);
+        scheduleRecyclerViews[ScheduleActivity.TUE] = getActivity().findViewById(R.id.schedule_tue_recyclerview);
+        scheduleRecyclerViews[ScheduleActivity.WED] = getActivity().findViewById(R.id.schedule_wed_recyclerview);
+        scheduleRecyclerViews[ScheduleActivity.THU] = getActivity().findViewById(R.id.schedule_thu_recyclerview);
+        scheduleRecyclerViews[ScheduleActivity.FRI] = getActivity().findViewById(R.id.schedule_fri_recyclerview);
+        scheduleRecyclerViews[ScheduleActivity.SAT] = getActivity().findViewById(R.id.schedule_sat_recyclerview);
+
+        for (int i = 0; i < scheduleRecyclerViews.length-1; i++){
+            List<ScheduleActivity> scheduleActivities = ConfigurationManager.getIstance().getScheduleListFromSavedJSON(classId);
+            scheduleActivities = getDayOfWeekSchedule(scheduleActivities, i);
+            scheduleRecyclerViews[i].setLayoutManager(new LinearLayoutManager(getActivity()));
+            ScheduleCardAdapter adapter = new ScheduleCardAdapter(scheduleActivities);
+            scheduleRecyclerViews[i].setAdapter(adapter);
+
+            Log.d("rendering", String.valueOf(scheduleActivities.get(0).getMateria()));
+        }
 
         //controlla se la sezione (personale, classi, docente) è cambiata
         //se no si prende l'orario dalle shared
         //se non ce --> snackbar con errore connessione
+    }
+
+    private List<ScheduleActivity> getDayOfWeekSchedule(List<ScheduleActivity> scheduleActivities, int dayOfWeek){
+
+        List<ScheduleActivity> resultSchedule = new ArrayList<>();
+        for (ScheduleActivity anyActivity : scheduleActivities){
+            if (anyActivity.getGiorno() == dayOfWeek){
+                resultSchedule.add(anyActivity);
+            }
+        }
+
+        Collections.sort(resultSchedule, new Comparator<ScheduleActivity>() {
+            @Override
+            public int compare(ScheduleActivity s1, ScheduleActivity s2) {
+                return Integer.valueOf(s1.getHourNum()).compareTo(s2.getHourNum());
+            }
+        });
+
+        return resultSchedule;
     }
 }

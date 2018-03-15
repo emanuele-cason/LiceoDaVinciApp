@@ -1,4 +1,4 @@
-package davi.liceodavinci;
+package davi.liceodavinci.Communications;
 
 import android.annotation.SuppressLint;
 
@@ -19,33 +19,33 @@ public class Communication {
     private String tipo;
     private String url;
 
-    static final int COMM_STUDENTS = 0;
-    static final int COMM_PARENTS = 1;
-    static final int COMM_PROFS = 2;
-    static final int COMM_SAVED = 3;
+    public static final int COMM_STUDENTS = 0;
+    public static final int COMM_PARENTS = 1;
+    public static final int COMM_PROFS = 2;
+    public static final int COMM_SAVED = 3;
 
-    static final int REMOTE = 0;
-    static final int CACHED = 1;
-    static final int DOWNLOADED = 2;
+    public static final int REMOTE = 0;
+    public static final int CACHED = 1;
+    public static final int DOWNLOADED = 2;
 
-    Communication(String name, String date, String type, String URL) {
+    public Communication(String name, String date, String type, String URL) {
         nome = name;
         data = date;
         tipo = type;
         url = URL;
     }
 
-    class LocalCommunication extends davi.liceodavinci.Communication {
+    public class LocalCommunication extends Communication {
         private int status;
         private boolean seen;
 
-        LocalCommunication(davi.liceodavinci.Communication communication, int status, boolean seen){
+        LocalCommunication(Communication communication, int status, boolean seen){
             super(communication.getName(), communication.getData(), communication.getType(), communication.getUrl());
             this.status = status;
             this.seen = seen;
         }
 
-        LocalCommunication(davi.liceodavinci.Communication communication){
+        public LocalCommunication(Communication communication){
             super(communication.getName(), communication.getData(), communication.getType(), communication.getUrl());
             this.status = REMOTE;
             this.seen = false;
@@ -53,22 +53,22 @@ public class Communication {
 
         void setSeen(boolean seen){this.seen = seen;}
 
-        boolean isSeen(){return seen;}
+        public boolean isSeen(){return seen;}
 
-        void setStatus(int status){
+        public void setStatus(int status){
             if (status == DOWNLOADED || status == CACHED || status == REMOTE) this.status = status;
         }
 
-        int getStatus(){
+        public int getStatus(){
             return status;
         }
     }
 
-    String getName() {
+    public String getName() {
         return nome;
     }
 
-    String getNameFormatted(){
+    public String getNameFormatted(){
         //^(?:(\d+)\s*[-|_]+\s*(com.)*\s*)+    regex originale
 
         String regex = "^(?:(\\d+)\\s*[-|_]+\\s*(com.)*\\s*)+";
@@ -80,11 +80,11 @@ public class Communication {
         }else return nome;
     }
 
-    String getData() {
+    public String getData() {
         return data;
     }
 
-    Date getDataObject(){
+    public Date getDataObject(){
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSSSSS");
 
@@ -100,7 +100,7 @@ public class Communication {
 
     private String getType(){return tipo;}
 
-    String getUrl() {
+    public String getUrl() {
         return url;
     }
 
@@ -116,7 +116,7 @@ public class Communication {
         return 0;
     }
 
-    void setUrl(String url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 }

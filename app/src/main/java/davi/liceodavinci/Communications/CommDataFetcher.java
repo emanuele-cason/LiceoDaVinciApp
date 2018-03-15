@@ -1,4 +1,4 @@
-package davi.liceodavinci;
+package davi.liceodavinci.Communications;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -32,14 +32,14 @@ import okhttp3.ResponseBody;
      * dall'API. Da rimuovere e rimpiazzare con la stringa commentata (responseBody.string() --> il vero risultato dell'api).
     * */
 
-class CommDataFetcher {
+public class CommDataFetcher {
 
     private CommunicationsFragment communicationsFragment;
     private final String requestUrls[] = new String[3];
     private OkHttpClient client = new OkHttpClient();
     private Activity activity;
 
-    CommDataFetcher(CommunicationsFragment communicationsFragment, Activity activity) {
+    public CommDataFetcher(CommunicationsFragment communicationsFragment, Activity activity) {
         this.communicationsFragment = communicationsFragment;
         this.activity = activity;
 
@@ -48,7 +48,7 @@ class CommDataFetcher {
         requestUrls[Communication.COMM_PROFS] = "http://www.liceodavinci.tv/api/comunicati/docenti";
     }
 
-    void fetchCommunicationsJson(int section) throws IOException {
+    public void fetchCommunicationsJson(int section) throws IOException {
 
         Request request = new Request.Builder()
                 .url(requestUrls[section])

@@ -1,4 +1,4 @@
-package davi.liceodavinci;
+package davi.liceodavinci.Communications;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -16,6 +16,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import davi.liceodavinci.ConfigurationManager;
+import davi.liceodavinci.R;
+
 /**
  * Created by Emanuele on 01/01/2018 at 15:21!
  */
@@ -27,7 +30,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private int section;
     private CommunicationsFragment communicationsFragment;
 
-    CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment, List<Communication.LocalCommunication> communications, int section) {
+    public CommCardAdapter(Activity activity, CommunicationsFragment communicationsFragment, List<Communication.LocalCommunication> communications, int section) {
         this.communications = communications;
         this.activity = activity;
         this.section = section;

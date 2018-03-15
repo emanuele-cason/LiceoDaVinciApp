@@ -1,4 +1,4 @@
-package davi.liceodavinci;
+package davi.liceodavinci.Communications;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,6 +20,9 @@ import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
 
+import davi.liceodavinci.ConfigurationManager;
+import davi.liceodavinci.R;
+
 /**
  * Created by Emanuele on 07/01/2018 at 17:57 at 20:21!
  */
@@ -31,7 +34,7 @@ public class PdfRenderFragment extends Fragment {
     private Communication.LocalCommunication communication;
 
     @SuppressLint("ValidFragment")
-    protected PdfRenderFragment(Activity activity, Communication.LocalCommunication communication) {
+    public PdfRenderFragment(Activity activity, Communication.LocalCommunication communication) {
         this.activity = activity;
         this.communication = communication;
     }

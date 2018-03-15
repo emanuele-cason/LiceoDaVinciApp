@@ -19,6 +19,10 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.File;
 
+import davi.liceodavinci.Communications.Communication;
+import davi.liceodavinci.Communications.CommunicationsFragment;
+import davi.liceodavinci.Schedule.ScheduleFragment;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 

@@ -1,4 +1,4 @@
-package davi.liceodavinci;
+package davi.liceodavinci.Communications;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -19,10 +19,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static davi.liceodavinci.Communication.CACHED;
-import static davi.liceodavinci.Communication.DOWNLOADED;
+import davi.liceodavinci.ConfigurationManager;
+import davi.liceodavinci.R;
 
-class CommDownload extends AsyncTask<Void, Integer, String> {
+import static davi.liceodavinci.Communications.Communication.CACHED;
+import static davi.liceodavinci.Communications.Communication.DOWNLOADED;
+
+public class CommDownload extends AsyncTask<Void, Integer, String> {
 
     @SuppressLint("StaticFieldLeak")
     private Activity activity;
@@ -33,10 +36,10 @@ class CommDownload extends AsyncTask<Void, Integer, String> {
     private Communication.LocalCommunication communication;
     private CommunicationsFragment communicationFragment;
 
-    static final int DOWNLOAD = DOWNLOADED;
-    static final int CACHE = CACHED;
+    public static final int DOWNLOAD = DOWNLOADED;
+    public static final int CACHE = CACHED;
 
-    CommDownload(Activity activity, CommunicationsFragment communicationsFragment, Communication.LocalCommunication communication, int savingMode, boolean openOnFinish) {
+    public CommDownload(Activity activity, CommunicationsFragment communicationsFragment, Communication.LocalCommunication communication, int savingMode, boolean openOnFinish) {
         this.activity = activity;
         this.savingMode = savingMode;
         this.openOnFinish = openOnFinish;

@@ -11,12 +11,15 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import davi.liceodavinci.Communications.Communication;
+import davi.liceodavinci.Schedule.ScheduleActivity;
+
 
 /**
  * Created by Emanuele on 16/01/2018 at 17:24!
  */
 
-class ConfigurationManager {
+public class ConfigurationManager {
     private static ConfigurationManager configurationManager;
     private SharedPreferences sharedPreferences;
     private Activity activity;
@@ -27,11 +30,11 @@ class ConfigurationManager {
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
     }
 
-    static ConfigurationManager getIstance() {
+    public static ConfigurationManager getIstance() {
         return configurationManager;
     }
 
-    void loadCommunication(Communication.LocalCommunication communication) {
+    public void loadCommunication(Communication.LocalCommunication communication) {
         List<Communication.LocalCommunication> communications = new ArrayList<>();
 
         if (!(getCommListFromSavedJSON() == null)) {
@@ -80,7 +83,7 @@ class ConfigurationManager {
         saveCommJSONFromList(communications);
     }
 
-    void setCommStatus(Communication.LocalCommunication communication, int status){
+    public void setCommStatus(Communication.LocalCommunication communication, int status){
         List<Communication.LocalCommunication> communications = new ArrayList<>();
 
         if (!(getCommListFromSavedJSON() == null)) {
@@ -96,7 +99,7 @@ class ConfigurationManager {
         saveCommJSONFromList(communications);
     }
 
-    boolean getCommNotificationEnabled(int commType) {
+    public boolean getCommNotificationEnabled(int commType) {
         switch (commType) {
             case Communication.COMM_STUDENTS: {
                 return sharedPreferences.getBoolean(activity.getString(R.string.notifications_enabled_comm_students), false);
@@ -120,7 +123,7 @@ class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    List<Communication.LocalCommunication> getCommListFromSavedJSON() {
+    public List<Communication.LocalCommunication> getCommListFromSavedJSON() {
         String json = sharedPreferences.getString(activity.getString(R.string.stored_comm_list_key), "");
         Gson gson = new Gson();
         Type listType = new TypeToken<ArrayList<Communication.LocalCommunication>>() {
@@ -129,7 +132,7 @@ class ConfigurationManager {
         return gson.fromJson(json, listType);
     }
 
-    void saveClassesList(List<String> classes){
+    public void saveClassesList(List<String> classes){
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(classes);
@@ -137,13 +140,13 @@ class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    List<String> getClassesListFromSavedJSON(){
+    public List<String> getClassesListFromSavedJSON(){
         String json = sharedPreferences.getString(activity.getString(R.string.stored_class_list_key), "");
         Gson gson = new Gson();
         return gson.fromJson(json, List.class);
     }
 
-    void saveSchedule(List<ScheduleActivity> scheduleActivities, String key){
+    public void saveSchedule(List<ScheduleActivity> scheduleActivities, String key){
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(scheduleActivities);
@@ -151,7 +154,7 @@ class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    List<ScheduleActivity> getScheduleListFromSavedJSON(String key){
+    public List<ScheduleActivity> getScheduleListFromSavedJSON(String key){
         String json = sharedPreferences.getString(key.toLowerCase(), "");
         Gson gson = new Gson();
         Type listType = new TypeToken<ArrayList<ScheduleActivity>>() {

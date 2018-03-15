@@ -1,4 +1,4 @@
-package davi.liceodavinci;
+package davi.liceodavinci.Schedule;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -91,14 +91,14 @@ class ScheduleDataFetcher {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
-                scheduleFragment.renderSchedule();
+                fetchClassFailed(classNum.concat(classSection));
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
-                        scheduleFragment.renderSchedule();
+                        fetchClassFailed(classNum.concat(classSection));
                         throw new IOException("Unexpected code " + response);
                     }
 
@@ -119,6 +119,15 @@ class ScheduleDataFetcher {
             @Override
             public void run() {
                 scheduleFragment.fetchClassComplete(result, classId);
+            }
+        });
+    }
+
+    private void fetchClassFailed(final String classId){
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                scheduleFragment.renderSchedule(classId);
             }
         });
     }

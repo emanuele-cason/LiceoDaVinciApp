@@ -7,15 +7,17 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import davi.liceodavinci.Communications.Communication;
+
 /**
  * Created by Emanuele on 15/01/2018 at 20:06!
  */
 
 public class NotificationsManager extends FirebaseMessagingService {
 
-    static final String COMM_STUDENTS_TOPIC = "comunicati-studenti";
-    static final String COMM_PARENTS_TOPIC = "comunicati-genitori";
-    static final String COMM_PROFS_TOPIC = "comunicati-docenti";
+    public static final String COMM_STUDENTS_TOPIC = "comunicati-studenti";
+    public static final String COMM_PARENTS_TOPIC = "comunicati-genitori";
+    public static final String COMM_PROFS_TOPIC = "comunicati-docenti";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {

@@ -1,4 +1,4 @@
-package davi.liceodavinci;
+package davi.liceodavinci.Communications;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import davi.liceodavinci.ConfigurationManager;
+import davi.liceodavinci.R;
 
 /**
  * Created by Emanuele on 30/12/2017 at 23:25 at 20:20 at 20:21!
@@ -189,7 +192,7 @@ public class CommunicationsFragment extends Fragment {
         }
     }
 
-    protected void updateItem (Communication.LocalCommunication communication){
+    public void updateItem(Communication.LocalCommunication communication){
         for (Communication.LocalCommunication comm : this.communications){
             if (comm.getName().equals(communication.getName())){
                 commRecyclerView.getAdapter().notifyItemChanged(this.communications.indexOf(comm), comm);
@@ -199,7 +202,7 @@ public class CommunicationsFragment extends Fragment {
     }
 
 
-    protected void fetchComplete(List<Communication> communications) {
+    public void fetchComplete(List<Communication> communications) {
         List<Communication.LocalCommunication> localCommunications = new ArrayList<>();
 
         for (Communication comm : communications)
@@ -210,7 +213,7 @@ public class CommunicationsFragment extends Fragment {
         setResult(this.communications, searchQuery);
     }
 
-    protected void fetchFailed() {
+    public void fetchFailed() {
         swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
         swipeRefreshCom.setRefreshing(false);
         Snackbar snackbar = Snackbar
