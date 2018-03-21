@@ -2,6 +2,7 @@ package davi.liceodavinci.Schedule;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -124,6 +125,7 @@ class ScheduleDataFetcher {
     }
 
     private void fetchClassFailed(final String classId){
+        Log.d("Fetch","Failed");
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

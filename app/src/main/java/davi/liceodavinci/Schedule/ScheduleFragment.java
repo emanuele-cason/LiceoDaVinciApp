@@ -6,10 +6,10 @@ import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
@@ -46,6 +47,8 @@ public class ScheduleFragment extends Fragment {
     private final int PROFS_SCHEDULE = 2;
 
     private Activity activity;
+    ScheduleFragment thisFragment;
+    private LinearLayout scheduleContainer;
     private int currentSchedule = 0;
     private List<String> classes;
     private String[] classesNum = {"1", "2", "3", "4", "5"};
@@ -53,6 +56,7 @@ public class ScheduleFragment extends Fragment {
     @SuppressLint("ValidFragment")
     public ScheduleFragment(Activity activity) {
         this.activity = activity;
+        this.thisFragment = this;
     }
 
     @Override
@@ -76,11 +80,27 @@ public class ScheduleFragment extends Fragment {
 
         switch (currentSchedule) {
             case PERSONAL_SCHEDULE: {
+                try {
+                    scheduleContainer.setVisibility(View.GONE);
+                } catch (Exception ignored) {
+                }
 
                 break;
             }
             case CLASSES_SCHEDULE: {
+                try {
+                    scheduleContainer.setVisibility(View.GONE);
+                } catch (Exception ignored) {
+                }
+
                 final ScheduleDataFetcher scheduleDataFetcher = new ScheduleDataFetcher(activity, this);
+                try {
+                    scheduleDataFetcher.fetchClassesList();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                classes = ConfigurationManager.getIstance().getClassesListFromSavedJSON();
 
                 inflater.inflate(R.menu.schedule_actionbar, menu);
 
@@ -97,6 +117,12 @@ public class ScheduleFragment extends Fragment {
                 firstSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        if (classes == null) {
+                            Snackbar snackbar = Snackbar
+                                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                            return;
+                        }
                         List<String> sections = new ArrayList<>();
                         for (String cl : classes)
                             if (cl.contains(firstSpinner.getSelectedItem().toString()))
@@ -118,6 +144,11 @@ public class ScheduleFragment extends Fragment {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         try {
+                            scheduleContainer.setVisibility(View.GONE);
+                        } catch (Exception ignored) {
+                        }
+
+                        try {
                             scheduleDataFetcher.fetchClassSchedule(firstSpinner.getSelectedItem().toString(), secondSpinner.getSelectedItem().toString());
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -133,6 +164,11 @@ public class ScheduleFragment extends Fragment {
                 break;
             }
             case PROFS_SCHEDULE: {
+                try {
+                    scheduleContainer.setVisibility(View.GONE);
+                } catch (Exception ignored) {
+                }
+
                 break;
             }
         }
@@ -141,15 +177,9 @@ public class ScheduleFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        scheduleContainer = activity.findViewById(R.id.schedule_scrollview);
 
-        ScheduleDataFetcher scheduleDataFetcher = new ScheduleDataFetcher(activity, this);
-        try {
-            scheduleDataFetcher.fetchClassesList();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        AHBottomNavigation bar = (AHBottomNavigation) activity.findViewById(R.id.bottom_navigation);
+        AHBottomNavigation bar = activity.findViewById(R.id.bottom_navigation);
         bar.setDefaultBackgroundColor(Color.parseColor("#FEFEFE"));
         AHBottomNavigationItem personal = new AHBottomNavigationItem(
                 "Personale",
@@ -205,7 +235,7 @@ public class ScheduleFragment extends Fragment {
         renderSchedule(classId);
     }
 
-    public void renderSchedule(String classId){
+    public void renderSchedule(final String classId) {
 
         RecyclerView[] scheduleRecyclerViews = new RecyclerView[6];
         scheduleRecyclerViews[ScheduleActivity.MON] = getActivity().findViewById(R.id.schedule_mon_recyclerview);
@@ -215,14 +245,43 @@ public class ScheduleFragment extends Fragment {
         scheduleRecyclerViews[ScheduleActivity.FRI] = getActivity().findViewById(R.id.schedule_fri_recyclerview);
         scheduleRecyclerViews[ScheduleActivity.SAT] = getActivity().findViewById(R.id.schedule_sat_recyclerview);
 
-        for (int i = 0; i < scheduleRecyclerViews.length-1; i++){
-            List<ScheduleActivity> scheduleActivities = ConfigurationManager.getIstance().getScheduleListFromSavedJSON(classId);
-            scheduleActivities = getDayOfWeekSchedule(scheduleActivities, i);
-            scheduleRecyclerViews[i].setLayoutManager(new LinearLayoutManager(getActivity()));
-            ScheduleCardAdapter adapter = new ScheduleCardAdapter(scheduleActivities);
-            scheduleRecyclerViews[i].setAdapter(adapter);
+        AHBottomNavigation bar = activity.findViewById(R.id.bottom_navigation);
 
-            Log.d("rendering", String.valueOf(scheduleActivities.get(0).getMateria()));
+        for (int i = 0; i < scheduleRecyclerViews.length; i++) {
+            List<ScheduleActivity> scheduleActivities = ConfigurationManager.getIstance().getScheduleListFromSavedJSON(classId);
+            if (scheduleActivities == null) {
+                Snackbar snackbar = Snackbar
+                        .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                        .setAction("RIPROVA", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                ScheduleDataFetcher scheduleDataFetcher = new ScheduleDataFetcher(activity, thisFragment);
+                                try {
+                                    scheduleDataFetcher.fetchClassSchedule(String.valueOf(classId.charAt(0)), String.valueOf(classId.charAt(1)));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                snackbar.show();
+            } else {
+                scheduleActivities = getDayOfWeekSchedule(scheduleActivities, i);
+                if (scheduleActivities.size() > 0) {
+                    scheduleRecyclerViews[i].setLayoutManager(new LinearLayoutManager(getActivity()) {
+                        @Override
+                        public boolean canScrollVertically() {
+                            return false;
+                        }
+                    });
+
+                    scheduleContainer.setVisibility(View.VISIBLE);
+
+                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities);
+                    scheduleRecyclerViews[i].setAdapter(adapter);
+                }
+
+                scheduleRecyclerViews[i].setPadding(0, 0, 0, bar.getHeight());
+            }
         }
 
         //controlla se la sezione (personale, classi, docente) è cambiata
@@ -230,11 +289,11 @@ public class ScheduleFragment extends Fragment {
         //se non ce --> snackbar con errore connessione
     }
 
-    private List<ScheduleActivity> getDayOfWeekSchedule(List<ScheduleActivity> scheduleActivities, int dayOfWeek){
+    private List<ScheduleActivity> getDayOfWeekSchedule(List<ScheduleActivity> scheduleActivities, int dayOfWeek) {
 
         List<ScheduleActivity> resultSchedule = new ArrayList<>();
-        for (ScheduleActivity anyActivity : scheduleActivities){
-            if (anyActivity.getGiorno() == dayOfWeek){
+        for (ScheduleActivity anyActivity : scheduleActivities) {
+            if (anyActivity.getGiorno() == dayOfWeek) {
                 resultSchedule.add(anyActivity);
             }
         }

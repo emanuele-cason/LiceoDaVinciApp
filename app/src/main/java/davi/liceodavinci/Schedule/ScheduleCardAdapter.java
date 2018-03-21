@@ -1,11 +1,13 @@
 package davi.liceodavinci.Schedule;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -19,9 +21,11 @@ import davi.liceodavinci.R;
 public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<ScheduleActivity> scheduleActivities;
+    private Activity activity;
 
-    ScheduleCardAdapter(List<ScheduleActivity> scheduleActivities) {
+    ScheduleCardAdapter(Activity activity, List<ScheduleActivity> scheduleActivities) {
         this.scheduleActivities = scheduleActivities;
+        this.activity = activity;
     }
 
     @Override
@@ -34,7 +38,16 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+        int margin = (int) activity.getResources().getDimension(R.dimen.schedule_activity_margin);
+
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                (int) (activity.getResources().getDimension(R.dimen.schedule_activity_height) +
+                        (scheduleActivities.get(position).getDuration() > 1 ? (margin) : 0)) * scheduleActivities.get(position).getDuration());
+        layoutParams.setMargins(margin, margin, margin, margin);
+
         ((ViewHolder) holder).titleTextView.setText(scheduleActivities.get(position).getMateria());
+        ((ViewHolder) holder).cardCell.setLayoutParams(layoutParams);
     }
 
     @Override
