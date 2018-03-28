@@ -1,8 +1,7 @@
-package davi.liceodavinci.Schedule;
+package davi.liceodavinci.schedule;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -51,6 +50,36 @@ class ScheduleDataFetcher {
         requestUrls[GET_CLASSES] = "http://www.liceodavinci.tv/api/classi";
         requestUrls[GET_CLASS] = "http://www.liceodavinci.tv/api/orario/classe/";
         requestUrls[GET_PROFS] = "http://www.liceodavinci.tv/api/docenti";
+    }
+
+    void fetchProfsList() throws Exception {
+        Request request = new Request.Builder()
+                .url(requestUrls[GET_PROFS])
+                .addHeader("Accept", "application/json")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Unexpected code " + response);
+                    }
+
+                    Gson gson = new Gson();
+                    Type listType = new TypeToken<ArrayList<Prof>>() {
+                    }.getType();
+                    assert responseBody != null;
+                    List<Prof> profsListAPI = gson.fromJson(responseBody.string(), listType);
+                    fetchProfsComplete(profsListAPI);
+                }
+            }
+        });
     }
 
     void fetchClassesList() throws Exception {
@@ -104,17 +133,17 @@ class ScheduleDataFetcher {
                     }
 
                     Gson gson = new Gson();
-                    Type listType = new TypeToken<ArrayList<ScheduleActivity>>() {
+                    Type listType = new TypeToken<ArrayList<ScheduleEvent>>() {
                     }.getType();
                     assert responseBody != null;
-                    List<ScheduleActivity> classScheduleAPI = gson.fromJson(responseBody.string(), listType);
+                    List<ScheduleEvent> classScheduleAPI = gson.fromJson(responseBody.string(), listType);
                     fetchClassComplete(classScheduleAPI, classNum.concat(classSection));
                 }
             }
         });
     }
 
-    private void fetchClassComplete(final List<ScheduleActivity> result, final String classId) {
+    private void fetchClassComplete(final List<ScheduleEvent> result, final String classId) {
 
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -124,8 +153,7 @@ class ScheduleDataFetcher {
         });
     }
 
-    private void fetchClassFailed(final String classId){
-        Log.d("Fetch","Failed");
+    private void fetchClassFailed(final String classId) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -140,6 +168,16 @@ class ScheduleDataFetcher {
             @Override
             public void run() {
                 scheduleFragment.fetchClassesComplete(result);
+            }
+        });
+    }
+
+    private void fetchProfsComplete(final List<Prof> result) {
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                scheduleFragment.fetchProfsListComplete(result);
             }
         });
     }

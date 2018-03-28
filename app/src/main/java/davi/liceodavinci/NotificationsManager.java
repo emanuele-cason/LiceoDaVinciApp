@@ -7,7 +7,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import davi.liceodavinci.Communications.Communication;
+import davi.liceodavinci.communications.Communication;
 
 /**
  * Created by Emanuele on 15/01/2018 at 20:06!

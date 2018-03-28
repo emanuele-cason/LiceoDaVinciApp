@@ -1,4 +1,4 @@
-package davi.liceodavinci.Schedule;
+package davi.liceodavinci.schedule;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,10 +20,11 @@ import davi.liceodavinci.R;
 
 public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<ScheduleActivity> scheduleActivities;
+    private List<ScheduleEvent> scheduleActivities;
     private Activity activity;
+    private int lastPosition;
 
-    ScheduleCardAdapter(Activity activity, List<ScheduleActivity> scheduleActivities) {
+    ScheduleCardAdapter(Activity activity, List<ScheduleEvent> scheduleActivities) {
         this.scheduleActivities = scheduleActivities;
         this.activity = activity;
     }
@@ -39,15 +40,16 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        int margin = (int) activity.getResources().getDimension(R.dimen.schedule_activity_margin);
+        int margin = (int) activity.getResources().getDimension(R.dimen.schedule_event_margin);
 
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                (int) (activity.getResources().getDimension(R.dimen.schedule_activity_height) +
+                (int) (activity.getResources().getDimension(R.dimen.schedule_event_height) +
                         (scheduleActivities.get(position).getDuration() > 1 ? (margin) : 0)) * scheduleActivities.get(position).getDuration());
         layoutParams.setMargins(margin, margin, margin, margin);
 
         ((ViewHolder) holder).titleTextView.setText(scheduleActivities.get(position).getMateria());
         ((ViewHolder) holder).cardCell.setLayoutParams(layoutParams);
+        //setAnimation(holder.itemView, position);
     }
 
     @Override

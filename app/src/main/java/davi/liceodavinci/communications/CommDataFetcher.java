@@ -1,4 +1,4 @@
-package davi.liceodavinci.Communications;
+package davi.liceodavinci.communications;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;

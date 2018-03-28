@@ -11,8 +11,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import davi.liceodavinci.Communications.Communication;
-import davi.liceodavinci.Schedule.ScheduleActivity;
+import davi.liceodavinci.communications.Communication;
+import davi.liceodavinci.schedule.Prof;
+import davi.liceodavinci.schedule.ScheduleEvent;
 
 
 /**
@@ -146,7 +147,7 @@ public class ConfigurationManager {
         return gson.fromJson(json, List.class);
     }
 
-    public void saveSchedule(List<ScheduleActivity> scheduleActivities, String key){
+    public void saveSchedule(List<ScheduleEvent> scheduleActivities, String key){
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(scheduleActivities);
@@ -154,12 +155,20 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    public List<ScheduleActivity> getScheduleListFromSavedJSON(String key){
+    public List<ScheduleEvent> getScheduleListFromSavedJSON(String key){
         String json = sharedPreferences.getString(key.toLowerCase(), "");
         Gson gson = new Gson();
-        Type listType = new TypeToken<ArrayList<ScheduleActivity>>() {
+        Type listType = new TypeToken<ArrayList<ScheduleEvent>>() {
         }.getType();
 
         return gson.fromJson(json, listType);
+    }
+
+    public void saveProfsList (List<Prof> profsList){
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(profsList);
+        prefsEditor.putString(activity.getString(R.string.stored_profs_list_key), json);
+        prefsEditor.apply();
     }
 }

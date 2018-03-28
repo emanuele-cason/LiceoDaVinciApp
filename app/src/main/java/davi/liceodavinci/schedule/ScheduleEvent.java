@@ -1,10 +1,10 @@
-package davi.liceodavinci.Schedule;
+package davi.liceodavinci.schedule;
 
 /**
  * Created by Emanuele on 12/03/2018 at 23:05!
  */
 
-public class ScheduleActivity {
+public class ScheduleEvent {
 
     static final int MON = 0;
     static final int TUE = 1;

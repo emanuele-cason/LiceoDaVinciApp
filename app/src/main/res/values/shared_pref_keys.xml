@@ -2,6 +2,7 @@
 <resources>
     <string name="stored_comm_list_key">stored_comm_list</string>
     <string name="stored_class_list_key">stored_class_list</string>
+    <string name="stored_profs_list_key">stored_profs</string>
     <string name="notifications_enabled_comm_students">notifications_students</string>
     <string name="notifications_enabled_comm_parents">notifications_parents</string>
     <string name="notifications_enabled_comm_profs">notifications_prof</string>

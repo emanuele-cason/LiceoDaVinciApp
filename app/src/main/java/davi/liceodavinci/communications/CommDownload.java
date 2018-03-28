@@ -1,4 +1,4 @@
-package davi.liceodavinci.Communications;
+package davi.liceodavinci.communications;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -22,8 +22,8 @@ import java.net.URL;
 import davi.liceodavinci.ConfigurationManager;
 import davi.liceodavinci.R;
 
-import static davi.liceodavinci.Communications.Communication.CACHED;
-import static davi.liceodavinci.Communications.Communication.DOWNLOADED;
+import static davi.liceodavinci.communications.Communication.CACHED;
+import static davi.liceodavinci.communications.Communication.DOWNLOADED;
 
 public class CommDownload extends AsyncTask<Void, Integer, String> {
 

@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import davi.liceodavinci.Communications.Communication;
+import davi.liceodavinci.communications.Communication;
 
 /**
  * Created by Emanuele on 27/01/2018 at 22:55!

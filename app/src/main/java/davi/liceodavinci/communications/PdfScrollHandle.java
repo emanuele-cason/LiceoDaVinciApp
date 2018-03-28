@@ -1,4 +1,4 @@
-package davi.liceodavinci.Communications;
+package davi.liceodavinci.communications;
 
 import android.content.Context;
 import android.graphics.Color;
