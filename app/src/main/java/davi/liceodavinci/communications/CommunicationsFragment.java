@@ -217,16 +217,18 @@ public class CommunicationsFragment extends Fragment {
 
     public void fetchFailed() {
         swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
-        swipeRefreshCom.setRefreshing(false);
-        Snackbar snackbar = Snackbar
-                .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                .setAction("RIPROVA", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        fetch();
-                    }
-                });
-        snackbar.show();
+        if (swipeRefreshCom != null){
+            swipeRefreshCom.setRefreshing(false);
+            Snackbar snackbar = Snackbar
+                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                    .setAction("RIPROVA", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            fetch();
+                        }
+                    });
+            snackbar.show();
+        }
     }
 
     private void setResult(List<Communication.LocalCommunication> communications, String query) {

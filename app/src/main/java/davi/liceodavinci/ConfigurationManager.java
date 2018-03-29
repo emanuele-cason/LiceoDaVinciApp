@@ -155,8 +155,25 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
+    public void saveSchedule(List<ScheduleEvent> scheduleActivities, Prof prof){
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(scheduleActivities);
+        prefsEditor.putString((prof.getSurname().concat(prof.getName())).toLowerCase(), json);
+        prefsEditor.apply();
+    }
+
     public List<ScheduleEvent> getScheduleListFromSavedJSON(String key){
         String json = sharedPreferences.getString(key.toLowerCase(), "");
+        Gson gson = new Gson();
+        Type listType = new TypeToken<ArrayList<ScheduleEvent>>() {
+        }.getType();
+
+        return gson.fromJson(json, listType);
+    }
+
+    public List<ScheduleEvent> getScheduleListFromSavedJSON(Prof prof){
+        String json = sharedPreferences.getString((prof.getSurname().concat(prof.getName())).toLowerCase(), "");
         Gson gson = new Gson();
         Type listType = new TypeToken<ArrayList<ScheduleEvent>>() {
         }.getType();
@@ -170,5 +187,14 @@ public class ConfigurationManager {
         String json = gson.toJson(profsList);
         prefsEditor.putString(activity.getString(R.string.stored_profs_list_key), json);
         prefsEditor.apply();
+    }
+
+    public List<Prof> getProfsListFromSavedJSON(){
+        String json = sharedPreferences.getString(activity.getString(R.string.stored_profs_list_key), "");
+        Gson gson = new Gson();
+        Type listType = new TypeToken<ArrayList<Prof>>() {
+        }.getType();
+
+        return gson.fromJson(json, listType);
     }
 }

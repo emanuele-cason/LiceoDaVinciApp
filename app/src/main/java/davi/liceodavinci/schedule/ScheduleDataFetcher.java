@@ -2,6 +2,8 @@ package davi.liceodavinci.schedule;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.view.View;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -11,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import davi.liceodavinci.R;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -35,13 +38,14 @@ import okhttp3.ResponseBody;
 class ScheduleDataFetcher {
 
     private ScheduleFragment scheduleFragment;
-    private final String requestUrls[] = new String[3];
+    private final String requestUrls[] = new String[4];
     private OkHttpClient client = new OkHttpClient();
     private Activity activity;
 
     private final int GET_CLASSES = 0;
     private final int GET_CLASS = 1;
     private final int GET_PROFS = 2;
+    private final int GET_PROF = 3;
 
     ScheduleDataFetcher(Activity activity, ScheduleFragment scheduleFragment) {
         this.activity = activity;
@@ -50,6 +54,7 @@ class ScheduleDataFetcher {
         requestUrls[GET_CLASSES] = "http://www.liceodavinci.tv/api/classi";
         requestUrls[GET_CLASS] = "http://www.liceodavinci.tv/api/orario/classe/";
         requestUrls[GET_PROFS] = "http://www.liceodavinci.tv/api/docenti";
+        requestUrls[GET_PROF] = "http://www.liceodavinci.tv/api/orario/docente/";
     }
 
     void fetchProfsList() throws Exception {
@@ -77,6 +82,39 @@ class ScheduleDataFetcher {
                     assert responseBody != null;
                     List<Prof> profsListAPI = gson.fromJson(responseBody.string(), listType);
                     fetchProfsComplete(profsListAPI);
+                }
+            }
+        });
+    }
+
+    void fetchProfSchedule(final Prof prof) throws Exception{
+
+        Request request = new Request.Builder()
+                .url(requestUrls[GET_PROF].concat(prof.getSurname()))
+                .addHeader("Accept", "application/json")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+                fetchProfFailed(prof);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful()) {
+                        fetchProfFailed(prof);
+                        throw new IOException("Unexpected code " + response);
+                    }
+
+                    Gson gson = new Gson();
+                    Type listType = new TypeToken<ArrayList<ScheduleEvent>>() {
+                    }.getType();
+                    assert responseBody != null;
+                    List<ScheduleEvent> profScheduleAPI = gson.fromJson(responseBody.string(), listType);
+                    fetchProfComplete(profScheduleAPI, prof);
                 }
             }
         });
@@ -154,12 +192,19 @@ class ScheduleDataFetcher {
     }
 
     private void fetchClassFailed(final String classId) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                scheduleFragment.renderSchedule(classId);
-            }
-        });
+        Snackbar snackbar = Snackbar
+                .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                .setAction("RIPROVA", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        try {
+                            fetchClassSchedule(String.valueOf(classId.charAt(0)), String.valueOf(classId.charAt(1)));
+                        } catch (IOException e) {
+                            fetchClassFailed(classId);
+                        }
+                    }
+                });
+        snackbar.show();
     }
 
     private void fetchClassesComplete(final List<String> result) {
@@ -180,5 +225,30 @@ class ScheduleDataFetcher {
                 scheduleFragment.fetchProfsListComplete(result);
             }
         });
+    }
+
+    private void fetchProfComplete(final List<ScheduleEvent> result, final Prof prof){
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                scheduleFragment.fetchProfComplete(result, prof);
+            }
+        });
+    }
+
+    private void fetchProfFailed(final Prof prof) {
+        Snackbar snackbar = Snackbar
+                .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                .setAction("RIPROVA", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        try {
+                            fetchProfSchedule(prof);
+                        } catch (Exception e) {
+                            fetchProfFailed(prof);
+                        }
+                    }
+                });
+        snackbar.show();
     }
 }
