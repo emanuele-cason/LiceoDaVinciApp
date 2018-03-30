@@ -16,8 +16,10 @@ import java.util.List;
 import davi.liceodavinci.R;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -51,10 +53,10 @@ class ScheduleDataFetcher {
         this.activity = activity;
         this.scheduleFragment = scheduleFragment;
 
-        requestUrls[GET_CLASSES] = "http://www.liceodavinci.tv/api/classi";
-        requestUrls[GET_CLASS] = "http://www.liceodavinci.tv/api/orario/classe/";
-        requestUrls[GET_PROFS] = "http://www.liceodavinci.tv/api/docenti";
-        requestUrls[GET_PROF] = "http://www.liceodavinci.tv/api/orario/docente/";
+        requestUrls[GET_CLASSES] = "http://192.168.1.6:8080/api/classi";
+        requestUrls[GET_CLASS] = "http://192.168.1.6:8080/api/orario/classe/";
+        requestUrls[GET_PROFS] = "http://192.168.1.6:8080/api/docenti";
+        requestUrls[GET_PROF] = "http://192.168.1.6:8080/api/orario/docente";
     }
 
     void fetchProfsList() throws Exception {
@@ -87,11 +89,15 @@ class ScheduleDataFetcher {
         });
     }
 
-    void fetchProfSchedule(final Prof prof) throws Exception{
+    void fetchProfSchedule(final Prof prof) throws Exception {
 
+        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody body = RequestBody.create(JSON, "{\"nome\": " + "\"" + prof.getName() + "\"" + ", \"cognome\": " + "\"" + prof.getSurname() + "\"" + "}");
         Request request = new Request.Builder()
-                .url(requestUrls[GET_PROF].concat(prof.getSurname()))
+                .url(requestUrls[GET_PROF])
+                .post(body)
                 .addHeader("Accept", "application/json")
+                .addHeader("Content-Type", "application/json")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -227,7 +233,7 @@ class ScheduleDataFetcher {
         });
     }
 
-    private void fetchProfComplete(final List<ScheduleEvent> result, final Prof prof){
+    private void fetchProfComplete(final List<ScheduleEvent> result, final Prof prof) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

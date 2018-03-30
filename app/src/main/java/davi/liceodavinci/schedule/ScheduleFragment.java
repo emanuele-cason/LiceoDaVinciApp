@@ -44,9 +44,9 @@ import davi.liceodavinci.R;
 @SuppressLint("ValidFragment")
 public class ScheduleFragment extends Fragment {
 
-    private final int PERSONAL_SCHEDULE = 0;
-    private final int CLASSES_SCHEDULE = 1;
-    private final int PROFS_SCHEDULE = 2;
+    public static final int PERSONAL_SCHEDULE = 0;
+    public static final int CLASSES_SCHEDULE = 1;
+    public static final int PROFS_SCHEDULE = 2;
 
     private Activity activity;
     ScheduleFragment thisFragment;
@@ -346,7 +346,7 @@ public class ScheduleFragment extends Fragment {
 
                     scheduleRecyclerViews[i].setVisibility(View.VISIBLE);
                     scheduleContainer.setVisibility(View.VISIBLE);
-                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities);
+                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, CLASSES_SCHEDULE);
                     scheduleRecyclerViews[i].setAdapter(adapter);
                     runLayoutAnimation(scheduleRecyclerViews[i]);
                 }else {
@@ -394,7 +394,7 @@ public class ScheduleFragment extends Fragment {
 
                     scheduleRecyclerViews[i].setVisibility(View.VISIBLE);
                     scheduleContainer.setVisibility(View.VISIBLE);
-                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities);
+                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, PROFS_SCHEDULE);
                     scheduleRecyclerViews[i].setAdapter(adapter);
                     runLayoutAnimation(scheduleRecyclerViews[i]);
                 }else {

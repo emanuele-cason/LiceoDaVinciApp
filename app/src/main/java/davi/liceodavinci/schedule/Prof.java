@@ -6,16 +6,16 @@ package davi.liceodavinci.schedule;
 
 public class Prof {
 
-    private String Nome;
-    private String Cognome;
+    private String nome;
+    private String cognome;
 
     public String getName() {
-        if (Nome == null) return "test";
-        return Nome;
+        if (nome == null) return "Errore";
+        return nome;
     }
 
     public String getSurname() {
-        if (Cognome == null) return "ssst";
-        return Cognome;
+        if (cognome == null) return "Porco cane!";
+        return cognome;
     }
 }

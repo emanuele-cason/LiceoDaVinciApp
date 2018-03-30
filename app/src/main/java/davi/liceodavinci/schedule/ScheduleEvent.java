@@ -6,6 +6,8 @@ package davi.liceodavinci.schedule;
 
 public class ScheduleEvent {
 
+    private static String[] beginTimes = {"08:05AM", "09:05AM", "10:00AM", "11:10AM", "12:05PM", "13:00PM"};
+
     static final int MON = 0;
     static final int TUE = 1;
     static final int WED = 2;
@@ -25,12 +27,17 @@ public class ScheduleEvent {
     private String inizio;
     private String sede;
 
+    public ScheduleEvent(int hourNum, String duration){
+        this.durata = duration;
+        this.inizio = beginTimes[hourNum];
+    }
+
     String getMateria() {
         return materia;
     }
 
     int getDuration() {
-        return Integer.parseInt(durata.substring(0, durata.indexOf("h")));
+        return Integer.parseInt(String.valueOf(durata.charAt(0)));
     }
 
     public int[] getBeginningTime() {
@@ -38,7 +45,6 @@ public class ScheduleEvent {
     }
 
     int getHourNum() {
-        String[] beginTimes = {"08:05AM", "09:05AM", "10:00AM", "11:10AM", "12:05PM", "13:00PM"};
         for (int i = 0; i < beginTimes.length; i++) if (inizio.equals(beginTimes[i])) return i;
         return -1;
     }
@@ -48,5 +54,13 @@ public class ScheduleEvent {
         for (int i = 0; i < dayKeywords.length; i++)
             if (giorno.toLowerCase().contains(dayKeywords[i])) return i;
         return -1;
+    }
+
+    public String getClasse() {
+        return classe;
+    }
+
+    public String getAula() {
+        return aula;
     }
 }

@@ -7,35 +7,50 @@
     android:animateLayoutChanges="true">
 
     <LinearLayout
+        android:id="@+id/schedule_prof_selection_bar"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:visibility="gone"
+        android:background="@color/colorPrimary"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:id="@+id/schedule_prof_selection_bar"
-        android:background="@color/colorPrimary"
         android:paddingLeft="16dp"
-        android:paddingRight="16dp">
+        android:paddingRight="16dp"
+        android:visibility="gone"
+        android:baselineAligned="false">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Docente"
-            android:textColor="@android:color/white"
-            android:layout_marginEnd="16dp" />
-
-        <View
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            />
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:gravity="start|center_vertical"
+            android:orientation="horizontal">
 
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:layout_gravity="center_vertical|end"
-            android:id="@+id/schedule_prof_spinner" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:lines="1"
+                android:ellipsize="end"
+                android:text="Docente"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:gravity="end|center_vertical"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/schedule_prof_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:gravity="end" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
