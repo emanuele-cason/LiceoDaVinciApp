@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/timetable_headers"
+        android:id="@+id/schedule_headers"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:background="#fcfcfc">
@@ -18,7 +18,8 @@
             android:gravity="center"
             android:text="Lun"
             android:textColor="@color/secondary_text"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:id="@+id/schedule_header_mon"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -28,7 +29,8 @@
             android:gravity="center"
             android:text="Mar"
             android:textColor="@color/secondary_text"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:id="@+id/schedule_header_tue"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -38,7 +40,8 @@
             android:gravity="center"
             android:text="Mer"
             android:textColor="@color/secondary_text"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:id="@+id/schedule_header_wed"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -48,7 +51,8 @@
             android:gravity="center"
             android:text="Gio"
             android:textColor="@color/secondary_text"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:id="@+id/schedule_header_thu"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -58,10 +62,10 @@
             android:gravity="center"
             android:text="Ven"
             android:textColor="@color/secondary_text"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:id="@+id/schedule_header_fri"/>
 
         <TextView
-            android:id="@+id/timetable_saturday_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1.0"
@@ -69,7 +73,8 @@
             android:gravity="center"
             android:text="Sab"
             android:textColor="@color/secondary_text"
-            android:textSize="13sp"/>
+            android:textSize="13sp"
+            android:id="@+id/schedule_header_sat"/>
 
     </LinearLayout>
 

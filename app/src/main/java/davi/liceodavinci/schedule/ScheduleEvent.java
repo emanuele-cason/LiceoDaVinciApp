@@ -27,12 +27,12 @@ public class ScheduleEvent {
     private String inizio;
     private String sede;
 
-    public ScheduleEvent(int hourNum, String duration){
+    ScheduleEvent(int hourNum, String duration){
         this.durata = duration;
         this.inizio = beginTimes[hourNum];
     }
 
-    String getMateria() {
+    String getSubject() {
         return materia;
     }
 
@@ -49,18 +49,26 @@ public class ScheduleEvent {
         return -1;
     }
 
-    int getGiorno() {
+    int getDay() {
         String[] dayKeywords = {"lun", "mar", "mer", "gio", "ven", "sab"};
         for (int i = 0; i < dayKeywords.length; i++)
             if (giorno.toLowerCase().contains(dayKeywords[i])) return i;
         return -1;
     }
 
-    public String getClasse() {
+    String getClassId() {
         return classe;
     }
 
-    public String getAula() {
+    String getClassroom() {
         return aula;
+    }
+
+    String getProfName() {
+        return doc_cognome;
+    }
+
+    String getProfSurname() {
+        return doc_nome;
     }
 }

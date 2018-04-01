@@ -11,17 +11,18 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@color/colorPrimary"
+        android:baselineAligned="false"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:visibility="gone"
-        android:baselineAligned="false">
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
+        android:weightSum="100"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="50"
+            android:layout_weight="30"
             android:gravity="start|center_vertical"
             android:orientation="horizontal">
 
@@ -29,8 +30,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:lines="1"
                 android:ellipsize="end"
+                android:lines="1"
                 android:text="Docente"
                 android:textColor="@android:color/white" />
 
@@ -39,7 +40,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="50"
+            android:layout_weight="70"
             android:gravity="end|center_vertical"
             android:orientation="horizontal">
 

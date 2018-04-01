@@ -4,12 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +33,13 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         //Questi cicli for annidati servono a skippare gli spazi vuoti in una colonna, se la prima ora è vuota ad esempio essa viene indicata con una card vuota
         for (int i = 0; i < scheduleEvents.get(scheduleEvents.size() - 1).getHourNum() + scheduleEvents.get(scheduleEvents.size() - 1).getDuration(); i++) {
-            Log.d("line", String.valueOf(i));
             boolean done = false;
 
             for (ScheduleEvent scheduleEvent : scheduleEvents) {
-                for (int d = 0; d < scheduleEvent.getDuration(); d++) {
-                    if ((scheduleEvent.getHourNum() + d) == i) {
-                        this.scheduleEvents.add(scheduleEvent);
-                        done = true;
-                        i = scheduleEvent.getHourNum() + scheduleEvent.getDuration();
-                    }
+                if ((scheduleEvent.getHourNum()) == i) {
+                    this.scheduleEvents.add(scheduleEvent);
+                    done = true;
+                    i = scheduleEvent.getHourNum() + scheduleEvent.getDuration() - 1;
                 }
             }
             if (!done) this.scheduleEvents.add(new ScheduleEvent(i, "1"));
@@ -67,21 +65,21 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         layoutParams.setMargins(margin, margin, margin, margin);
         ((ViewHolder) holder).cardCell.setLayoutParams(layoutParams);
 
-        if (scheduleEvents.get(position).getMateria() == null) {
+        if (scheduleEvents.get(position).getSubject() == null) {
             ((ViewHolder) holder).cardCell.setVisibility(View.INVISIBLE);
         }
 
         if (section == ScheduleFragment.CLASSES_SCHEDULE)
-            ((ViewHolder) holder).titleTextView.setText(scheduleEvents.get(position).getMateria());
+            ((ViewHolder) holder).titleTextView.setText(scheduleEvents.get(position).getSubject());
         if (section == ScheduleFragment.PROFS_SCHEDULE) {
             String title = "";
-            if (scheduleEvents.get(position).getClasse() != null) {
-                title = title.concat(scheduleEvents.get(position).getClasse());
-                if (scheduleEvents.get(position).getAula() != null)
-                    title = title.concat(" - ".concat(scheduleEvents.get(position).getAula()));
+            if (scheduleEvents.get(position).getClassId() != null) {
+                title = title.concat(scheduleEvents.get(position).getClassId());
+                if (scheduleEvents.get(position).getClassroom() != null)
+                    title = title.concat(" - ".concat(scheduleEvents.get(position).getClassroom()));
             } else {
-                if (scheduleEvents.get(position).getMateria() != null)
-                    title = title.concat(scheduleEvents.get(position).getMateria());
+                if (scheduleEvents.get(position).getSubject() != null)
+                    title = title.concat(scheduleEvents.get(position).getSubject());
             }
 
             ((ViewHolder) holder).titleTextView.setText(title);
@@ -108,7 +106,35 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         @Override
         public void onClick(View view) {
+            MaterialDialog dialog =
+                    new MaterialDialog.Builder(activity)
+                            .title(scheduleEvents.get(this.getLayoutPosition()).getSubject())
+                            .customView(R.layout.schedule_dialog, true)
+                            .build();
 
+            TextView profOrClassFieldName = (TextView) dialog.findViewById(R.id.schedule_dialog_prof_or_class_field_name);
+            TextView profOrClass = (TextView) dialog.findViewById(R.id.schedule_dialog_prof_or_class);
+            TextView classroom = (TextView) dialog.findViewById(R.id.schedule_dialog_classroom);
+            TextView duration = (TextView) dialog.findViewById(R.id.schedule_dialog_duration);
+
+            if (section == ScheduleFragment.CLASSES_SCHEDULE){
+                profOrClassFieldName.setText("Docente");
+                profOrClass.setText(scheduleEvents.get(this.getLayoutPosition()).getProfSurname().concat(" ").concat(scheduleEvents.get(this.getLayoutPosition()).getProfName()));
+            }
+
+            if (section == ScheduleFragment.PROFS_SCHEDULE){
+                profOrClassFieldName.setText("Classe");
+                profOrClass.setText(scheduleEvents.get(this.getLayoutPosition()).getClassId());
+            }
+
+            classroom.setText(scheduleEvents.get(this.getLayoutPosition()).getClassroom());
+            duration.setText(String.valueOf(scheduleEvents.get(this.getLayoutPosition()).getDuration()).concat(" h"));
+
+            if (profOrClass.getText().equals("")) profOrClass.setText("-");
+            if (classroom.getText().equals("")) classroom.setText("-");
+            if (duration.getText().equals("")) classroom.setText("-");
+
+            dialog.show();
         }
     }
 }

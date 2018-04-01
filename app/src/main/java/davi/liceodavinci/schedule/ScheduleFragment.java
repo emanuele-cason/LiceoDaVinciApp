@@ -23,12 +23,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -161,6 +163,9 @@ public class ScheduleFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+        selectTodayHeader();
+
         super.onViewCreated(view, savedInstanceState);
         scheduleContainer = activity.findViewById(R.id.schedule_scrollview);
         profSelectorBar = activity.findViewById(R.id.schedule_prof_selection_bar);
@@ -240,6 +245,57 @@ public class ScheduleFragment extends Fragment {
                 return true;
             }
         });
+    }
+
+    private void selectTodayHeader(){
+        TextView[] headers = new TextView[6];
+
+        headers[ScheduleEvent.MON] = activity.findViewById(R.id.schedule_header_mon);
+        headers[ScheduleEvent.TUE] = activity.findViewById(R.id.schedule_header_tue);
+        headers[ScheduleEvent.WED] = activity.findViewById(R.id.schedule_header_wed);
+        headers[ScheduleEvent.THU] = activity.findViewById(R.id.schedule_header_thu);
+        headers[ScheduleEvent.FRI] = activity.findViewById(R.id.schedule_header_fri);
+        headers[ScheduleEvent.SAT] = activity.findViewById(R.id.schedule_header_sat);
+
+        for (int i = 0; i < headers.length; i++){
+            headers[i].setTextColor(getResources().getColor(android.R.color.tab_indicator_text));
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+
+        switch (day) {
+
+            case Calendar.MONDAY:{
+                headers[ScheduleEvent.MON].setTextColor(activity.getResources().getColor(R.color.colorAccent));
+                break;
+            }
+
+            case Calendar.TUESDAY:{
+                headers[ScheduleEvent.TUE].setTextColor(activity.getResources().getColor(R.color.colorAccent));
+                break;
+            }
+
+            case Calendar.WEDNESDAY:{
+                headers[ScheduleEvent.WED].setTextColor(activity.getResources().getColor(R.color.colorAccent));
+                break;
+            }
+
+            case Calendar.THURSDAY:{
+                headers[ScheduleEvent.THU].setTextColor(activity.getResources().getColor(R.color.colorAccent));
+                break;
+            }
+
+            case Calendar.FRIDAY:{
+                headers[ScheduleEvent.FRI].setTextColor(activity.getResources().getColor(R.color.colorAccent));
+                break;
+            }
+
+            case Calendar.SATURDAY:{
+                headers[ScheduleEvent.SAT].setTextColor(activity.getResources().getColor(R.color.colorAccent));
+                break;
+            }
+        }
     }
 
     public void fetchClassesComplete(List<String> result) {
@@ -420,7 +476,7 @@ public class ScheduleFragment extends Fragment {
 
         List<ScheduleEvent> resultSchedule = new ArrayList<>();
         for (ScheduleEvent anyActivity : scheduleActivities) {
-            if (anyActivity.getGiorno() == dayOfWeek) {
+            if (anyActivity.getDay() == dayOfWeek) {
                 resultSchedule.add(anyActivity);
             }
         }
