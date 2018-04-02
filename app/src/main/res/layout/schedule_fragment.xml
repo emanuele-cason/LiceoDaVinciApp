@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:animateLayoutChanges="true">
 
     <LinearLayout
@@ -14,10 +13,10 @@
         android:baselineAligned="false"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
         android:paddingEnd="8dp"
-        android:weightSum="100"
-        android:visibility="gone">
+        android:paddingStart="16dp"
+        android:visibility="gone"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -55,81 +54,131 @@
 
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/schedule_empty_frame"
+    <LinearLayout
+        android:id="@+id/schedule_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/schedule_prof_selection_bar">
+        android:layout_height="match_parent"
+        android:layout_below="@id/schedule_prof_selection_bar"
+        android:orientation="vertical">
 
-        <include layout="@layout/schedule_week_header"/>
+        <FrameLayout
+            android:id="@+id/schedule_empty_frame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    </FrameLayout>
+            <include layout="@layout/schedule_week_header" />
 
-    <ScrollView
+        </FrameLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/schedule_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:orientation="horizontal"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/schedule_mon_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/schedule_tue_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/schedule_wed_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/schedule_thu_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/schedule_fri_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/schedule_sat_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                </android.support.v7.widget.RecyclerView>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/schedule_no_personal_schedule"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/schedule_empty_frame">
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone">
 
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="2dp"
-            android:layout_marginLeft="2dp"
-            android:id="@+id/schedule_scrollview"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:orientation="vertical">
 
-            <android.support.v7.widget.RecyclerView
+            <ImageView
+                android:layout_width="164dp"
+                android:layout_height="164dp"
+                android:src="@drawable/nothing_here"
+                android:layout_gravity="center_horizontal"/>
+
+            <TextView
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Nessun orario salvato"
+                android:textAlignment="center"
+                android:textSize="16sp"/>
+
+            <Button
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/schedule_mon_recyclerview">
-
-            </android.support.v7.widget.RecyclerView>
-
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/schedule_tue_recyclerview">
-
-            </android.support.v7.widget.RecyclerView>
-
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/schedule_wed_recyclerview">
-
-            </android.support.v7.widget.RecyclerView>
-
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/schedule_thu_recyclerview">
-
-            </android.support.v7.widget.RecyclerView>
-
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/schedule_fri_recyclerview">
-
-            </android.support.v7.widget.RecyclerView>
-
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/schedule_sat_recyclerview">
-
-            </android.support.v7.widget.RecyclerView>
+                android:id="@+id/schedule_select_personal_button"
+                android:background="?android:attr/selectableItemBackground"
+                android:text="Seleziona un orario"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:padding="16dp"
+                android:layout_marginBottom="48dp"
+                android:visibility="invisible"/>
 
         </LinearLayout>
 
-    </ScrollView>
+    </RelativeLayout>
 
     <com.aurelhubert.ahbottomnavigation.AHBottomNavigation
         android:id="@+id/bottom_navigation"

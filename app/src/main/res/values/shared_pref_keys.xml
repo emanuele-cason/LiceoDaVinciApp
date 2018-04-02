@@ -6,4 +6,5 @@
     <string name="notifications_enabled_comm_students">notifications_students</string>
     <string name="notifications_enabled_comm_parents">notifications_parents</string>
     <string name="notifications_enabled_comm_profs">notifications_prof</string>
+    <string name="stored_status_key">stored_my_status</string>
 </resources>

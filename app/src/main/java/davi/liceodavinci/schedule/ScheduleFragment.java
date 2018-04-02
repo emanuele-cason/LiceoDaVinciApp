@@ -21,10 +21,13 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 
@@ -54,7 +57,7 @@ public class ScheduleFragment extends Fragment {
     ScheduleFragment thisFragment;
     private LinearLayout scheduleContainer;
     private LinearLayout profSelectorBar;
-    private int currentSchedule = 0;
+    private int currentSchedule = PERSONAL_SCHEDULE;
     private List<String> classes;
     private String[] classesNum = {"1", "2", "3", "4", "5"};
 
@@ -167,7 +170,7 @@ public class ScheduleFragment extends Fragment {
         selectTodayHeader();
 
         super.onViewCreated(view, savedInstanceState);
-        scheduleContainer = activity.findViewById(R.id.schedule_scrollview);
+        scheduleContainer = activity.findViewById(R.id.schedule_table);
         profSelectorBar = activity.findViewById(R.id.schedule_prof_selection_bar);
 
         AHBottomNavigation bar = activity.findViewById(R.id.bottom_navigation);
@@ -187,64 +190,138 @@ public class ScheduleFragment extends Fragment {
                 R.drawable.ic_com_profs,
                 R.color.colorPrimary
         );
+
         bar.addItems(Arrays.asList(personal, classes, profs));
         bar.setAccentColor(Color.parseColor("#3F51B5"));
         bar.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
+
+        refreshTableContent(PERSONAL_SCHEDULE);
 
         bar.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
 
                 currentSchedule = position;
+                refreshTableContent(position);
                 getActivity().invalidateOptionsMenu();
 
-                switch (position) {
-                    case PERSONAL_SCHEDULE: {
-                        ((MainActivity) activity).getSupportActionBar().setTitle("Orario personale");
-                        profSelectorBar.setVisibility(View.GONE);
-
-                        try {
-                            scheduleContainer.setVisibility(View.GONE);
-                        } catch (Exception ignored) {
-                        }
-
-                        break;
-                    }
-                    case CLASSES_SCHEDULE: {
-                        ((MainActivity) activity).getSupportActionBar().setTitle("Orario classe");
-                        profSelectorBar.setVisibility(View.GONE);
-
-                        try {
-                            scheduleContainer.setVisibility(View.GONE);
-                        } catch (Exception ignored) {
-                        }
-
-                        break;
-                    }
-                    case PROFS_SCHEDULE: {
-                        ((MainActivity) activity).getSupportActionBar().setTitle("Orario docente");
-                        profSelectorBar.setVisibility(View.VISIBLE);
-                        List<Prof> profList = ConfigurationManager.getIstance().getProfsListFromSavedJSON();
-
-                        try {
-                            scheduleContainer.setVisibility(View.GONE);
-                        } catch (Exception ignored) {
-                        }
-
-                        try {
-                            new ScheduleDataFetcher(activity, thisFragment).fetchProfsList();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        if (profList != null) prepareProfsSelector(profList);
-
-                        break;
-                    }
-                }
                 return true;
             }
         });
+    }
+
+    private void refreshTableContent(int position){
+        LinearLayout sContainer = activity.findViewById(R.id.schedule_container);
+        RelativeLayout noPersonal = activity.findViewById(R.id.schedule_no_personal_schedule);
+        sContainer.setVisibility(View.VISIBLE);
+        noPersonal.setVisibility(View.GONE);
+
+        try {
+            scheduleContainer.setVisibility(View.GONE);
+        } catch (Exception ignored) {
+        }
+
+        switch (position) {
+            case PERSONAL_SCHEDULE: {
+
+                ((MainActivity) activity).getSupportActionBar().setTitle("Orario personale");
+                profSelectorBar.setVisibility(View.GONE);
+                Button select = noPersonal.findViewById(R.id.schedule_select_personal_button);
+
+                if (ConfigurationManager.getIstance().getClassesListFromSavedJSON() != null && ConfigurationManager.getIstance().getProfsListFromSavedJSON() != null){
+                    select.setVisibility(View.VISIBLE);
+                }else select.setVisibility(View.INVISIBLE);
+
+                if (ConfigurationManager.getIstance().getMyStatus() == null){
+                    sContainer.setVisibility(View.GONE);
+                    noPersonal.setVisibility(View.VISIBLE);
+
+                    select.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            MaterialDialog dialog =
+                                    new MaterialDialog.Builder(activity)
+                                            .title("Seleziona orario")
+                                            .customView(R.layout.schedule_select_dialog, true)
+                                            .build();
+
+                            final Spinner classId = (Spinner)dialog.findViewById(R.id.schedule_select_dialog_class);
+                            final Spinner section = (Spinner)dialog.findViewById(R.id.schedule_select_dialog_section);
+                            Spinner profS = (Spinner)dialog.findViewById(R.id.schedule_select_dialog_prof);
+
+                            final ArrayAdapter<String> firstAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, classesNum);
+                            firstAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            classId.setAdapter(firstAdapter);
+
+                            classId.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                                    List<String> sections = new ArrayList<>();
+                                    for (String cl : ConfigurationManager.getIstance().getClassesListFromSavedJSON())
+                                        if (cl.contains(classId.getSelectedItem().toString()))
+                                            sections.add(String.valueOf(cl.charAt(1)));
+
+                                    java.util.Collections.sort(sections);
+
+                                    final ArrayAdapter<String> secondAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, sections);
+                                    secondAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    section.setAdapter(secondAdapter);
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                                }
+                            });
+
+                            List<Prof> profsList = ConfigurationManager.getIstance().getProfsListFromSavedJSON();
+                            List<String> profsListString = new ArrayList<>();
+
+                            Collections.sort(profsList, new Comparator<Prof>() {
+                                @Override
+                                public int compare(Prof s1, Prof s2) {
+                                    return String.valueOf(s1.getSurname()).compareTo(s2.getSurname());
+                                }
+                            });
+
+                            for (Prof prof : profsList){
+                                if (prof != null) profsListString.add(prof.getSurname().concat(" ").concat(prof.getName()));
+                            }
+
+                            final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, profsListString);
+                            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            profS.setAdapter(spinnerAdapter);
+
+                            dialog.show();
+                        }
+                    });
+                }
+
+                break;
+            }
+            case CLASSES_SCHEDULE: {
+                ((MainActivity) activity).getSupportActionBar().setTitle("Orario classe");
+                profSelectorBar.setVisibility(View.GONE);
+
+                break;
+            }
+            case PROFS_SCHEDULE: {
+                ((MainActivity) activity).getSupportActionBar().setTitle("Orario docente");
+                profSelectorBar.setVisibility(View.VISIBLE);
+                List<Prof> profList = ConfigurationManager.getIstance().getProfsListFromSavedJSON();
+
+                try {
+                    new ScheduleDataFetcher(activity, thisFragment).fetchProfsList();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (profList != null) prepareProfsSelector(profList);
+
+                break;
+            }
+        }
     }
 
     private void selectTodayHeader(){
@@ -257,8 +334,8 @@ public class ScheduleFragment extends Fragment {
         headers[ScheduleEvent.FRI] = activity.findViewById(R.id.schedule_header_fri);
         headers[ScheduleEvent.SAT] = activity.findViewById(R.id.schedule_header_sat);
 
-        for (int i = 0; i < headers.length; i++){
-            headers[i].setTextColor(getResources().getColor(android.R.color.tab_indicator_text));
+        for (TextView header : headers) {
+            header.setTextColor(getResources().getColor(android.R.color.tab_indicator_text));
         }
 
         Calendar calendar = Calendar.getInstance();
@@ -298,38 +375,6 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
-    public void fetchClassesComplete(List<String> result) {
-        if (ConfigurationManager.getIstance().getClassesListFromSavedJSON() == null){
-            ConfigurationManager.getIstance().saveClassesList(result);
-            getActivity().invalidateOptionsMenu();
-        }
-        ConfigurationManager.getIstance().saveClassesList(result);
-    }
-
-    public void fetchProfsListComplete(List<Prof> result) {
-        if (ConfigurationManager.getIstance().getClassesListFromSavedJSON() == null){
-            ConfigurationManager.getIstance().saveProfsList(result);
-            prepareProfsSelector(result);
-        }
-        ConfigurationManager.getIstance().saveProfsList(result);
-    }
-
-    public void fetchClassComplete(List<ScheduleEvent> events, String classId) {
-        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(classId) == null) {
-            ConfigurationManager.getIstance().saveSchedule(events, classId);
-            renderSchedule(classId);
-        }
-        ConfigurationManager.getIstance().saveSchedule(events, classId);
-    }
-
-    public void fetchProfComplete(List<ScheduleEvent> events, Prof prof){
-        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(prof) == null) {
-            ConfigurationManager.getIstance().saveSchedule(events, prof);
-            renderSchedule(prof);
-        }
-        ConfigurationManager.getIstance().saveSchedule(events, prof);
-    }
-
     public void prepareProfsSelector(final List<Prof> profsList){
 
         if (currentSchedule != PROFS_SCHEDULE) return;
@@ -347,7 +392,7 @@ public class ScheduleFragment extends Fragment {
             if (prof != null) profsListString.add(prof.getSurname().concat(" ").concat(prof.getName()));
         }
 
-        final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_class_style, profsListString);
+        final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_class_style, profsListString);
         final Spinner profsSpinner = activity.findViewById(R.id.schedule_prof_spinner);
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
         profsSpinner.setAdapter(spinnerAdapter);

@@ -7,4 +7,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="schedule_event_height">70dp</dimen>
     <dimen name="schedule_event_margin">2dp</dimen>
+    <dimen name="comm_nothing_here_image">96dp</dimen>
 </resources>

@@ -147,11 +147,11 @@ public class ConfigurationManager {
         return gson.fromJson(json, List.class);
     }
 
-    public void saveSchedule(List<ScheduleEvent> scheduleActivities, String key){
+    public void saveSchedule(List<ScheduleEvent> scheduleActivities, String classId){
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(scheduleActivities);
-        prefsEditor.putString(key.toLowerCase(), json);
+        prefsEditor.putString(classId.toLowerCase(), json);
         prefsEditor.apply();
     }
 
@@ -163,8 +163,8 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    public List<ScheduleEvent> getScheduleListFromSavedJSON(String key){
-        String json = sharedPreferences.getString(key.toLowerCase(), "");
+    public List<ScheduleEvent> getScheduleListFromSavedJSON(String classId){
+        String json = sharedPreferences.getString(classId.toLowerCase(), "");
         Gson gson = new Gson();
         Type listType = new TypeToken<ArrayList<ScheduleEvent>>() {
         }.getType();
@@ -196,5 +196,19 @@ public class ConfigurationManager {
         }.getType();
 
         return gson.fromJson(json, listType);
+    }
+
+    public void saveMyStatus(Object o){
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(o);
+        prefsEditor.putString(activity.getString(R.string.stored_status_key), json);
+        prefsEditor.apply();
+    }
+
+    public Object getMyStatus(){
+        String json = sharedPreferences.getString(activity.getString(R.string.stored_status_key), "");
+        Gson gson = new Gson();
+        return gson.fromJson(json, Object.class);
     }
 }

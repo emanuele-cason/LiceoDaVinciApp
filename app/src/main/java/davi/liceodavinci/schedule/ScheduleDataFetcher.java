@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import davi.liceodavinci.ConfigurationManager;
 import davi.liceodavinci.R;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -189,72 +190,102 @@ class ScheduleDataFetcher {
 
     private void fetchClassComplete(final List<ScheduleEvent> result, final String classId) {
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                scheduleFragment.fetchClassComplete(result, classId);
-            }
-        });
+        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(classId) == null) {
+            ConfigurationManager.getIstance().saveSchedule(result, classId);
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    scheduleFragment.renderSchedule(classId);
+                }
+            });
+        }
+
+        ConfigurationManager.getIstance().saveSchedule(result, classId);
     }
 
     private void fetchClassFailed(final String classId) {
-        Snackbar snackbar = Snackbar
-                .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                .setAction("RIPROVA", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        try {
-                            fetchClassSchedule(String.valueOf(classId.charAt(0)), String.valueOf(classId.charAt(1)));
-                        } catch (IOException e) {
-                            fetchClassFailed(classId);
+
+        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(classId) == null) {
+            Snackbar snackbar = Snackbar
+                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                    .setAction("RIPROVA", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            try {
+                                fetchClassSchedule(String.valueOf(classId.charAt(0)), String.valueOf(classId.charAt(1)));
+                            } catch (IOException e) {
+                                fetchClassFailed(classId);
+                            }
                         }
-                    }
-                });
-        snackbar.show();
+                    });
+            snackbar.show();
+        }
     }
 
     private void fetchClassesComplete(final List<String> result) {
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                scheduleFragment.fetchClassesComplete(result);
-            }
-        });
+        if (ConfigurationManager.getIstance().getClassesListFromSavedJSON() == null) {
+            ConfigurationManager.getIstance().saveClassesList(result);
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    activity.invalidateOptionsMenu();
+                }
+            });
+        }
+
+        ConfigurationManager.getIstance().saveClassesList(result);
     }
 
     private void fetchProfsComplete(final List<Prof> result) {
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                scheduleFragment.fetchProfsListComplete(result);
-            }
-        });
+        if (ConfigurationManager.getIstance().getClassesListFromSavedJSON() == null) {
+            ConfigurationManager.getIstance().saveProfsList(result);
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    scheduleFragment.prepareProfsSelector(result);
+                }
+            });
+        }
+
+        ConfigurationManager.getIstance().saveProfsList(result);
     }
 
     private void fetchProfComplete(final List<ScheduleEvent> result, final Prof prof) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                scheduleFragment.fetchProfComplete(result, prof);
-            }
-        });
+
+        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(prof) == null) {
+            ConfigurationManager.getIstance().saveSchedule(result, prof);
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    scheduleFragment.renderSchedule(prof);
+                }
+            });
+        }
+
+        ConfigurationManager.getIstance().saveSchedule(result, prof);
     }
 
     private void fetchProfFailed(final Prof prof) {
-        Snackbar snackbar = Snackbar
-                .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                .setAction("RIPROVA", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        try {
-                            fetchProfSchedule(prof);
-                        } catch (Exception e) {
-                            fetchProfFailed(prof);
+
+        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(prof) == null) {
+            Snackbar snackbar = Snackbar
+                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                    .setAction("RIPROVA", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            try {
+                                fetchProfSchedule(prof);
+                            } catch (Exception e) {
+                                fetchProfFailed(prof);
+                            }
                         }
-                    }
-                });
-        snackbar.show();
+                    });
+            snackbar.show();
+        }
     }
 }
