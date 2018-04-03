@@ -1,11 +1,13 @@
 <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true">
 
     <RadioButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Studente" />
+        android:id="@+id/schedule_select_dialog_radio_studente"
+        android:text="Classe" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,12 +15,10 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="32dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Classe" />
+        android:orientation="horizontal"
+        android:id="@+id/schedule_select_dialog_studente_wrapper"
+        android:animateLayoutChanges="true"
+        android:visibility="gone">
 
         <Spinner
             android:layout_width="wrap_content"
@@ -33,8 +33,10 @@
     </LinearLayout>
 
     <RadioButton
+        android:layout_marginTop="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/schedule_select_dialog_radio_docente"
         android:text="Docente" />
 
     <LinearLayout
@@ -43,7 +45,10 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="32dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/schedule_select_dialog_docente_wrapper"
+        android:animateLayoutChanges="true"
+        android:visibility="gone">
 
         <Spinner
             android:layout_width="wrap_content"

@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -239,19 +240,37 @@ public class ScheduleFragment extends Fragment {
                     select.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            MaterialDialog dialog =
+                            final MaterialDialog dialog =
                                     new MaterialDialog.Builder(activity)
-                                            .title("Seleziona orario")
+                                            .title("Seleziona il tuo orario")
                                             .customView(R.layout.schedule_select_dialog, true)
                                             .build();
+
+                            final RadioButton radioStudente = (RadioButton) dialog.findViewById(R.id.schedule_select_dialog_radio_studente);
+                            radioStudente.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.GONE);
+                                    dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.VISIBLE);
+                                }
+                            });
+
+                            final RadioButton radioDocente = (RadioButton) dialog.findViewById(R.id.schedule_select_dialog_radio_docente);
+                            radioDocente.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.GONE);
+                                    dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.VISIBLE);
+                                }
+                            });
 
                             final Spinner classId = (Spinner)dialog.findViewById(R.id.schedule_select_dialog_class);
                             final Spinner section = (Spinner)dialog.findViewById(R.id.schedule_select_dialog_section);
                             Spinner profS = (Spinner)dialog.findViewById(R.id.schedule_select_dialog_prof);
 
-                            final ArrayAdapter<String> firstAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, classesNum);
-                            firstAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            classId.setAdapter(firstAdapter);
+                            final ArrayAdapter<String> classNumAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, classesNum);
+                            classNumAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
+                            classId.setAdapter(classNumAdapter);
 
                             classId.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -264,9 +283,9 @@ public class ScheduleFragment extends Fragment {
 
                                     java.util.Collections.sort(sections);
 
-                                    final ArrayAdapter<String> secondAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, sections);
-                                    secondAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                    section.setAdapter(secondAdapter);
+                                    final ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, sections);
+                                    sectionAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
+                                    section.setAdapter(sectionAdapter);
                                 }
 
                                 @Override
@@ -289,9 +308,9 @@ public class ScheduleFragment extends Fragment {
                                 if (prof != null) profsListString.add(prof.getSurname().concat(" ").concat(prof.getName()));
                             }
 
-                            final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, profsListString);
-                            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            profS.setAdapter(spinnerAdapter);
+                            final ArrayAdapter<String> profAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, profsListString);
+                            profAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
+                            profS.setAdapter(profAdapter);
 
                             dialog.show();
                         }
