@@ -242,9 +242,9 @@ public class CommunicationsFragment extends Fragment {
     private List<Communication.LocalCommunication> mergeCommWithSPref(List<Communication.LocalCommunication> queryResult) {
         List<Communication.LocalCommunication> result = new ArrayList<>();
 
-        if (ConfigurationManager.getIstance().getCommListFromSavedJSON() != null) {
+        if (ConfigurationManager.getIstance().getCommList() != null) {
             for (Communication.LocalCommunication queryComm : queryResult) {
-                for (Communication.LocalCommunication savedComm : ConfigurationManager.getIstance().getCommListFromSavedJSON()) {
+                for (Communication.LocalCommunication savedComm : ConfigurationManager.getIstance().getCommList()) {
                     if (queryComm.getName().equals(savedComm.getName())) {
                         result.add(savedComm);
                         break;

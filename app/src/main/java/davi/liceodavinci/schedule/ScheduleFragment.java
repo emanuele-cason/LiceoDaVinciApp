@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
@@ -59,7 +61,6 @@ public class ScheduleFragment extends Fragment {
     private LinearLayout scheduleContainer;
     private LinearLayout profSelectorBar;
     private int currentSchedule = PERSONAL_SCHEDULE;
-    private List<String> classes;
     private String[] classesNum = {"1", "2", "3", "4", "5"};
 
     @SuppressLint("ValidFragment")
@@ -114,7 +115,7 @@ public class ScheduleFragment extends Fragment {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-                        if (ConfigurationManager.getIstance().getClassesListFromSavedJSON() == null) {
+                        if (ConfigurationManager.getIstance().getClassesList() == null) {
                             Snackbar snackbar = Snackbar
                                     .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG);
                             snackbar.show();
@@ -122,9 +123,11 @@ public class ScheduleFragment extends Fragment {
                         }
 
                         List<String> sections = new ArrayList<>();
-                        for (String cl : ConfigurationManager.getIstance().getClassesListFromSavedJSON())
-                            if (cl.contains(firstSpinner.getSelectedItem().toString()))
-                                sections.add(String.valueOf(cl.charAt(1)));
+                        for (Pair cl : ConfigurationManager.getIstance().getClassesList()) {
+                            if (cl.first.toString().equals(firstSpinner.getSelectedItem().toString())) {
+                                sections.add(String.valueOf(cl.second));
+                            }
+                        }
 
                         java.util.Collections.sort(sections);
 
@@ -147,7 +150,7 @@ public class ScheduleFragment extends Fragment {
                         } catch (Exception ignored) {
                         }
 
-                        renderSchedule(firstSpinner.getSelectedItem().toString().concat(secondSpinner.getSelectedItem().toString()));
+                        renderSchedule(new Pair<>(Integer.parseInt(firstSpinner.getSelectedItem().toString()), secondSpinner.getSelectedItem().toString()));
                     }
 
                     @Override
@@ -211,7 +214,7 @@ public class ScheduleFragment extends Fragment {
         });
     }
 
-    private void refreshTableContent(int position){
+    private void refreshTableContent(final int position) {
         LinearLayout sContainer = activity.findViewById(R.id.schedule_container);
         RelativeLayout noPersonal = activity.findViewById(R.id.schedule_no_personal_schedule);
         sContainer.setVisibility(View.VISIBLE);
@@ -229,11 +232,11 @@ public class ScheduleFragment extends Fragment {
                 profSelectorBar.setVisibility(View.GONE);
                 Button select = noPersonal.findViewById(R.id.schedule_select_personal_button);
 
-                if (ConfigurationManager.getIstance().getClassesListFromSavedJSON() != null && ConfigurationManager.getIstance().getProfsListFromSavedJSON() != null){
+                if (ConfigurationManager.getIstance().getClassesList() != null && ConfigurationManager.getIstance().getProfsList() != null) {
                     select.setVisibility(View.VISIBLE);
-                }else select.setVisibility(View.INVISIBLE);
+                } else select.setVisibility(View.INVISIBLE);
 
-                if (ConfigurationManager.getIstance().getMyStatus() == null){
+                if (ConfigurationManager.getIstance().getMyStatus() == null) {
                     sContainer.setVisibility(View.GONE);
                     noPersonal.setVisibility(View.VISIBLE);
 
@@ -264,9 +267,9 @@ public class ScheduleFragment extends Fragment {
                                 }
                             });
 
-                            final Spinner classId = (Spinner)dialog.findViewById(R.id.schedule_select_dialog_class);
-                            final Spinner section = (Spinner)dialog.findViewById(R.id.schedule_select_dialog_section);
-                            Spinner profS = (Spinner)dialog.findViewById(R.id.schedule_select_dialog_prof);
+                            final Spinner classId = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_class);
+                            final Spinner section = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_section);
+                            final Spinner profS = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_prof);
 
                             final ArrayAdapter<String> classNumAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, classesNum);
                             classNumAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
@@ -277,9 +280,9 @@ public class ScheduleFragment extends Fragment {
                                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                                     List<String> sections = new ArrayList<>();
-                                    for (String cl : ConfigurationManager.getIstance().getClassesListFromSavedJSON())
-                                        if (cl.contains(classId.getSelectedItem().toString()))
-                                            sections.add(String.valueOf(cl.charAt(1)));
+                                    for (Pair cl : ConfigurationManager.getIstance().getClassesList())
+                                        if (cl.first.toString().equals(classId.getSelectedItem().toString()))
+                                            sections.add(String.valueOf(cl.second));
 
                                     java.util.Collections.sort(sections);
 
@@ -294,7 +297,7 @@ public class ScheduleFragment extends Fragment {
                                 }
                             });
 
-                            List<Prof> profsList = ConfigurationManager.getIstance().getProfsListFromSavedJSON();
+                            List<Prof> profsList = ConfigurationManager.getIstance().getProfsList();
                             List<String> profsListString = new ArrayList<>();
 
                             Collections.sort(profsList, new Comparator<Prof>() {
@@ -304,14 +307,28 @@ public class ScheduleFragment extends Fragment {
                                 }
                             });
 
-                            for (Prof prof : profsList){
-                                if (prof != null) profsListString.add(prof.getSurname().concat(" ").concat(prof.getName()));
+                            for (Prof prof : profsList) {
+                                if (prof != null)
+                                    profsListString.add(prof.getSurname().concat(" ").concat(prof.getName()));
                             }
 
                             final ArrayAdapter<String> profAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, profsListString);
                             profAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
                             profS.setAdapter(profAdapter);
 
+                            dialog.setActionButton(DialogAction.POSITIVE, "Fatto");
+                            dialog.setActionButton(DialogAction.NEGATIVE, "Annulla");
+                            View positive = dialog.getActionButton(DialogAction.POSITIVE);
+                            positive.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (radioStudente.isChecked()) {
+                                        ConfigurationManager.getIstance().saveMyStatus(new Pair<>(Integer.parseInt(classId.getSelectedItem().toString()), section.getSelectedItem().toString()));
+                                    }if (radioDocente.isChecked()){
+                                        
+                                    }
+                                }
+                            });
                             dialog.show();
                         }
                     });
@@ -328,7 +345,7 @@ public class ScheduleFragment extends Fragment {
             case PROFS_SCHEDULE: {
                 ((MainActivity) activity).getSupportActionBar().setTitle("Orario docente");
                 profSelectorBar.setVisibility(View.VISIBLE);
-                List<Prof> profList = ConfigurationManager.getIstance().getProfsListFromSavedJSON();
+                List<Prof> profList = ConfigurationManager.getIstance().getProfsList();
 
                 try {
                     new ScheduleDataFetcher(activity, thisFragment).fetchProfsList();
@@ -343,7 +360,7 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
-    private void selectTodayHeader(){
+    private void selectTodayHeader() {
         TextView[] headers = new TextView[6];
 
         headers[ScheduleEvent.MON] = activity.findViewById(R.id.schedule_header_mon);
@@ -362,39 +379,39 @@ public class ScheduleFragment extends Fragment {
 
         switch (day) {
 
-            case Calendar.MONDAY:{
+            case Calendar.MONDAY: {
                 headers[ScheduleEvent.MON].setTextColor(activity.getResources().getColor(R.color.colorAccent));
                 break;
             }
 
-            case Calendar.TUESDAY:{
+            case Calendar.TUESDAY: {
                 headers[ScheduleEvent.TUE].setTextColor(activity.getResources().getColor(R.color.colorAccent));
                 break;
             }
 
-            case Calendar.WEDNESDAY:{
+            case Calendar.WEDNESDAY: {
                 headers[ScheduleEvent.WED].setTextColor(activity.getResources().getColor(R.color.colorAccent));
                 break;
             }
 
-            case Calendar.THURSDAY:{
+            case Calendar.THURSDAY: {
                 headers[ScheduleEvent.THU].setTextColor(activity.getResources().getColor(R.color.colorAccent));
                 break;
             }
 
-            case Calendar.FRIDAY:{
+            case Calendar.FRIDAY: {
                 headers[ScheduleEvent.FRI].setTextColor(activity.getResources().getColor(R.color.colorAccent));
                 break;
             }
 
-            case Calendar.SATURDAY:{
+            case Calendar.SATURDAY: {
                 headers[ScheduleEvent.SAT].setTextColor(activity.getResources().getColor(R.color.colorAccent));
                 break;
             }
         }
     }
 
-    public void prepareProfsSelector(final List<Prof> profsList){
+    public void prepareProfsSelector(final List<Prof> profsList) {
 
         if (currentSchedule != PROFS_SCHEDULE) return;
         if (profsList == null) return;
@@ -407,8 +424,9 @@ public class ScheduleFragment extends Fragment {
             }
         });
 
-        for (Prof prof : profsList){
-            if (prof != null) profsListString.add(prof.getSurname().concat(" ").concat(prof.getName()));
+        for (Prof prof : profsList) {
+            if (prof != null)
+                profsListString.add(prof.getSurname().concat(" ").concat(prof.getName()));
         }
 
         final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_class_style, profsListString);
@@ -429,7 +447,7 @@ public class ScheduleFragment extends Fragment {
         });
     }
 
-    public void renderSchedule(final String classId) {
+    public void renderSchedule(final Pair<Integer, String> classId) {
 
         if (currentSchedule != CLASSES_SCHEDULE) return;
 
@@ -445,14 +463,14 @@ public class ScheduleFragment extends Fragment {
 
         ScheduleDataFetcher scheduleDataFetcher = new ScheduleDataFetcher(activity, thisFragment);
         try {
-            scheduleDataFetcher.fetchClassSchedule(String.valueOf(classId.charAt(0)), String.valueOf(classId.charAt(1)));
+            scheduleDataFetcher.fetchClassSchedule(classId);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         for (int i = 0; i < scheduleRecyclerViews.length; i++) {
 
-            List<ScheduleEvent> scheduleActivities = ConfigurationManager.getIstance().getScheduleListFromSavedJSON(classId);
+            List<ScheduleEvent> scheduleActivities = ConfigurationManager.getIstance().getScheduleList(classId);
 
             if (scheduleActivities != null) {
                 scheduleActivities = getDayOfWeekSchedule(scheduleActivities, i);
@@ -469,7 +487,7 @@ public class ScheduleFragment extends Fragment {
                     ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, CLASSES_SCHEDULE);
                     scheduleRecyclerViews[i].setAdapter(adapter);
                     runLayoutAnimation(scheduleRecyclerViews[i]);
-                }else {
+                } else {
                     scheduleRecyclerViews[i].setVisibility(View.INVISIBLE);
                 }
 
@@ -478,7 +496,7 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
-    public void renderSchedule(final Prof prof){
+    public void renderSchedule(final Prof prof) {
 
         if (currentSchedule != PROFS_SCHEDULE) return;
 
@@ -500,7 +518,7 @@ public class ScheduleFragment extends Fragment {
 
         for (int i = 0; i < scheduleRecyclerViews.length; i++) {
 
-            List<ScheduleEvent> scheduleActivities = ConfigurationManager.getIstance().getScheduleListFromSavedJSON(prof);
+            List<ScheduleEvent> scheduleActivities = ConfigurationManager.getIstance().getScheduleList(prof);
 
             if (scheduleActivities != null) {
                 scheduleActivities = getDayOfWeekSchedule(scheduleActivities, i);
@@ -517,7 +535,7 @@ public class ScheduleFragment extends Fragment {
                     ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, PROFS_SCHEDULE);
                     scheduleRecyclerViews[i].setAdapter(adapter);
                     runLayoutAnimation(scheduleRecyclerViews[i]);
-                }else {
+                } else {
                     scheduleRecyclerViews[i].setVisibility(View.INVISIBLE);
                 }
 

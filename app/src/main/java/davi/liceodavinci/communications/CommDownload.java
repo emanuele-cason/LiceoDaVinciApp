@@ -24,6 +24,7 @@ import davi.liceodavinci.R;
 
 import static davi.liceodavinci.communications.Communication.CACHED;
 import static davi.liceodavinci.communications.Communication.DOWNLOADED;
+import static davi.liceodavinci.communications.Communication.REMOTE;
 
 public class CommDownload extends AsyncTask<Void, Integer, String> {
 
@@ -119,6 +120,8 @@ public class CommDownload extends AsyncTask<Void, Integer, String> {
             int count;
             while ((count = input.read(data)) != -1) {
                 if (isCancelled()) {
+                    this.communication.setStatus(REMOTE);
+                    ConfigurationManager.getIstance().loadCommunication(communication);
                     input.close();
                     return null;
                 }

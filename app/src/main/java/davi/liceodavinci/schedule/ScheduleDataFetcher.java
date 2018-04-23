@@ -3,6 +3,8 @@ package davi.liceodavinci.schedule;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 
 import com.google.gson.Gson;
@@ -54,13 +56,16 @@ class ScheduleDataFetcher {
         this.activity = activity;
         this.scheduleFragment = scheduleFragment;
 
-        requestUrls[GET_CLASSES] = "http://192.168.1.6:8080/api/classi";
-        requestUrls[GET_CLASS] = "http://192.168.1.6:8080/api/orario/classe/";
-        requestUrls[GET_PROFS] = "http://192.168.1.6:8080/api/docenti";
-        requestUrls[GET_PROF] = "http://192.168.1.6:8080/api/orario/docente";
+        requestUrls[GET_CLASSES] = "http://www.liceodavinci.tv/api/classi";
+        requestUrls[GET_CLASS] = "http://www.liceodavinci.tv/api/orario/classe/";
+        requestUrls[GET_PROFS] = "http://www.liceodavinci.tv/api/docenti";
+        requestUrls[GET_PROF] = "http://www.liceodavinci.tv/api/orario/docente";
     }
 
     void fetchProfsList() throws Exception {
+
+        Log.d("fetching", "profs list");
+
         Request request = new Request.Builder()
                 .url(requestUrls[GET_PROFS])
                 .addHeader("Accept", "application/json")
@@ -91,6 +96,8 @@ class ScheduleDataFetcher {
     }
 
     void fetchProfSchedule(final Prof prof) throws Exception {
+
+        Log.d("fetching prof schedule", prof.getSurname());
 
         final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(JSON, "{\"nome\": " + "\"" + prof.getName() + "\"" + ", \"cognome\": " + "\"" + prof.getSurname() + "\"" + "}");
@@ -128,6 +135,9 @@ class ScheduleDataFetcher {
     }
 
     void fetchClassesList() throws Exception {
+
+        Log.d("fetching", "classes list");
+
         Request request = new Request.Builder()
                 .url(requestUrls[GET_CLASSES])
                 .addHeader("Accept", "application/json")
@@ -148,17 +158,26 @@ class ScheduleDataFetcher {
 
                     Gson gson = new Gson();
                     assert response.body() != null;
-                    List<String> classListAPI = gson.fromJson(response.body().string(), List.class);
+
+                    Type listType = new TypeToken<List<String>>(){}.getType();
+                    List<Pair<Integer,String>> classListAPI = new ArrayList<>();
+                    List<String> classesStr = gson.fromJson(response.body().string(), listType);
+                    for (String classId : classesStr){
+                        classListAPI.add(new Pair<Integer, String>(Integer.parseInt(String.valueOf(classId.charAt(0))), String.valueOf(classId.charAt(1))));
+                    }
+
                     fetchClassesComplete(classListAPI);
                 }
             }
         });
     }
 
-    void fetchClassSchedule(final String classNum, final String classSection) throws IOException {
+    void fetchClassSchedule(final Pair<Integer,String> classId) throws IOException {
+
+        Log.d("fetching class schedule", classId.first.toString().concat(classId.second));
 
         Request request = new Request.Builder()
-                .url(requestUrls[GET_CLASS].concat(classNum).concat(classSection))
+                .url(requestUrls[GET_CLASS].concat(classId.first.toString()).concat(classId.second))
                 .addHeader("Accept", "application/json")
                 .build();
 
@@ -166,14 +185,14 @@ class ScheduleDataFetcher {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
-                fetchClassFailed(classNum.concat(classSection));
+                fetchClassFailed(classId);
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
-                        fetchClassFailed(classNum.concat(classSection));
+                        fetchClassFailed(classId);
                         throw new IOException("Unexpected code " + response);
                     }
 
@@ -182,15 +201,15 @@ class ScheduleDataFetcher {
                     }.getType();
                     assert responseBody != null;
                     List<ScheduleEvent> classScheduleAPI = gson.fromJson(responseBody.string(), listType);
-                    fetchClassComplete(classScheduleAPI, classNum.concat(classSection));
+                    fetchClassComplete(classScheduleAPI, classId);
                 }
             }
         });
     }
 
-    private void fetchClassComplete(final List<ScheduleEvent> result, final String classId) {
+    private void fetchClassComplete(final List<ScheduleEvent> result, final Pair<Integer,String> classId) {
 
-        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(classId) == null) {
+        if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
             ConfigurationManager.getIstance().saveSchedule(result, classId);
 
             activity.runOnUiThread(new Runnable() {
@@ -204,16 +223,16 @@ class ScheduleDataFetcher {
         ConfigurationManager.getIstance().saveSchedule(result, classId);
     }
 
-    private void fetchClassFailed(final String classId) {
+    private void fetchClassFailed(final Pair<Integer,String> classId) {
 
-        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(classId) == null) {
+        if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
             Snackbar snackbar = Snackbar
                     .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
                     .setAction("RIPROVA", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             try {
-                                fetchClassSchedule(String.valueOf(classId.charAt(0)), String.valueOf(classId.charAt(1)));
+                                fetchClassSchedule(classId);
                             } catch (IOException e) {
                                 fetchClassFailed(classId);
                             }
@@ -223,9 +242,9 @@ class ScheduleDataFetcher {
         }
     }
 
-    private void fetchClassesComplete(final List<String> result) {
+    private void fetchClassesComplete(final List<Pair<Integer,String>> result) {
 
-        if (ConfigurationManager.getIstance().getClassesListFromSavedJSON() == null) {
+        if (ConfigurationManager.getIstance().getClassesList() == null && result != null) {
             ConfigurationManager.getIstance().saveClassesList(result);
 
             activity.runOnUiThread(new Runnable() {
@@ -241,7 +260,7 @@ class ScheduleDataFetcher {
 
     private void fetchProfsComplete(final List<Prof> result) {
 
-        if (ConfigurationManager.getIstance().getClassesListFromSavedJSON() == null) {
+        if (ConfigurationManager.getIstance().getClassesList() == null) {
             ConfigurationManager.getIstance().saveProfsList(result);
 
             activity.runOnUiThread(new Runnable() {
@@ -257,7 +276,7 @@ class ScheduleDataFetcher {
 
     private void fetchProfComplete(final List<ScheduleEvent> result, final Prof prof) {
 
-        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(prof) == null) {
+        if (ConfigurationManager.getIstance().getScheduleList(prof) == null) {
             ConfigurationManager.getIstance().saveSchedule(result, prof);
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -272,7 +291,7 @@ class ScheduleDataFetcher {
 
     private void fetchProfFailed(final Prof prof) {
 
-        if (ConfigurationManager.getIstance().getScheduleListFromSavedJSON(prof) == null) {
+        if (ConfigurationManager.getIstance().getScheduleList(prof) == null) {
             Snackbar snackbar = Snackbar
                     .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
                     .setAction("RIPROVA", new View.OnClickListener() {
