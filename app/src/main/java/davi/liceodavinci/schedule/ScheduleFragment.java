@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +22,7 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -89,6 +89,16 @@ public class ScheduleFragment extends Fragment {
         switch (currentSchedule) {
             case PERSONAL_SCHEDULE: {
                 menu.clear();
+                inflater.inflate(R.menu.schedule_personal_actionbar, menu);
+
+                MenuItem selectNew = menu.findItem(R.id.action_new_schedule);
+                selectNew.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        selectPersonalSchedule();
+                        return false;
+                    }
+                });
                 break;
             }
             case CLASSES_SCHEDULE: {
@@ -99,7 +109,7 @@ public class ScheduleFragment extends Fragment {
                     e.printStackTrace();
                 }
 
-                inflater.inflate(R.menu.schedule_actionbar, menu);
+                inflater.inflate(R.menu.schedule_classes_actionbar, menu);
 
                 MenuItem itemSpinner1 = menu.findItem(R.id.first_spinner);
                 final Spinner firstSpinner = (Spinner) MenuItemCompat.getActionView(itemSpinner1);
@@ -116,9 +126,6 @@ public class ScheduleFragment extends Fragment {
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                         if (ConfigurationManager.getIstance().getClassesList() == null) {
-                            Snackbar snackbar = Snackbar
-                                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG);
-                            snackbar.show();
                             return;
                         }
 
@@ -243,95 +250,15 @@ public class ScheduleFragment extends Fragment {
                     select.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            final MaterialDialog dialog =
-                                    new MaterialDialog.Builder(activity)
-                                            .title("Seleziona il tuo orario")
-                                            .customView(R.layout.schedule_select_dialog, true)
-                                            .build();
-
-                            final RadioButton radioStudente = (RadioButton) dialog.findViewById(R.id.schedule_select_dialog_radio_studente);
-                            radioStudente.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.GONE);
-                                    dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.VISIBLE);
-                                }
-                            });
-
-                            final RadioButton radioDocente = (RadioButton) dialog.findViewById(R.id.schedule_select_dialog_radio_docente);
-                            radioDocente.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.GONE);
-                                    dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.VISIBLE);
-                                }
-                            });
-
-                            final Spinner classId = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_class);
-                            final Spinner section = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_section);
-                            final Spinner profS = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_prof);
-
-                            final ArrayAdapter<String> classNumAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, classesNum);
-                            classNumAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
-                            classId.setAdapter(classNumAdapter);
-
-                            classId.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                @Override
-                                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                                    List<String> sections = new ArrayList<>();
-                                    for (Pair cl : ConfigurationManager.getIstance().getClassesList())
-                                        if (cl.first.toString().equals(classId.getSelectedItem().toString()))
-                                            sections.add(String.valueOf(cl.second));
-
-                                    java.util.Collections.sort(sections);
-
-                                    final ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, sections);
-                                    sectionAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
-                                    section.setAdapter(sectionAdapter);
-                                }
-
-                                @Override
-                                public void onNothingSelected(AdapterView<?> adapterView) {
-
-                                }
-                            });
-
-                            List<Prof> profsList = ConfigurationManager.getIstance().getProfsList();
-                            List<String> profsListString = new ArrayList<>();
-
-                            Collections.sort(profsList, new Comparator<Prof>() {
-                                @Override
-                                public int compare(Prof s1, Prof s2) {
-                                    return String.valueOf(s1.getSurname()).compareTo(s2.getSurname());
-                                }
-                            });
-
-                            for (Prof prof : profsList) {
-                                if (prof != null)
-                                    profsListString.add(prof.getSurname().concat(" ").concat(prof.getName()));
-                            }
-
-                            final ArrayAdapter<String> profAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, profsListString);
-                            profAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
-                            profS.setAdapter(profAdapter);
-
-                            dialog.setActionButton(DialogAction.POSITIVE, "Fatto");
-                            dialog.setActionButton(DialogAction.NEGATIVE, "Annulla");
-                            View positive = dialog.getActionButton(DialogAction.POSITIVE);
-                            positive.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    if (radioStudente.isChecked()) {
-                                        ConfigurationManager.getIstance().saveMyStatus(new Pair<>(Integer.parseInt(classId.getSelectedItem().toString()), section.getSelectedItem().toString()));
-                                    }if (radioDocente.isChecked()){
-                                        
-                                    }
-                                }
-                            });
-                            dialog.show();
+                            selectPersonalSchedule();
                         }
                     });
+                }else {
+                    sContainer.setVisibility(View.VISIBLE);
+                    noPersonal.setVisibility(View.GONE);
+
+                    if (ConfigurationManager.getIstance().getMyStatus() instanceof Pair)renderSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus());
+                    if (ConfigurationManager.getIstance().getMyStatus() instanceof Prof)renderSchedule((Prof) ConfigurationManager.getIstance().getMyStatus());
                 }
 
                 break;
@@ -358,6 +285,118 @@ public class ScheduleFragment extends Fragment {
                 break;
             }
         }
+    }
+
+    private void selectPersonalSchedule(){
+        final MaterialDialog dialog =
+                new MaterialDialog.Builder(activity)
+                        .title("Seleziona il tuo orario")
+                        .customView(R.layout.schedule_select_dialog, true)
+                        .build();
+
+        final RadioButton studentRadio = (RadioButton) dialog.findViewById(R.id.schedule_select_dialog_radio_studente);
+        studentRadio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.GONE);
+                dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.VISIBLE);
+            }
+        });
+
+        final RadioButton profRadio = (RadioButton) dialog.findViewById(R.id.schedule_select_dialog_radio_docente);
+        profRadio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.GONE);
+                dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.VISIBLE);
+            }
+        });
+
+        final Spinner classId = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_class);
+        final Spinner section = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_section);
+        final Spinner profS = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_prof);
+
+        final ArrayAdapter<String> classNumAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, classesNum);
+        classNumAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
+        classId.setAdapter(classNumAdapter);
+
+        classId.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                List<String> sections = new ArrayList<>();
+                for (Pair cl : ConfigurationManager.getIstance().getClassesList())
+                    if (cl.first.toString().equals(classId.getSelectedItem().toString()))
+                        sections.add(String.valueOf(cl.second));
+
+                java.util.Collections.sort(sections);
+
+                final ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, sections);
+                sectionAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
+                section.setAdapter(sectionAdapter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        final List<Prof> profsList = ConfigurationManager.getIstance().getProfsList();
+        List<String> profsListString = new ArrayList<>();
+
+        Collections.sort(profsList, new Comparator<Prof>() {
+            @Override
+            public int compare(Prof s1, Prof s2) {
+                return String.valueOf(s1.getSurname()).compareTo(s2.getSurname());
+            }
+        });
+
+        for (Prof prof : profsList) {
+            if (prof != null)
+                profsListString.add(prof.getSurname().concat(" ").concat(prof.getName()));
+        }
+
+        final ArrayAdapter<String> profAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, profsListString);
+        profAdapter.setDropDownViewResource(R.layout.spinner_class_dropdown_style);
+        profS.setAdapter(profAdapter);
+
+        dialog.setActionButton(DialogAction.POSITIVE, "Fatto");
+        dialog.setActionButton(DialogAction.NEGATIVE, "Annulla");
+        final View positive = dialog.getActionButton(DialogAction.POSITIVE);
+        positive.setEnabled(false);
+
+        studentRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                positive.setEnabled(true);
+            }
+        });
+
+        profRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                positive.setEnabled(true);
+            }
+        });
+
+        positive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (studentRadio.isChecked()) {
+
+                    ConfigurationManager.getIstance().saveMyStatus(new Pair<>(Integer.parseInt(classId.getSelectedItem().toString()), section.getSelectedItem().toString()));
+                    refreshTableContent(PERSONAL_SCHEDULE);
+
+                }if (profRadio.isChecked()){
+
+                    ConfigurationManager.getIstance().saveMyStatus(profsList.get((int)profS.getSelectedItemId()));
+                    refreshTableContent(PERSONAL_SCHEDULE);
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     private void selectTodayHeader() {
@@ -449,7 +488,7 @@ public class ScheduleFragment extends Fragment {
 
     public void renderSchedule(final Pair<Integer, String> classId) {
 
-        if (currentSchedule != CLASSES_SCHEDULE) return;
+        if (currentSchedule != CLASSES_SCHEDULE && currentSchedule != PERSONAL_SCHEDULE) return;
 
         RecyclerView[] scheduleRecyclerViews = new RecyclerView[6];
         scheduleRecyclerViews[ScheduleEvent.MON] = getActivity().findViewById(R.id.schedule_mon_recyclerview);
@@ -498,7 +537,7 @@ public class ScheduleFragment extends Fragment {
 
     public void renderSchedule(final Prof prof) {
 
-        if (currentSchedule != PROFS_SCHEDULE) return;
+        if (currentSchedule != PROFS_SCHEDULE && currentSchedule != PERSONAL_SCHEDULE) return;
 
         RecyclerView[] scheduleRecyclerViews = new RecyclerView[6];
         scheduleRecyclerViews[ScheduleEvent.MON] = getActivity().findViewById(R.id.schedule_mon_recyclerview);

@@ -74,6 +74,7 @@ class ScheduleDataFetcher {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                fetchProfsFailed();
                 e.printStackTrace();
             }
 
@@ -81,6 +82,7 @@ class ScheduleDataFetcher {
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
+                        fetchProfsFailed();
                         throw new IOException("Unexpected code " + response);
                     }
 
@@ -146,6 +148,7 @@ class ScheduleDataFetcher {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                fetchClassesFailed();
                 e.printStackTrace();
             }
 
@@ -153,6 +156,7 @@ class ScheduleDataFetcher {
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
+                        fetchClassesFailed();
                         throw new IOException("Unexpected code " + response);
                     }
 
@@ -207,6 +211,54 @@ class ScheduleDataFetcher {
         });
     }
 
+    private void fetchClassesComplete(final List<Pair<Integer,String>> result) {
+
+        if (ConfigurationManager.getIstance().getClassesList() == null && result != null) {
+            ConfigurationManager.getIstance().saveClassesList(result);
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    activity.invalidateOptionsMenu();
+                }
+            });
+        }
+
+        ConfigurationManager.getIstance().saveClassesList(result);
+    }
+
+    private void fetchClassesFailed(){
+        if (ConfigurationManager.getIstance().getClassesList() == null) {
+            Snackbar snackbar = Snackbar
+                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG);
+            snackbar.show();
+        }
+    }
+
+    private void fetchProfsComplete(final List<Prof> result) {
+
+        if (ConfigurationManager.getIstance().getProfsList() == null) {
+            ConfigurationManager.getIstance().saveProfsList(result);
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    scheduleFragment.prepareProfsSelector(result);
+                }
+            });
+        }
+
+        ConfigurationManager.getIstance().saveProfsList(result);
+    }
+
+    private void fetchProfsFailed(){
+        if (ConfigurationManager.getIstance().getProfsList() == null) {
+            Snackbar snackbar = Snackbar
+                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG);
+            snackbar.show();
+        }
+    }
+
     private void fetchClassComplete(final List<ScheduleEvent> result, final Pair<Integer,String> classId) {
 
         if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
@@ -240,38 +292,6 @@ class ScheduleDataFetcher {
                     });
             snackbar.show();
         }
-    }
-
-    private void fetchClassesComplete(final List<Pair<Integer,String>> result) {
-
-        if (ConfigurationManager.getIstance().getClassesList() == null && result != null) {
-            ConfigurationManager.getIstance().saveClassesList(result);
-
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    activity.invalidateOptionsMenu();
-                }
-            });
-        }
-
-        ConfigurationManager.getIstance().saveClassesList(result);
-    }
-
-    private void fetchProfsComplete(final List<Prof> result) {
-
-        if (ConfigurationManager.getIstance().getClassesList() == null) {
-            ConfigurationManager.getIstance().saveProfsList(result);
-
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    scheduleFragment.prepareProfsSelector(result);
-                }
-            });
-        }
-
-        ConfigurationManager.getIstance().saveProfsList(result);
     }
 
     private void fetchProfComplete(final List<ScheduleEvent> result, final Prof prof) {

@@ -29,6 +29,9 @@ public class ConfigurationManager {
     private SharedPreferences sharedPreferences;
     private Activity activity;
 
+    private final String STATUS_STUDENT = "student";
+    private final String STATUS_PROF = "prof";
+
     ConfigurationManager(Activity activity) {
         this.activity = activity;
         configurationManager = this;
@@ -259,14 +262,27 @@ public class ConfigurationManager {
         return gson.fromJson(json, listType);
     }
 
-    public void saveMyStatus(Object o){
+    public void saveMyStatus(Pair<Integer, String> classId){
 
-        Log.d("storing user status", "-");
+        Log.d("storing user status", "class");
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(o);
+        String json = gson.toJson(classId);
         prefsEditor.putString(activity.getString(R.string.stored_status_key), json);
+        prefsEditor.putString(activity.getString(R.string.stored_user_status_type), STATUS_STUDENT);
+        prefsEditor.apply();
+    }
+
+    public void saveMyStatus(Prof prof){
+
+        Log.d("storing user status", "prof");
+
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(prof);
+        prefsEditor.putString(activity.getString(R.string.stored_status_key), json);
+        prefsEditor.putString(activity.getString(R.string.stored_user_status_type), STATUS_PROF);
         prefsEditor.apply();
     }
 
@@ -275,7 +291,21 @@ public class ConfigurationManager {
         Log.d("getting user status", "-");
 
         String json = sharedPreferences.getString(activity.getString(R.string.stored_status_key), "");
+        if (json == null) return null;
         Gson gson = new Gson();
-        return gson.fromJson(json, Object.class);
+
+        if (sharedPreferences.getString(activity.getString(R.string.stored_user_status_type), "").equals(STATUS_STUDENT)){
+            Type classType = new TypeToken<Pair<Integer, String>>() {
+            }.getType();
+            return gson.fromJson(json, classType);
+        }
+
+        if (sharedPreferences.getString(activity.getString(R.string.stored_user_status_type), "").equals(STATUS_PROF)){
+            Type profType = new TypeToken<Prof>() {
+            }.getType();
+            return gson.fromJson(json, profType);
+        }
+
+        return null;
     }
 }
