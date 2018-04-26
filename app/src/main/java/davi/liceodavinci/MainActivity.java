@@ -41,6 +41,29 @@ public class MainActivity extends AppCompatActivity
         deleteCache(this);
         ConfigurationManager.getIstance().setCacheDeleted();
 
+        /*AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setTitle("Versione beta")
+                .setMessage("Attenzione, questa è una versione beta dell'applicazione di supporto al sito www.liceodavinci.tv, di Cason Emanuele. Lato server (RESTFul API) a cura di Leonardo Baldin. Si prega di non condividere l'installer dell'applicazione.")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+
+        Date currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date strDate = null;
+        try {
+            strDate = sdf.parse("03/05/2018");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if (currentTime.after(strDate)) {
+            this.finishAffinity();
+        }*/
+
         drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);

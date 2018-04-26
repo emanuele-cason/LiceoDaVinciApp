@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -43,6 +44,7 @@ import java.util.List;
 
 import davi.liceodavinci.ConfigurationManager;
 import davi.liceodavinci.MainActivity;
+import davi.liceodavinci.OnFetchCompleteListener;
 import davi.liceodavinci.R;
 
 /**
@@ -102,12 +104,27 @@ public class ScheduleFragment extends Fragment {
                 break;
             }
             case CLASSES_SCHEDULE: {
-                final ScheduleDataFetcher scheduleDataFetcher = new ScheduleDataFetcher(activity, this);
-                try {
-                    scheduleDataFetcher.fetchClassesList();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                new ScheduleDataFetcher(activity, this).fetchClassesList(new OnFetchCompleteListener<List<Pair<Integer, String>>>() {
+                    @Override
+                    public void onSuccess(List<Pair<Integer, String>> result) {
+                        if (ConfigurationManager.getIstance().getClassesList() == null && result != null) {
+                            ConfigurationManager.getIstance().saveClassesList(result);
+
+                            activity.invalidateOptionsMenu();
+                        }
+
+                        ConfigurationManager.getIstance().saveClassesList(result);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        if (ConfigurationManager.getIstance().getClassesList() == null) {
+                            Snackbar snackbar = Snackbar
+                                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    }
+                });
 
                 inflater.inflate(R.menu.schedule_classes_actionbar, menu);
 
@@ -253,12 +270,14 @@ public class ScheduleFragment extends Fragment {
                             selectPersonalSchedule();
                         }
                     });
-                }else {
+                } else {
                     sContainer.setVisibility(View.VISIBLE);
                     noPersonal.setVisibility(View.GONE);
 
-                    if (ConfigurationManager.getIstance().getMyStatus() instanceof Pair)renderSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus());
-                    if (ConfigurationManager.getIstance().getMyStatus() instanceof Prof)renderSchedule((Prof) ConfigurationManager.getIstance().getMyStatus());
+                    if (ConfigurationManager.getIstance().getMyStatus() instanceof Pair)
+                        renderSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus());
+                    if (ConfigurationManager.getIstance().getMyStatus() instanceof Prof)
+                        renderSchedule((Prof) ConfigurationManager.getIstance().getMyStatus());
                 }
 
                 break;
@@ -272,13 +291,25 @@ public class ScheduleFragment extends Fragment {
             case PROFS_SCHEDULE: {
                 ((MainActivity) activity).getSupportActionBar().setTitle("Orario docente");
                 profSelectorBar.setVisibility(View.VISIBLE);
-                List<Prof> profList = ConfigurationManager.getIstance().getProfsList();
+                final List<Prof> profList = ConfigurationManager.getIstance().getProfsList();
 
-                try {
-                    new ScheduleDataFetcher(activity, thisFragment).fetchProfsList();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                new ScheduleDataFetcher(activity, thisFragment).fetchProfsList(new OnFetchCompleteListener<List<Prof>>() {
+                    @Override
+                    public void onSuccess(List<Prof> result) {
+                        if (ConfigurationManager.getIstance().getProfsList() == null) {
+                            ConfigurationManager.getIstance().saveProfsList(result);
+
+                            prepareProfsSelector(result);
+                        }
+
+                        ConfigurationManager.getIstance().saveProfsList(result);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+
+                    }
+                });
 
                 if (profList != null) prepareProfsSelector(profList);
 
@@ -287,7 +318,7 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
-    private void selectPersonalSchedule(){
+    private void selectPersonalSchedule() {
         final MaterialDialog dialog =
                 new MaterialDialog.Builder(activity)
                         .title("Seleziona il tuo orario")
@@ -388,9 +419,10 @@ public class ScheduleFragment extends Fragment {
                     ConfigurationManager.getIstance().saveMyStatus(new Pair<>(Integer.parseInt(classId.getSelectedItem().toString()), section.getSelectedItem().toString()));
                     refreshTableContent(PERSONAL_SCHEDULE);
 
-                }if (profRadio.isChecked()){
+                }
+                if (profRadio.isChecked()) {
 
-                    ConfigurationManager.getIstance().saveMyStatus(profsList.get((int)profS.getSelectedItemId()));
+                    ConfigurationManager.getIstance().saveMyStatus(profsList.get((int) profS.getSelectedItemId()));
                     refreshTableContent(PERSONAL_SCHEDULE);
                 }
                 dialog.dismiss();
@@ -490,6 +522,33 @@ public class ScheduleFragment extends Fragment {
 
         if (currentSchedule != CLASSES_SCHEDULE && currentSchedule != PERSONAL_SCHEDULE) return;
 
+        new ScheduleDataFetcher(activity, thisFragment).fetchClassSchedule(classId, new OnFetchCompleteListener<List<ScheduleEvent>>() {
+            @Override
+            public void onSuccess(final List<ScheduleEvent> result) {
+                if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
+                    ConfigurationManager.getIstance().saveSchedule(result, classId);
+                    renderSchedule(classId);
+                }
+
+                ConfigurationManager.getIstance().saveSchedule(result, classId);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
+                    Snackbar snackbar = Snackbar
+                            .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                            .setAction("RIPROVA", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    renderSchedule(classId);
+                                }
+                            });
+                    snackbar.show();
+                }
+            }
+        });
+
         RecyclerView[] scheduleRecyclerViews = new RecyclerView[6];
         scheduleRecyclerViews[ScheduleEvent.MON] = getActivity().findViewById(R.id.schedule_mon_recyclerview);
         scheduleRecyclerViews[ScheduleEvent.TUE] = getActivity().findViewById(R.id.schedule_tue_recyclerview);
@@ -499,13 +558,7 @@ public class ScheduleFragment extends Fragment {
         scheduleRecyclerViews[ScheduleEvent.SAT] = getActivity().findViewById(R.id.schedule_sat_recyclerview);
 
         AHBottomNavigation bar = activity.findViewById(R.id.bottom_navigation);
-
-        ScheduleDataFetcher scheduleDataFetcher = new ScheduleDataFetcher(activity, thisFragment);
-        try {
-            scheduleDataFetcher.fetchClassSchedule(classId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        LinearLayout scheduleContainer = activity.findViewById(R.id.schedule_table);
 
         for (int i = 0; i < scheduleRecyclerViews.length; i++) {
 
@@ -549,11 +602,32 @@ public class ScheduleFragment extends Fragment {
 
         AHBottomNavigation bar = activity.findViewById(R.id.bottom_navigation);
 
-        try {
-            new ScheduleDataFetcher(activity, thisFragment).fetchProfSchedule(prof);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new ScheduleDataFetcher(activity, thisFragment).fetchProfSchedule(prof, new OnFetchCompleteListener<List<ScheduleEvent>>() {
+            @Override
+            public void onSuccess(List<ScheduleEvent> result) {
+                if (ConfigurationManager.getIstance().getScheduleList(prof) == null) {
+                    ConfigurationManager.getIstance().saveSchedule(result, prof);
+                    renderSchedule(prof);
+                }
+
+                ConfigurationManager.getIstance().saveSchedule(result, prof);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                if (ConfigurationManager.getIstance().getScheduleList(prof) == null) {
+                    Snackbar snackbar = Snackbar
+                            .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                            .setAction("RIPROVA", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    renderSchedule(prof);
+                                }
+                            });
+                    snackbar.show();
+                }
+            }
+        });
 
         for (int i = 0; i < scheduleRecyclerViews.length; i++) {
 

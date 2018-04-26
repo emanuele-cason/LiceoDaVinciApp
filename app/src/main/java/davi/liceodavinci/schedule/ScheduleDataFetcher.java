@@ -2,10 +2,8 @@ package davi.liceodavinci.schedule;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.util.Pair;
-import android.view.View;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -15,8 +13,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import davi.liceodavinci.ConfigurationManager;
-import davi.liceodavinci.R;
+import davi.liceodavinci.OnFetchCompleteListener;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -62,7 +59,7 @@ class ScheduleDataFetcher {
         requestUrls[GET_PROF] = "http://www.liceodavinci.tv/api/orario/docente";
     }
 
-    void fetchProfsList() throws Exception {
+    void fetchProfsList(final OnFetchCompleteListener<List<Prof>> callback) {
 
         Log.d("fetching", "profs list");
 
@@ -74,16 +71,14 @@ class ScheduleDataFetcher {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                fetchProfsFailed();
-                e.printStackTrace();
+                callback.onFailure(e);
             }
 
             @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
-                        fetchProfsFailed();
-                        throw new IOException("Unexpected code " + response);
+                        callback.onFailure(new IOException("Unexpected code " + response));
                     }
 
                     Gson gson = new Gson();
@@ -91,13 +86,16 @@ class ScheduleDataFetcher {
                     }.getType();
                     assert responseBody != null;
                     List<Prof> profsListAPI = gson.fromJson(responseBody.string(), listType);
-                    fetchProfsComplete(profsListAPI);
+
+                    callback.onSuccess(profsListAPI);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
     }
 
-    void fetchProfSchedule(final Prof prof) throws Exception {
+    void fetchProfSchedule(final Prof prof, final OnFetchCompleteListener<List<ScheduleEvent>> callback) {
 
         Log.d("fetching prof schedule", prof.getSurname());
 
@@ -113,16 +111,14 @@ class ScheduleDataFetcher {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                e.printStackTrace();
-                fetchProfFailed(prof);
+                callback.onFailure(e);
             }
 
             @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
-                        fetchProfFailed(prof);
-                        throw new IOException("Unexpected code " + response);
+                        callback.onFailure(new IOException("Unexpected code " + response));
                     }
 
                     Gson gson = new Gson();
@@ -130,13 +126,15 @@ class ScheduleDataFetcher {
                     }.getType();
                     assert responseBody != null;
                     List<ScheduleEvent> profScheduleAPI = gson.fromJson(responseBody.string(), listType);
-                    fetchProfComplete(profScheduleAPI, prof);
+                    callback.onSuccess(profScheduleAPI);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
     }
 
-    void fetchClassesList() throws Exception {
+    void fetchClassesList(final OnFetchCompleteListener<List<Pair<Integer, String>>> callback) {
 
         Log.d("fetching", "classes list");
 
@@ -148,35 +146,36 @@ class ScheduleDataFetcher {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                fetchClassesFailed();
-                e.printStackTrace();
+                callback.onFailure(e);
             }
 
             @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
-                        fetchClassesFailed();
-                        throw new IOException("Unexpected code " + response);
+                        callback.onFailure(new IOException("Unexpected code " + response));
                     }
 
                     Gson gson = new Gson();
                     assert response.body() != null;
 
-                    Type listType = new TypeToken<List<String>>(){}.getType();
-                    List<Pair<Integer,String>> classListAPI = new ArrayList<>();
+                    Type listType = new TypeToken<List<String>>() {
+                    }.getType();
+                    List<Pair<Integer, String>> classListAPI = new ArrayList<>();
                     List<String> classesStr = gson.fromJson(response.body().string(), listType);
-                    for (String classId : classesStr){
+                    for (String classId : classesStr) {
                         classListAPI.add(new Pair<Integer, String>(Integer.parseInt(String.valueOf(classId.charAt(0))), String.valueOf(classId.charAt(1))));
                     }
 
-                    fetchClassesComplete(classListAPI);
+                    callback.onSuccess(classListAPI);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
     }
 
-    void fetchClassSchedule(final Pair<Integer,String> classId) throws IOException {
+    void fetchClassSchedule(final Pair<Integer, String> classId, final OnFetchCompleteListener<List<ScheduleEvent>> callback) {
 
         Log.d("fetching class schedule", classId.first.toString().concat(classId.second));
 
@@ -188,16 +187,14 @@ class ScheduleDataFetcher {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                e.printStackTrace();
-                fetchClassFailed(classId);
+                callback.onFailure(e);
             }
 
             @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
-                        fetchClassFailed(classId);
-                        throw new IOException("Unexpected code " + response);
+                        callback.onFailure(new IOException("Unexpected code " + response));
                     }
 
                     Gson gson = new Gson();
@@ -205,126 +202,11 @@ class ScheduleDataFetcher {
                     }.getType();
                     assert responseBody != null;
                     List<ScheduleEvent> classScheduleAPI = gson.fromJson(responseBody.string(), listType);
-                    fetchClassComplete(classScheduleAPI, classId);
+                    callback.onSuccess(classScheduleAPI);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
-    }
-
-    private void fetchClassesComplete(final List<Pair<Integer,String>> result) {
-
-        if (ConfigurationManager.getIstance().getClassesList() == null && result != null) {
-            ConfigurationManager.getIstance().saveClassesList(result);
-
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    activity.invalidateOptionsMenu();
-                }
-            });
-        }
-
-        ConfigurationManager.getIstance().saveClassesList(result);
-    }
-
-    private void fetchClassesFailed(){
-        if (ConfigurationManager.getIstance().getClassesList() == null) {
-            Snackbar snackbar = Snackbar
-                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG);
-            snackbar.show();
-        }
-    }
-
-    private void fetchProfsComplete(final List<Prof> result) {
-
-        if (ConfigurationManager.getIstance().getProfsList() == null) {
-            ConfigurationManager.getIstance().saveProfsList(result);
-
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    scheduleFragment.prepareProfsSelector(result);
-                }
-            });
-        }
-
-        ConfigurationManager.getIstance().saveProfsList(result);
-    }
-
-    private void fetchProfsFailed(){
-        if (ConfigurationManager.getIstance().getProfsList() == null) {
-            Snackbar snackbar = Snackbar
-                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG);
-            snackbar.show();
-        }
-    }
-
-    private void fetchClassComplete(final List<ScheduleEvent> result, final Pair<Integer,String> classId) {
-
-        if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
-            ConfigurationManager.getIstance().saveSchedule(result, classId);
-
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    scheduleFragment.renderSchedule(classId);
-                }
-            });
-        }
-
-        ConfigurationManager.getIstance().saveSchedule(result, classId);
-    }
-
-    private void fetchClassFailed(final Pair<Integer,String> classId) {
-
-        if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
-            Snackbar snackbar = Snackbar
-                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                    .setAction("RIPROVA", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            try {
-                                fetchClassSchedule(classId);
-                            } catch (IOException e) {
-                                fetchClassFailed(classId);
-                            }
-                        }
-                    });
-            snackbar.show();
-        }
-    }
-
-    private void fetchProfComplete(final List<ScheduleEvent> result, final Prof prof) {
-
-        if (ConfigurationManager.getIstance().getScheduleList(prof) == null) {
-            ConfigurationManager.getIstance().saveSchedule(result, prof);
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    scheduleFragment.renderSchedule(prof);
-                }
-            });
-        }
-
-        ConfigurationManager.getIstance().saveSchedule(result, prof);
-    }
-
-    private void fetchProfFailed(final Prof prof) {
-
-        if (ConfigurationManager.getIstance().getScheduleList(prof) == null) {
-            Snackbar snackbar = Snackbar
-                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                    .setAction("RIPROVA", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            try {
-                                fetchProfSchedule(prof);
-                            } catch (Exception e) {
-                                fetchProfFailed(prof);
-                            }
-                        }
-                    });
-            snackbar.show();
-        }
     }
 }
