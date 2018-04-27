@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
@@ -91,16 +92,19 @@ public class ScheduleFragment extends Fragment {
         switch (currentSchedule) {
             case PERSONAL_SCHEDULE: {
                 menu.clear();
-                inflater.inflate(R.menu.schedule_personal_actionbar, menu);
 
-                MenuItem selectNew = menu.findItem(R.id.action_new_schedule);
-                selectNew.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        selectPersonalSchedule();
-                        return false;
-                    }
-                });
+                if (ConfigurationManager.getIstance().getClassesList() != null && ConfigurationManager.getIstance().getProfsList() != null) {
+                    inflater.inflate(R.menu.schedule_personal_actionbar, menu);
+
+                    MenuItem selectNew = menu.findItem(R.id.action_new_schedule);
+                    selectNew.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+                            selectPersonalSchedule();
+                            return false;
+                        }
+                    });
+                }
                 break;
             }
             case CLASSES_SCHEDULE: {
@@ -295,11 +299,16 @@ public class ScheduleFragment extends Fragment {
 
                 new ScheduleDataFetcher(activity, thisFragment).fetchProfsList(new OnFetchCompleteListener<List<Prof>>() {
                     @Override
-                    public void onSuccess(List<Prof> result) {
+                    public void onSuccess(final List<Prof> result) {
                         if (ConfigurationManager.getIstance().getProfsList() == null) {
                             ConfigurationManager.getIstance().saveProfsList(result);
 
-                            prepareProfsSelector(result);
+                            new Handler(activity.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    prepareProfsSelector(result);
+                                }
+                            });
                         }
 
                         ConfigurationManager.getIstance().saveProfsList(result);
@@ -527,7 +536,13 @@ public class ScheduleFragment extends Fragment {
             public void onSuccess(final List<ScheduleEvent> result) {
                 if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
                     ConfigurationManager.getIstance().saveSchedule(result, classId);
-                    renderSchedule(classId);
+                    new Handler(activity.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            renderSchedule(classId);
+                        }
+                    });
+
                 }
 
                 ConfigurationManager.getIstance().saveSchedule(result, classId);
@@ -558,7 +573,6 @@ public class ScheduleFragment extends Fragment {
         scheduleRecyclerViews[ScheduleEvent.SAT] = getActivity().findViewById(R.id.schedule_sat_recyclerview);
 
         AHBottomNavigation bar = activity.findViewById(R.id.bottom_navigation);
-        LinearLayout scheduleContainer = activity.findViewById(R.id.schedule_table);
 
         for (int i = 0; i < scheduleRecyclerViews.length; i++) {
 
@@ -592,22 +606,18 @@ public class ScheduleFragment extends Fragment {
 
         if (currentSchedule != PROFS_SCHEDULE && currentSchedule != PERSONAL_SCHEDULE) return;
 
-        RecyclerView[] scheduleRecyclerViews = new RecyclerView[6];
-        scheduleRecyclerViews[ScheduleEvent.MON] = getActivity().findViewById(R.id.schedule_mon_recyclerview);
-        scheduleRecyclerViews[ScheduleEvent.TUE] = getActivity().findViewById(R.id.schedule_tue_recyclerview);
-        scheduleRecyclerViews[ScheduleEvent.WED] = getActivity().findViewById(R.id.schedule_wed_recyclerview);
-        scheduleRecyclerViews[ScheduleEvent.THU] = getActivity().findViewById(R.id.schedule_thu_recyclerview);
-        scheduleRecyclerViews[ScheduleEvent.FRI] = getActivity().findViewById(R.id.schedule_fri_recyclerview);
-        scheduleRecyclerViews[ScheduleEvent.SAT] = getActivity().findViewById(R.id.schedule_sat_recyclerview);
-
-        AHBottomNavigation bar = activity.findViewById(R.id.bottom_navigation);
-
         new ScheduleDataFetcher(activity, thisFragment).fetchProfSchedule(prof, new OnFetchCompleteListener<List<ScheduleEvent>>() {
             @Override
             public void onSuccess(List<ScheduleEvent> result) {
                 if (ConfigurationManager.getIstance().getScheduleList(prof) == null) {
                     ConfigurationManager.getIstance().saveSchedule(result, prof);
-                    renderSchedule(prof);
+
+                    new Handler(activity.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            renderSchedule(prof);
+                        }
+                    });
                 }
 
                 ConfigurationManager.getIstance().saveSchedule(result, prof);
@@ -628,6 +638,16 @@ public class ScheduleFragment extends Fragment {
                 }
             }
         });
+
+        RecyclerView[] scheduleRecyclerViews = new RecyclerView[6];
+        scheduleRecyclerViews[ScheduleEvent.MON] = getActivity().findViewById(R.id.schedule_mon_recyclerview);
+        scheduleRecyclerViews[ScheduleEvent.TUE] = getActivity().findViewById(R.id.schedule_tue_recyclerview);
+        scheduleRecyclerViews[ScheduleEvent.WED] = getActivity().findViewById(R.id.schedule_wed_recyclerview);
+        scheduleRecyclerViews[ScheduleEvent.THU] = getActivity().findViewById(R.id.schedule_thu_recyclerview);
+        scheduleRecyclerViews[ScheduleEvent.FRI] = getActivity().findViewById(R.id.schedule_fri_recyclerview);
+        scheduleRecyclerViews[ScheduleEvent.SAT] = getActivity().findViewById(R.id.schedule_sat_recyclerview);
+
+        AHBottomNavigation bar = activity.findViewById(R.id.bottom_navigation);
 
         for (int i = 0; i < scheduleRecyclerViews.length; i++) {
 
