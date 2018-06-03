@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import davi.liceodavinci.agenda.Event;
 import davi.liceodavinci.communications.Communication;
 import davi.liceodavinci.schedule.Prof;
 import davi.liceodavinci.schedule.ScheduleEvent;
@@ -307,5 +308,28 @@ public class ConfigurationManager {
         }
 
         return null;
+    }
+
+    public void saveEvents(List<Event> events){
+
+        Log.d("storing events", String.valueOf(events.size()));
+
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(events);
+        prefsEditor.putString(activity.getString(R.string.stored_events), json);
+        prefsEditor.apply();
+    }
+
+    public List<Event> getEvents(){
+
+        Log.d("getting events list", "-");
+
+        String json = sharedPreferences.getString(activity.getString(R.string.stored_events), "");
+        Gson gson = new Gson();
+        Type listType = new TypeToken<ArrayList<Event>>() {
+        }.getType();
+
+        return gson.fromJson(json, listType);
     }
 }

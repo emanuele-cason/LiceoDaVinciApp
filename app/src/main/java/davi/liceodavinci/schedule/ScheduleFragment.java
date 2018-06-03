@@ -311,7 +311,12 @@ public class ScheduleFragment extends Fragment {
                             });
                         }
 
-                        ConfigurationManager.getIstance().saveProfsList(result);
+                        new Handler(activity.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                ConfigurationManager.getIstance().saveProfsList(result);
+                            }
+                        });
                     }
 
                     @Override

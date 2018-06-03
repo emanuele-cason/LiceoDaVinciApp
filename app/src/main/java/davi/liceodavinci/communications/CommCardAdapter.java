@@ -40,7 +40,7 @@ public class CommCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View row = inflater.inflate(R.layout.com_recyclerview_item, parent, false);
+        View row = inflater.inflate(R.layout.comm_recyclerview_item, parent, false);
 
         return new Item(row);
     }

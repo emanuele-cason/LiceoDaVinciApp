@@ -19,6 +19,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.File;
 
+import davi.liceodavinci.agenda.AgendaFragment;
 import davi.liceodavinci.communications.Communication;
 import davi.liceodavinci.communications.CommunicationsFragment;
 import davi.liceodavinci.schedule.ScheduleFragment;
@@ -136,7 +137,8 @@ public class MainActivity extends AppCompatActivity
         item.setChecked(true);
 
         if (id == R.id.drawer_agenda) {
-
+            selection = new AgendaFragment(this);
+            getSupportActionBar().setTitle("Agenda del liceo");
         } else if (id == R.id.drawer_schedule) {
             selection = new ScheduleFragment(this);
             getSupportActionBar().setTitle("Orario personale");

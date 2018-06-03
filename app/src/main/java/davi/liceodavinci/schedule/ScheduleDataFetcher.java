@@ -2,7 +2,6 @@ package davi.liceodavinci.schedule;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.Pair;
 
 import com.google.gson.Gson;
@@ -61,8 +60,6 @@ class ScheduleDataFetcher {
 
     void fetchProfsList(final OnFetchCompleteListener<List<Prof>> callback) {
 
-        Log.d("fetching", "profs list");
-
         Request request = new Request.Builder()
                 .url(requestUrls[GET_PROFS])
                 .addHeader("Accept", "application/json")
@@ -96,8 +93,6 @@ class ScheduleDataFetcher {
     }
 
     void fetchProfSchedule(final Prof prof, final OnFetchCompleteListener<List<ScheduleEvent>> callback) {
-
-        Log.d("fetching prof schedule", prof.getSurname());
 
         final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(JSON, "{\"nome\": " + "\"" + prof.getName() + "\"" + ", \"cognome\": " + "\"" + prof.getSurname() + "\"" + "}");
@@ -135,8 +130,6 @@ class ScheduleDataFetcher {
     }
 
     void fetchClassesList(final OnFetchCompleteListener<List<Pair<Integer, String>>> callback) {
-
-        Log.d("fetching", "classes list");
 
         Request request = new Request.Builder()
                 .url(requestUrls[GET_CLASSES])
@@ -176,8 +169,6 @@ class ScheduleDataFetcher {
     }
 
     void fetchClassSchedule(final Pair<Integer, String> classId, final OnFetchCompleteListener<List<ScheduleEvent>> callback) {
-
-        Log.d("fetching class schedule", classId.first.toString().concat(classId.second));
 
         Request request = new Request.Builder()
                 .url(requestUrls[GET_CLASS].concat(classId.first.toString()).concat(classId.second))
