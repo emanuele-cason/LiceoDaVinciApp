@@ -20,6 +20,8 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import org.json.JSONException;
 
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -81,7 +83,7 @@ public class AgendaFragment extends Fragment {
         this.eventsRecyclerView = getActivity().findViewById(R.id.agenda_recyclerview);
 
         fetchAndStoreCurrentMonthEvents();
-        setResult(ConfigurationManager.getIstance().getEvents());
+        setResult(sortByBeginDate(ConfigurationManager.getIstance().getEvents()));
 
         //this.calendar.addDecorator(new EventDecorator(dates));
     }
@@ -139,6 +141,19 @@ public class AgendaFragment extends Fragment {
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
         if ((events != null) && (events.size() != 0))
             eventsRecyclerView.setAdapter(new AgendaCardAdapter(activity, events));
+    }
+
+    private List<Event> sortByBeginDate(List<Event> events){
+        if (!events.isEmpty()) {
+            Collections.sort(events, new Comparator<Event>() {
+                @Override
+                public int compare(Event e1, Event e2) {
+                    return e1.getBeginCalendar().getTime().compareTo(e2.getBeginCalendar().getTime());
+                }
+            });
+        }
+
+        return events;
     }
 
     @Override
