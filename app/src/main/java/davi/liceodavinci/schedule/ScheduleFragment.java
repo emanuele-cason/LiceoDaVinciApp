@@ -227,8 +227,6 @@ public class ScheduleFragment extends Fragment {
         bar.setAccentColor(Color.parseColor("#3F51B5"));
         bar.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
 
-        refreshTableContent(PERSONAL_SCHEDULE);
-
         bar.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
@@ -240,6 +238,8 @@ public class ScheduleFragment extends Fragment {
                 return true;
             }
         });
+
+        refreshTableContent(PERSONAL_SCHEDULE);
     }
 
     private void refreshTableContent(final int position) {

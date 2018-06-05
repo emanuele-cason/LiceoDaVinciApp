@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -159,14 +160,35 @@ public class MainActivity extends AppCompatActivity
             getSupportActionBar().setTitle("Impostazioni");
         }
 
-        if (selection != null) {
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_frame, selection)
-                    .commit();
-        }
-
         drawer.closeDrawer(GravityCompat.START);
+
+        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                if (selection != null) {
+                    getFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.main_frame, selection)
+                            .commit();
+                }
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+        
         return true;
     }
 

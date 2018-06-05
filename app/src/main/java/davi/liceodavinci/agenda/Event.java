@@ -31,13 +31,13 @@ public class Event {
 
     public Calendar getBeginCalendar(){
         Calendar begin = Calendar.getInstance();
-        begin.setTimeInMillis(inizio * 1000);
+        begin.setTimeInMillis((long)inizio * 1000);
         return begin;
     }
 
     public Calendar getEndCalendar(){
         Calendar end = Calendar.getInstance();
-        end.setTimeInMillis(fine * 1000);
+        end.setTimeInMillis((long)fine * 1000);
         return end;
     }
 }

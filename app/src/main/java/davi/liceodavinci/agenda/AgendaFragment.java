@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -40,6 +41,7 @@ public class AgendaFragment extends Fragment {
     private Activity activity;
     private MaterialCalendarView calendar;
     private RecyclerView eventsRecyclerView;
+    private List<Event> events;
 
     public AgendaFragment(Activity activity){
        this.activity = activity;
@@ -81,27 +83,38 @@ public class AgendaFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.calendar = getActivity().findViewById(R.id.calendarView);
         this.eventsRecyclerView = getActivity().findViewById(R.id.agenda_recyclerview);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         fetchAndStoreCurrentMonthEvents();
-        setResult(sortByBeginDate(ConfigurationManager.getIstance().getEvents()));
-
+        this.events = ConfigurationManager.getIstance().getEvents();
+        setResult(sortByBeginDate(this.events));
         //this.calendar.addDecorator(new EventDecorator(dates));
     }
 
-    private void fetchEvents(List<String> filterTitle, List<String> filterContent, int after, int before){
+    private void fetchEvents(final List<String> filterTitle, final List<String> filterContent, final int after, final int before){
 
         try {
             new AgendaDataFetcher(activity, this).fetchEvents(filterTitle, filterContent, before, after, new OnFetchCompleteListener<List<Event>>() {
                 @Override
                 public void onSuccess(List<Event> result) {
-                    for(Event event: result){
-                        Log.d("event", event.getTitle());
-                    }
+
                 }
 
                 @Override
                 public void onFailure(Exception e) {
-
+                    Snackbar snackbar = Snackbar
+                            .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                            .setAction("RIPROVA", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    fetchEvents(filterTitle, filterContent, before, after);
+                                }
+                            });
+                    snackbar.show();
                 }
             });
         } catch (JSONException e) {
@@ -111,14 +124,23 @@ public class AgendaFragment extends Fragment {
 
     private void fetchAndStoreCurrentMonthEvents(){
 
-        Calendar afterDate = Calendar.getInstance(); //Si prende gli eventi dal primo giorno del mese precedente
+        Calendar afterDate = Calendar.getInstance(); // Si prende gli eventi dal primo giorno del mese corrente
         afterDate.set(Calendar.DAY_OF_MONTH, 1);
         afterDate.add(Calendar.MONTH, -1);
+        afterDate.set(Calendar.HOUR_OF_DAY, 23);
+        afterDate.set(Calendar.MINUTE, 59);
+        afterDate.set(Calendar.SECOND, 59);
 
-        Calendar beforeDate = Calendar.getInstance(); // Si prende gli eventi fino al giorno di oggi dell'anno prossimo
-        beforeDate.add(Calendar.MONTH, 1);
+        Calendar beforeDate = Calendar.getInstance(); // All'ultimo giorno del mese prossimo
+        beforeDate.add(Calendar.MONTH, 2);
         beforeDate.set(Calendar.DAY_OF_MONTH,1);
         beforeDate.add(Calendar.DAY_OF_MONTH,-1);
+        beforeDate.set(Calendar.HOUR_OF_DAY, 23);
+        beforeDate.set(Calendar.MINUTE, 59);
+        beforeDate.set(Calendar.SECOND, 59);
+
+        Log.d("before", String.valueOf((int)(beforeDate.getTimeInMillis()/1000L)));
+        Log.d("after", String.valueOf((int)(afterDate.getTimeInMillis()/1000L)));
 
         try {
             new AgendaDataFetcher(activity, this).fetchEvents(null, null, (int)(beforeDate.getTimeInMillis()/1000L), (int)(afterDate.getTimeInMillis()/1000L), new OnFetchCompleteListener<List<Event>>() {
@@ -129,7 +151,27 @@ public class AgendaFragment extends Fragment {
 
                 @Override
                 public void onFailure(Exception e) {
-
+                    if (ConfigurationManager.getIstance().getEvents() != null) {
+                        Snackbar snackbar = Snackbar
+                                .make(activity.findViewById(R.id.main_frame), "Errore di connessione. Impossibile aggiornare l'agenda", Snackbar.LENGTH_LONG)
+                                .setAction("RIPROVA", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        fetchAndStoreCurrentMonthEvents();
+                                    }
+                                });
+                        snackbar.show();
+                    } else{
+                        Snackbar snackbar = Snackbar
+                                .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                                .setAction("RIPROVA", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        fetchAndStoreCurrentMonthEvents();
+                                    }
+                                });
+                        snackbar.show();
+                    }
                 }
             });
         } catch (JSONException e) {
@@ -144,7 +186,7 @@ public class AgendaFragment extends Fragment {
     }
 
     private List<Event> sortByBeginDate(List<Event> events){
-        if (!events.isEmpty()) {
+        if (!(events == null)) if (!events.isEmpty()) {
             Collections.sort(events, new Comparator<Event>() {
                 @Override
                 public int compare(Event e1, Event e2) {
