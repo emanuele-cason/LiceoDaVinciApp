@@ -2,10 +2,9 @@
 
 ### TODO ###
 
-* Aggiungere una simbologia per avvenuta presa visione del comunicato
-* Aggiungere impostazioni (notifiche, marchia comunicati letti o non letti)
 * Aggiungere area contattaci/about
-* Aggiungere agenda del liceo, orario classi, orario docenti, laboratori prenotati
-* Trovare icona per l'applicazione
+* Aggiungere laboratori prenotati
+* Aggiungere seleziona pattern colori in impostazioni (per gli orari) o switch per decidere se generarli
+* Aggiungere scelta pagina iniziale
 * Risolvere errore problema grafico in Android Lollipop: immagine dell'header in bassa definizione
 * Aggiungere Proguard, aggiungendo "-keep class com.shockwave.**" come da indicazioni: https://github.com/barteksc/AndroidPdfViewer
