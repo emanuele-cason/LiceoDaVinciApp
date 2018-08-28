@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <Preference
-        android:key="notifications"
-        android:summary="Abilita o disabilita le notifiche per i nuovi comunicati delle categorie studenti, genitori e docenti"
-        android:title="Notifiche" />
+    <PreferenceCategory android:title="Generali">
+        <Preference
+            android:key="notifications"
+            android:summary="Abilita o disabilita le notifiche per i nuovi comunicati delle categorie studenti, genitori e docenti"
+            android:title="Notifiche" />
+
+        <ListPreference
+            android:key="startup_fragment"
+            android:summary="Seleziona la schermata che si deve visualizzare all'apertura dell'applicazione"
+            android:title="Sezione all'avvio" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

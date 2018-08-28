@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity
 
     private DrawerLayout drawer;
     private NavigationView navigationView;
-    private Fragment selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
+    private Fragment selection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +120,33 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        switch (ConfigurationManager.getIstance().getStartupFragment()){
+            case "0": {
+                selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
+                getSupportActionBar().setTitle("Comunicati studenti");
+                break;
+            }
+            case "1": {
+                selection = new CommunicationsFragment(this, Communication.COMM_PARENTS);
+                getSupportActionBar().setTitle("Comunicati genitori");
+                break;
+            }
+            case "2": {
+                selection = new CommunicationsFragment(this, Communication.COMM_PROFS);
+                getSupportActionBar().setTitle("Comunicati docenti");
+                break;
+            }
+            case "4": {
+                selection = new ScheduleFragment(this);
+                getSupportActionBar().setTitle("Orario personale");
+                break;
+            }
+            case "5": {
+                selection = new AgendaFragment(this);
+                getSupportActionBar().setTitle("Agenda del liceo");
+                break;
+            }
+        }
 
         if (selection != null) {
             getFragmentManager()

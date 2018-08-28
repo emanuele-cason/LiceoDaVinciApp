@@ -352,4 +352,11 @@ public class ConfigurationManager {
 
         return gson.fromJson(json, listType);
     }
+
+    public String getStartupFragment(){
+
+        Log.d("getting startup frag", "-");
+
+        return sharedPreferences.getString("startup_fragment", "0");
+    }
 }

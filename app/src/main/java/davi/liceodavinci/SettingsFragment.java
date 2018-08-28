@@ -2,6 +2,7 @@ package davi.liceodavinci;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
@@ -86,6 +87,10 @@ public class SettingsFragment extends PreferenceFragment {
                 return false;
             }
         });
+
+        ListPreference startupFragment = (ListPreference)findPreference("startup_fragment");
+        startupFragment.setEntries(new String[]{"Agenda del Liceo", "Orario personale", "Comunicati studenti", "Comunicati genitori", "Comunicati docenti"});
+        startupFragment.setEntryValues(new String[]{"5", "4", String.valueOf(Communication.COMM_STUDENTS), String.valueOf(Communication.COMM_PARENTS), String.valueOf(Communication.COMM_PROFS)});
     }
 
     @Override
