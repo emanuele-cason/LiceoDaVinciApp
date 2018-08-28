@@ -45,7 +45,6 @@ public class NotificationsManager extends FirebaseMessagingService {
                             .setContentTitle(remoteMessage.getNotification().getTitle() == null ? "" : remoteMessage.getNotification().getTitle())
                             .setGroup(String.valueOf(topicID))
                             .setGroupSummary(true)
-                            .setOnlyAlertOnce(true)
                             .setContentText(remoteMessage.getNotification().getBody());
             notificationManager.notify(topicID, mBuilder.build());
         }

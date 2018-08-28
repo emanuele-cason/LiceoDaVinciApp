@@ -2,6 +2,10 @@ package davi.liceodavinci.agenda;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.provider.CalendarContract;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,7 +46,7 @@ public class AgendaCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @SuppressLint("SimpleDateFormat")
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
         SimpleDateFormat time = new SimpleDateFormat("HH:mm");
         SimpleDateFormat datetime = new SimpleDateFormat("dd MMM (HH:mm)");
@@ -79,6 +84,34 @@ public class AgendaCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).day.setText(String.valueOf(events.get(position).getBeginCalendar().get(Calendar.DAY_OF_MONTH)));
             ((Item)holder).month.setText(new SimpleDateFormat("MMM").format(events.get(position).getBeginCalendar().getTime()));
         }else ((Item)holder).date.setVisibility(View.INVISIBLE);
+
+        ((Item)holder).recycler_row.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setMessage("Aggiungere questo evento al tuo calendario?")
+                        .setPositiveButton("AGGIUNGI", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(Intent.ACTION_EDIT);
+                                intent.setType("vnd.android.cursor.item/event");
+                                intent.putExtra(CalendarContract.Events.TITLE, events.get(position).getTitle());
+                                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+                                        events.get(position).getBeginCalendar().getTimeInMillis());
+                                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
+                                        events.get(position).getEndCalendar().getTimeInMillis());
+                                activity.startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("ANNULLA", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        });
+                builder.show();
+
+                return false;
+            }
+        });
     }
 
     @Override
@@ -88,6 +121,8 @@ public class AgendaCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 }
 
 class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    private int tutorialToastSwitch = 0;
 
     TextView titleTV;
     TextView timeTV;
@@ -109,6 +144,9 @@ class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-
+        if (tutorialToastSwitch < 1){
+            Toast.makeText(view.getContext(), "Premi a lungo per aggiungere al tuo calendario", Toast.LENGTH_SHORT).show();
+            tutorialToastSwitch++;
+        }
     }
 }

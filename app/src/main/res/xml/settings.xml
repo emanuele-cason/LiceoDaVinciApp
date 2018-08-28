@@ -2,8 +2,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
-        android:title="Notifiche"
+        android:key="notifications"
         android:summary="Abilita o disabilita le notifiche per i nuovi comunicati delle categorie studenti, genitori e docenti"
-        android:key="notifications"/>
+        android:title="Notifiche" />
 
 </PreferenceScreen>

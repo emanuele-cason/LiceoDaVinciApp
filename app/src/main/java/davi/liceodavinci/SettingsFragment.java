@@ -91,6 +91,5 @@ public class SettingsFragment extends PreferenceFragment {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
     }
 }
