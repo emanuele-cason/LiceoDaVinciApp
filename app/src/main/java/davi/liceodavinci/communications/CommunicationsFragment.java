@@ -11,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import davi.liceodavinci.ConfigurationManager;
+import davi.liceodavinci.OnFetchCompleteListener;
 import davi.liceodavinci.R;
 
 /**
@@ -68,6 +70,8 @@ public class CommunicationsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        Log.d("activityCreated", "ac");
 
         commRecyclerView = activity.findViewById(R.id.com_recyclerview);
         swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
@@ -174,10 +178,10 @@ public class CommunicationsFragment extends Fragment {
             }
         }
 
-        if (communications.size() == 0){
+        if (communications.size() == 0) {
             nothingHere.setVisibility(View.VISIBLE);
             swipeRefreshCom.setRefreshing(false);
-        }else {
+        } else {
             nothingHere.setVisibility(View.GONE);
             this.communications = mergeCommWithSPref(communications);
             setResult(this.communications, null);
@@ -187,24 +191,55 @@ public class CommunicationsFragment extends Fragment {
     protected void fetch() {
         swipeRefreshCom.setRefreshing(true);
         CommDataFetcher df = new CommDataFetcher(this, activity);
+
         try {
-            df.fetchCommunicationsJson(section);
+            df.fetchCommunicationsJson(section, new OnFetchCompleteListener<List<Communication>>() {
+                @Override
+                public void onSuccess(final List<Communication> result) {
+                    for (int i = 0; i < result.size(); i++) {
+                        result.get(i).setUrl(result.get(i).getUrl().replaceAll(" ", "%20"));
+                    }
+
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fetchComplete(result);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
+                    if (swipeRefreshCom != null) {
+                        swipeRefreshCom.setRefreshing(false);
+                        Snackbar snackbar = Snackbar
+                                .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
+                                .setAction("RIPROVA", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        fetch();
+                                    }
+                                });
+                        snackbar.show();
+                    }
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void updateItem(Communication.LocalCommunication communication){
-        for (Communication.LocalCommunication comm : this.communications){
-            if (comm.getName().equals(communication.getName())){
+    protected void updateItem(Communication.LocalCommunication communication) {
+        for (Communication.LocalCommunication comm : this.communications) {
+            if (comm.getName().equals(communication.getName())) {
                 commRecyclerView.getAdapter().notifyItemChanged(this.communications.indexOf(comm), comm);
                 this.communications.set(this.communications.indexOf(comm), communication);
             }
         }
     }
 
-
-    public void fetchComplete(List<Communication> communications) {
+    private void fetchComplete(List<Communication> communications) {
         List<Communication.LocalCommunication> localCommunications = new ArrayList<>();
 
         for (Communication comm : communications)
@@ -215,27 +250,12 @@ public class CommunicationsFragment extends Fragment {
         setResult(this.communications, searchQuery);
     }
 
-    public void fetchFailed() {
-        swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
-        if (swipeRefreshCom != null){
-            swipeRefreshCom.setRefreshing(false);
-            Snackbar snackbar = Snackbar
-                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                    .setAction("RIPROVA", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            fetch();
-                        }
-                    });
-            snackbar.show();
-        }
-    }
-
     private void setResult(List<Communication.LocalCommunication> communications, String query) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        if ((communications != null) && (communications.size() != 0))
-            commRecyclerView.setAdapter(new CommCardAdapter(activity, this,searchByName(communications, query), section));
-            runLayoutAnimation(commRecyclerView);
+        if ((communications != null) && (communications.size() != 0)) {
+            commRecyclerView.setAdapter(new CommCardAdapter(activity, this, searchByName(communications, query), section));
+        }
+        runLayoutAnimation(commRecyclerView);
         swipeRefreshCom.setRefreshing(false);
     }
 

@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,7 +18,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import org.json.JSONException;
 
@@ -41,7 +45,6 @@ public class AgendaFragment extends Fragment {
     private Activity activity;
     private MaterialCalendarView calendar;
     private RecyclerView eventsRecyclerView;
-    private List<Event> events;
 
     public AgendaFragment(Activity activity){
        this.activity = activity;
@@ -59,13 +62,12 @@ public class AgendaFragment extends Fragment {
         menu.clear();
         inflater.inflate(R.menu.agenda_actionbar_menu, menu);
 
-        MenuItem selectToday = menu.findItem(R.id.selectToday);
+        final MenuItem selectToday = menu.findItem(R.id.selectToday);
         selectToday.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if (calendar != null){
-                    calendar.setCurrentDate(new Date(System.currentTimeMillis()));
-                    calendar.setSelectedDate(new Date(System.currentTimeMillis()));
+                    setToToday();
                 }
                 return false;
             }
@@ -88,11 +90,37 @@ public class AgendaFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        setToToday();
 
+        this.calendar.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull final CalendarDay date, boolean selected) {
+
+                Calendar beforeDate = (Calendar)date.getCalendar().clone(); // All'ultimo giorno del mese prossimo
+                beforeDate.add(Calendar.MONTH, 1);
+                beforeDate.set(Calendar.DAY_OF_MONTH,1);
+                beforeDate.add(Calendar.DAY_OF_MONTH,-1);
+                beforeDate.set(Calendar.HOUR_OF_DAY, 23);
+                beforeDate.set(Calendar.MINUTE, 59);
+                beforeDate.set(Calendar.SECOND, 59);
+
+                Calendar afterDate = (Calendar)date.getCalendar().clone(); // Si prende gli eventi dal primo giorno del mese corrente
+                afterDate.add(Calendar.DAY_OF_MONTH,-1);
+                afterDate.set(Calendar.HOUR_OF_DAY, 23);
+                afterDate.set(Calendar.MINUTE, 59);
+                afterDate.set(Calendar.SECOND, 58);
+
+                fetchEvents(null, null, ((int)(afterDate.getTimeInMillis()/1000L)), ((int)(beforeDate.getTimeInMillis()/1000L)));
+            }
+        });
+    }
+
+    private void setToToday(){
         fetchAndStoreCurrentMonthEvents();
-        this.events = ConfigurationManager.getIstance().getEvents();
-        setResult(sortByBeginDate(this.events));
-        //this.calendar.addDecorator(new EventDecorator(dates));
+        setResult(sortByBeginDate(ConfigurationManager.getIstance().getEvents()));
+
+        calendar.setCurrentDate(new Date(System.currentTimeMillis()));
+        calendar.setSelectedDate(new Date(System.currentTimeMillis()));
     }
 
     private void fetchEvents(final List<String> filterTitle, final List<String> filterContent, final int after, final int before){
@@ -100,8 +128,13 @@ public class AgendaFragment extends Fragment {
         try {
             new AgendaDataFetcher(activity, this).fetchEvents(filterTitle, filterContent, before, after, new OnFetchCompleteListener<List<Event>>() {
                 @Override
-                public void onSuccess(List<Event> result) {
-
+                public void onSuccess(final List<Event> result) {
+                    new Handler(activity.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            setResult(sortByBeginDate(result));
+                        }
+                    });
                 }
 
                 @Override
@@ -126,10 +159,9 @@ public class AgendaFragment extends Fragment {
 
         Calendar afterDate = Calendar.getInstance(); // Si prende gli eventi dal primo giorno del mese corrente
         afterDate.set(Calendar.DAY_OF_MONTH, 1);
-        afterDate.add(Calendar.MONTH, -1);
-        afterDate.set(Calendar.HOUR_OF_DAY, 23);
-        afterDate.set(Calendar.MINUTE, 59);
-        afterDate.set(Calendar.SECOND, 59);
+        afterDate.set(Calendar.HOUR_OF_DAY, 0);
+        afterDate.set(Calendar.MINUTE, 0);
+        afterDate.set(Calendar.SECOND, 0);
 
         Calendar beforeDate = Calendar.getInstance(); // All'ultimo giorno del mese prossimo
         beforeDate.add(Calendar.MONTH, 2);
@@ -182,6 +214,7 @@ public class AgendaFragment extends Fragment {
     private void setResult(List<Event> events) {
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
         if ((events != null) && (events.size() != 0))
+            Log.d("donw","done");
             eventsRecyclerView.setAdapter(new AgendaCardAdapter(activity, events));
     }
 

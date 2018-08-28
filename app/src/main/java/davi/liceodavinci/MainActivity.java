@@ -2,6 +2,7 @@ package davi.liceodavinci;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -176,10 +177,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDrawerClosed(@NonNull View drawerView) {
                 if (selection != null) {
-                    getFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.main_frame, selection)
-                            .commit();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        getFragmentManager()
+                                .beginTransaction().setReorderingAllowed(false)
+                                .replace(R.id.main_frame, selection)
+                                .commit();
+                    }else {
+                        getFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.main_frame, selection)
+                                .commit();
+                    }
+
                 }
             }
 

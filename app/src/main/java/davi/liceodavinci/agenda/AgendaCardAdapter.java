@@ -43,10 +43,17 @@ public class AgendaCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat date = new SimpleDateFormat("dd MMM (HH:mm)");
 
         ((Item)holder).titleTV.setText(events.get(position).getTitle());
-        ((Item)holder).timeTV.setText(format.format(events.get(position).getBeginCalendar().getTime()).concat(" - ").concat(format.format(events.get(position).getEndCalendar().getTime())));
+        if ((events.get(position).getBeginCalendar().get(Calendar.DAY_OF_YEAR) == events.get(position).getEndCalendar().get(Calendar.DAY_OF_YEAR)) && (events.get(position).getBeginCalendar().get(Calendar.YEAR) == events.get(position).getEndCalendar().get(Calendar.YEAR))){
+            //Se l'inizio e la fine di uno stesso evento sono in uno stesso giorno
+            ((Item)holder).timeTV.setText(time.format(events.get(position).getBeginCalendar().getTime()).concat(" - ").concat(time.format(events.get(position).getEndCalendar().getTime())));
+        }else {
+            //Se inizio e fine dello stesso evento sono su giorni diversi - evento a cavallo di più giorni...
+            ((Item)holder).timeTV.setText(date.format(events.get(position).getBeginCalendar().getTime()).concat(" - ").concat(date.format(events.get(position).getEndCalendar().getTime())));
+        }
 
         if ((position <= 0) || (events.get(position - 1).getBeginCalendar().get(Calendar.DATE) != (events.get(position).getBeginCalendar().get(Calendar.DATE)))){
             //Se non ce un evento precedente a quello corrente o se il giorno dell'evento precedente è diverso da quello del corrente --> visualizza giorno
@@ -54,12 +61,11 @@ public class AgendaCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).day.setText(String.valueOf(events.get(position).getBeginCalendar().get(Calendar.DAY_OF_MONTH)));
             ((Item)holder).month.setText(new SimpleDateFormat("MMM").format(events.get(position).getBeginCalendar().getTime()));
         }else ((Item)holder).date.setVisibility(View.INVISIBLE);
-
     }
 
     @Override
     public int getItemCount() {
-        return events.size();
+        return (events != null) ? events.size(): 0;
     }
 }
 
