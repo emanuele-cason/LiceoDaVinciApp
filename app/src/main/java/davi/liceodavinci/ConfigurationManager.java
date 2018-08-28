@@ -117,7 +117,27 @@ public class ConfigurationManager {
         saveCommJSONFromList(communications);
     }
 
-    boolean getCommNotificationEnabled(int commType) {
+    void setCommNotificationEnabled(int commType, boolean enabled){
+        Log.d("storing data notific", String.valueOf(commType).concat(" --> ").concat(String.valueOf(enabled)));
+
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+
+        switch (commType) {
+            case Communication.COMM_STUDENTS: {
+                prefsEditor.putBoolean(activity.getString(R.string.notifications_enabled_comm_students), enabled);
+            }
+            case Communication.COMM_PARENTS: {
+                prefsEditor.putBoolean(activity.getString(R.string.notifications_enabled_comm_parents), enabled);
+            }
+            case Communication.COMM_PROFS: {
+                prefsEditor.putBoolean(activity.getString(R.string.notifications_enabled_comm_profs), enabled);
+            }
+        }
+
+        prefsEditor.apply();
+    }
+
+    boolean isNotificationEnabled(int commType) {
 
         Log.d("getting data notific", String.valueOf(commType));
 

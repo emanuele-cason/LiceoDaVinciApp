@@ -8,9 +8,9 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +45,7 @@ public class AgendaFragment extends Fragment {
     private Activity activity;
     private MaterialCalendarView calendar;
     private RecyclerView eventsRecyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public AgendaFragment(Activity activity){
        this.activity = activity;
@@ -85,6 +86,8 @@ public class AgendaFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.calendar = getActivity().findViewById(R.id.calendarView);
         this.eventsRecyclerView = getActivity().findViewById(R.id.agenda_recyclerview);
+        this.swipeRefreshLayout = getActivity().findViewById(R.id.agenda_swipe_refresh_layout);
+        swipeRefreshLayout.setEnabled(false);
     }
 
     @Override
@@ -99,10 +102,9 @@ public class AgendaFragment extends Fragment {
                 Calendar beforeDate = (Calendar)date.getCalendar().clone(); // All'ultimo giorno del mese prossimo
                 beforeDate.add(Calendar.MONTH, 1);
                 beforeDate.set(Calendar.DAY_OF_MONTH,1);
-                beforeDate.add(Calendar.DAY_OF_MONTH,-1);
-                beforeDate.set(Calendar.HOUR_OF_DAY, 23);
-                beforeDate.set(Calendar.MINUTE, 59);
-                beforeDate.set(Calendar.SECOND, 59);
+                beforeDate.set(Calendar.HOUR_OF_DAY, 0);
+                beforeDate.set(Calendar.MINUTE, 0);
+                beforeDate.set(Calendar.SECOND, 0);
 
                 Calendar afterDate = (Calendar)date.getCalendar().clone(); // Si prende gli eventi dal primo giorno del mese corrente
                 afterDate.add(Calendar.DAY_OF_MONTH,-1);
@@ -124,6 +126,7 @@ public class AgendaFragment extends Fragment {
     }
 
     private void fetchEvents(final List<String> filterTitle, final List<String> filterContent, final int after, final int before){
+        swipeRefreshLayout.setRefreshing(true);
 
         try {
             new AgendaDataFetcher(activity, this).fetchEvents(filterTitle, filterContent, before, after, new OnFetchCompleteListener<List<Event>>() {
@@ -139,6 +142,7 @@ public class AgendaFragment extends Fragment {
 
                 @Override
                 public void onFailure(Exception e) {
+                    swipeRefreshLayout.setRefreshing(false);
                     Snackbar snackbar = Snackbar
                             .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
                             .setAction("RIPROVA", new View.OnClickListener() {
@@ -166,13 +170,9 @@ public class AgendaFragment extends Fragment {
         Calendar beforeDate = Calendar.getInstance(); // All'ultimo giorno del mese prossimo
         beforeDate.add(Calendar.MONTH, 2);
         beforeDate.set(Calendar.DAY_OF_MONTH,1);
-        beforeDate.add(Calendar.DAY_OF_MONTH,-1);
-        beforeDate.set(Calendar.HOUR_OF_DAY, 23);
-        beforeDate.set(Calendar.MINUTE, 59);
-        beforeDate.set(Calendar.SECOND, 59);
-
-        Log.d("before", String.valueOf((int)(beforeDate.getTimeInMillis()/1000L)));
-        Log.d("after", String.valueOf((int)(afterDate.getTimeInMillis()/1000L)));
+        beforeDate.set(Calendar.HOUR_OF_DAY, 0);
+        beforeDate.set(Calendar.MINUTE, 0);
+        beforeDate.set(Calendar.SECOND, 0);
 
         try {
             new AgendaDataFetcher(activity, this).fetchEvents(null, null, (int)(beforeDate.getTimeInMillis()/1000L), (int)(afterDate.getTimeInMillis()/1000L), new OnFetchCompleteListener<List<Event>>() {
@@ -212,9 +212,9 @@ public class AgendaFragment extends Fragment {
     }
 
     private void setResult(List<Event> events) {
+        swipeRefreshLayout.setRefreshing(false);
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
         if ((events != null) && (events.size() != 0))
-            Log.d("donw","done");
             eventsRecyclerView.setAdapter(new AgendaCardAdapter(activity, events));
     }
 

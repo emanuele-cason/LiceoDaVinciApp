@@ -44,16 +44,34 @@ public class AgendaCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-        SimpleDateFormat date = new SimpleDateFormat("dd MMM (HH:mm)");
+        SimpleDateFormat datetime = new SimpleDateFormat("dd MMM (HH:mm)");
+        SimpleDateFormat date = new SimpleDateFormat("dd MMM");
 
         ((Item)holder).titleTV.setText(events.get(position).getTitle());
+        String period = "";
+
+        //L'ORDINE DEGLI IF E' STRUTTURATO IN MODO DA SOVRASCRIVERE PERIOD SECONDO UNA SCALA DI PRIORITA'. NON VARIARNE L'ORDINE
         if ((events.get(position).getBeginCalendar().get(Calendar.DAY_OF_YEAR) == events.get(position).getEndCalendar().get(Calendar.DAY_OF_YEAR)) && (events.get(position).getBeginCalendar().get(Calendar.YEAR) == events.get(position).getEndCalendar().get(Calendar.YEAR))){
             //Se l'inizio e la fine di uno stesso evento sono in uno stesso giorno
-            ((Item)holder).timeTV.setText(time.format(events.get(position).getBeginCalendar().getTime()).concat(" - ").concat(time.format(events.get(position).getEndCalendar().getTime())));
+            period = time.format(events.get(position).getBeginCalendar().getTime()).concat(" - ").concat(time.format(events.get(position).getEndCalendar().getTime()));
+            if (time.format(events.get(position).getBeginCalendar().getTime()).equals("00:00")) period = "Fino alle ".concat(time.format(events.get(position).getEndCalendar().getTime()));
+            if (time.format(events.get(position).getEndCalendar().getTime()).equals("23:59")) period = "Dalle ".concat(time.format(events.get(position).getBeginCalendar().getTime())).concat(" in poi");
+            if ((time.format(events.get(position).getBeginCalendar().getTime()).equals("00:00")) && (time.format(events.get(position).getEndCalendar().getTime()).equals("23:59"))){
+                //Se il giorno inizia con 00:00 e finisce con 23:59
+                period = "Tutto il giorno";
+            }
         }else {
             //Se inizio e fine dello stesso evento sono su giorni diversi - evento a cavallo di più giorni...
-            ((Item)holder).timeTV.setText(date.format(events.get(position).getBeginCalendar().getTime()).concat(" - ").concat(date.format(events.get(position).getEndCalendar().getTime())));
+            if (time.format(events.get(position).getBeginCalendar().getTime()).equals("00:00")) period = date.format(events.get(position).getBeginCalendar().getTime());
+            else period = datetime.format(events.get(position).getBeginCalendar().getTime());
+
+            if (time.format(events.get(position).getEndCalendar().getTime()).equals("23:59")) period = period.concat(" - ").concat(date.format(events.get(position).getEndCalendar().getTime()));
+            else period = period.concat(" - ").concat(datetime.format(events.get(position).getEndCalendar().getTime()));
+
+            if ((!time.format(events.get(position).getBeginCalendar().getTime()).equals("00:00")) && (!time.format(events.get(position).getEndCalendar().getTime()).equals("23:59")))
+                period = datetime.format(events.get(position).getBeginCalendar().getTime()).concat(" - ").concat(datetime.format(events.get(position).getEndCalendar().getTime()));
         }
+        ((Item)holder).timeTV.setText(period);
 
         if ((position <= 0) || (events.get(position - 1).getBeginCalendar().get(Calendar.DATE) != (events.get(position).getBeginCalendar().get(Calendar.DATE)))){
             //Se non ce un evento precedente a quello corrente o se il giorno dell'evento precedente è diverso da quello del corrente --> visualizza giorno

@@ -24,15 +24,15 @@ public class NotificationsManager extends FirebaseMessagingService {
 
         int topicID = -1;
         if (remoteMessage.getNotification().getTitle().contains("studenti")) {
-            if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_STUDENTS))
+            if (ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_STUDENTS))
                 topicID = Communication.COMM_STUDENTS;
         }
         if (remoteMessage.getNotification().getTitle().contains("genitori")) {
-            if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PARENTS))
+            if (ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PARENTS))
                 topicID = Communication.COMM_PARENTS;
         }
         if (remoteMessage.getNotification().getTitle().contains("docenti")) {
-            if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PROFS))
+            if (ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PROFS))
                 topicID = Communication.COMM_PROFS;
         }
 

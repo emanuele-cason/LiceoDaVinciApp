@@ -522,6 +522,7 @@ public class ScheduleFragment extends Fragment {
         profsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                scheduleContainer.setVisibility(View.GONE);
                 renderSchedule(profsList.get(profsSpinner.getSelectedItemPosition()));
             }
 

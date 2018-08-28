@@ -76,24 +76,24 @@ public class MainActivity extends AppCompatActivity
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_STUDENTS))
+        if (ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_STUDENTS))
             FirebaseMessaging.getInstance().subscribeToTopic(NotificationsManager.COMM_STUDENTS_TOPIC);
         else
             FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_STUDENTS_TOPIC);
 
-        if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PARENTS))
+        if (ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PARENTS))
             FirebaseMessaging.getInstance().subscribeToTopic(NotificationsManager.COMM_PARENTS_TOPIC);
         else
             FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PARENTS_TOPIC);
 
-        if (ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PROFS))
+        if (ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PROFS))
             FirebaseMessaging.getInstance().subscribeToTopic(NotificationsManager.COMM_PROFS_TOPIC);
         else
             FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PROFS_TOPIC);
 
-        Log.d("comm-stu", String.valueOf(ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_STUDENTS)));
-        Log.d("comm-par", String.valueOf(ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PARENTS)));
-        Log.d("comm-pro", String.valueOf(ConfigurationManager.getIstance().getCommNotificationEnabled(Communication.COMM_PROFS)));
+        Log.d("comm-stu", String.valueOf(ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_STUDENTS)));
+        Log.d("comm-par", String.valueOf(ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PARENTS)));
+        Log.d("comm-pro", String.valueOf(ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PROFS)));
     }
 
     @Override
@@ -182,13 +182,12 @@ public class MainActivity extends AppCompatActivity
                                 .beginTransaction().setReorderingAllowed(false)
                                 .replace(R.id.main_frame, selection)
                                 .commit();
-                    }else {
+                    } else {
                         getFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.main_frame, selection)
                                 .commit();
                     }
-
                 }
             }
 
@@ -197,7 +196,7 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
-        
+
         return true;
     }
 
