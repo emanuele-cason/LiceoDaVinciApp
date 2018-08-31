@@ -98,13 +98,13 @@ public class CommunicationsFragment extends Fragment {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                setResult(communications, query);
+                setResult(communications, query, true);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                setResult(communications, newText);
+                setResult(communications, newText, false);
                 return false;
             }
         });
@@ -114,45 +114,47 @@ public class CommunicationsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch (id) {
-            case (R.id.action_sort_by_name): {
-                if (!communications.isEmpty()) {
-                    Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
-                        @Override
-                        public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
-                            return c1.getNameFormatted().compareTo(c2.getNameFormatted());
-                        }
-                    });
+        if (communications != null) {
+            switch (id) {
+                case (R.id.action_sort_by_name): {
+                    if (!communications.isEmpty()) {
+                        Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
+                            @Override
+                            public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
+                                return c1.getNameFormatted().compareTo(c2.getNameFormatted());
+                            }
+                        });
+                    }
+                    break;
                 }
-                break;
+
+                case (R.id.action_sort_by_date): {
+                    if (!communications.isEmpty()) {
+                        Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
+                            @Override
+                            public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
+                                return c2.getDataObject().compareTo(c1.getDataObject());
+                            }
+                        });
+                    }
+                    break;
+                }
+
+                case (R.id.action_sort_by_id): {
+                    if (!communications.isEmpty()) {
+                        Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
+                            @Override
+                            public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
+                                return Integer.valueOf(c2.getId()).compareTo(c1.getId());
+                            }
+                        });
+                    }
+                    break;
+                }
             }
 
-            case (R.id.action_sort_by_date): {
-                if (!communications.isEmpty()) {
-                    Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
-                        @Override
-                        public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
-                            return c2.getDataObject().compareTo(c1.getDataObject());
-                        }
-                    });
-                }
-                break;
-            }
-
-            case (R.id.action_sort_by_id): {
-                if (!communications.isEmpty()) {
-                    Collections.sort(communications, new Comparator<Communication.LocalCommunication>() {
-                        @Override
-                        public int compare(Communication.LocalCommunication c1, Communication.LocalCommunication c2) {
-                            return Integer.valueOf(c2.getId()).compareTo(c1.getId());
-                        }
-                    });
-                }
-                break;
-            }
+            setResult(this.communications, searchView.getQuery().toString(), false);
         }
-
-        setResult(this.communications, searchView.getQuery().toString());
         return super.onOptionsItemSelected(item);
     }
 
@@ -184,7 +186,7 @@ public class CommunicationsFragment extends Fragment {
         } else {
             nothingHere.setVisibility(View.GONE);
             this.communications = mergeCommWithSPref(communications);
-            setResult(this.communications, null);
+            setResult(this.communications, null, true);
         }
     }
 
@@ -247,15 +249,15 @@ public class CommunicationsFragment extends Fragment {
 
         this.communications = mergeCommWithSPref(localCommunications);
         String searchQuery = String.valueOf((searchView != null) ? searchView.getQuery() : null);
-        setResult(this.communications, searchQuery);
+        setResult(this.communications, searchQuery, true);
     }
 
-    private void setResult(List<Communication.LocalCommunication> communications, String query) {
+    private void setResult(List<Communication.LocalCommunication> communications, String query, boolean animate) {
         commRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
         if ((communications != null) && (communications.size() != 0)) {
             commRecyclerView.setAdapter(new CommCardAdapter(activity, this, searchByName(communications, query), section));
         }
-        runLayoutAnimation(commRecyclerView);
+        if (animate) runLayoutAnimation(commRecyclerView);
         swipeRefreshCom.setRefreshing(false);
     }
 
@@ -299,7 +301,7 @@ public class CommunicationsFragment extends Fragment {
                 AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_slide_in);
 
         recyclerView.setLayoutAnimation(controller);
-        recyclerView.getAdapter().notifyDataSetChanged();
+        if (recyclerView.getAdapter() != null) recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
     }
 }
