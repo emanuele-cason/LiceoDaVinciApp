@@ -262,7 +262,39 @@ public class ScheduleFragment extends Fragment {
 
                 if (ConfigurationManager.getIstance().getClassesList() != null && ConfigurationManager.getIstance().getProfsList() != null) {
                     select.setVisibility(View.VISIBLE);
-                } else select.setVisibility(View.INVISIBLE);
+                } else {
+                    select.setVisibility(View.INVISIBLE);
+                    new ScheduleDataFetcher(activity, thisFragment).fetchClassesList(new OnFetchCompleteListener<List<Pair<Integer, String>>>() {
+                        @Override
+                        public void onSuccess(List<Pair<Integer, String>> result) {
+                            ConfigurationManager.getIstance().saveClassesList(result);
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Snackbar snackbar = Snackbar
+                                    .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    });
+
+                    new ScheduleDataFetcher(activity, thisFragment).fetchProfsList(new OnFetchCompleteListener<List<Prof>>() {
+                        @Override
+                        public void onSuccess(List<Prof> result) {
+                            ConfigurationManager.getIstance().saveProfsList(result);
+                            new Handler(activity.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(ConfigurationManager.getIstance().getClassesList() != null && ConfigurationManager.getIstance().getProfsList() != null)refreshTableContent(position);
+                                }
+                            });                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+
+                        }
+                    });
+                }
 
                 if (ConfigurationManager.getIstance().getMyStatus() == null) {
                     sContainer.setVisibility(View.GONE);

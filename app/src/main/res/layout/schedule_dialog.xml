@@ -52,6 +52,6 @@
         android:id="@+id/schedule_dialog_duration"
         android:text="-"
         android:textColor="#000000"
-        android:textSize="18dp" />
+        android:textSize="18dp"/>
 
 </LinearLayout>

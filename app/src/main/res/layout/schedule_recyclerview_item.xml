@@ -7,7 +7,7 @@
     android:layout_height="80dp"
     android:layout_margin="2dp"
     app:cardCornerRadius="3dp"
-    android:backgroundTint="@color/colorPrimaryDark">
+    app:cardBackgroundColor="@color/colorPrimaryDark">
 
     <TextView
         android:layout_margin="4dp"

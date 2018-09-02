@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/notifications_students_checkbox"
         android:text="Studenti"
-        android:textSize="14dp"
+        android:textSize="18dp"
         android:paddingLeft="4dp"/>
 
     <CheckBox
@@ -18,8 +18,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/notifications_parents_checkbox"
         android:text="Genitori"
-        android:textSize="14dp"
-        android:layout_marginTop="4dp"
+        android:textSize="18dp"
+        android:layout_marginTop="8dp"
         android:paddingLeft="4dp"/>
 
     <CheckBox
@@ -27,8 +27,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/notifications_profs_checkbox"
         android:text="Docenti"
-        android:textSize="14dp"
-        android:layout_marginTop="4dp"
+        android:textSize="18dp"
+        android:layout_marginTop="8dp"
         android:paddingLeft="4dp"/>
 
 </LinearLayout>

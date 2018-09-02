@@ -94,6 +94,48 @@ public class MainActivity extends AppCompatActivity
         Log.d("comm-stu", String.valueOf(ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_STUDENTS)));
         Log.d("comm-par", String.valueOf(ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PARENTS)));
         Log.d("comm-pro", String.valueOf(ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PROFS)));
+
+        switch (ConfigurationManager.getIstance().getStartupFragment()){
+            case "0": {
+                selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
+                getSupportActionBar().setTitle("Comunicati studenti");
+                navigationView.getMenu().findItem(R.id.com_students).setChecked(true);
+                break;
+            }
+            case "1": {
+                selection = new CommunicationsFragment(this, Communication.COMM_PARENTS);
+                getSupportActionBar().setTitle("Comunicati genitori");
+                navigationView.getMenu().findItem(R.id.com_parents).setChecked(true);
+                break;
+            }
+            case "2": {
+                selection = new CommunicationsFragment(this, Communication.COMM_PROFS);
+                getSupportActionBar().setTitle("Comunicati docenti");
+                navigationView.getMenu().getItem(R.id.com_profs).setChecked(true);
+                break;
+            }
+            case "4": {
+                selection = new ScheduleFragment(this);
+                getSupportActionBar().setTitle("Orario personale");
+                navigationView.getMenu().findItem(R.id.drawer_schedule).setChecked(true);
+                break;
+            }
+            case "5": {
+                selection = new AgendaFragment(this);
+                getSupportActionBar().setTitle("Agenda del liceo");
+                navigationView.getMenu().findItem(R.id.drawer_agenda).setChecked(true);
+                break;
+            }
+        }
+
+        if (selection != null) {
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_frame, selection)
+                    .commit();
+        }
+
+        drawer.closeDrawer(GravityCompat.START);
     }
 
     @Override
@@ -117,51 +159,11 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        switch (ConfigurationManager.getIstance().getStartupFragment()){
-            case "0": {
-                selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
-                getSupportActionBar().setTitle("Comunicati studenti");
-                break;
-            }
-            case "1": {
-                selection = new CommunicationsFragment(this, Communication.COMM_PARENTS);
-                getSupportActionBar().setTitle("Comunicati genitori");
-                break;
-            }
-            case "2": {
-                selection = new CommunicationsFragment(this, Communication.COMM_PROFS);
-                getSupportActionBar().setTitle("Comunicati docenti");
-                break;
-            }
-            case "4": {
-                selection = new ScheduleFragment(this);
-                getSupportActionBar().setTitle("Orario personale");
-                break;
-            }
-            case "5": {
-                selection = new AgendaFragment(this);
-                getSupportActionBar().setTitle("Agenda del liceo");
-                break;
-            }
-        }
-
-        if (selection != null) {
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_frame, selection)
-                    .commit();
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
+        Log.d("item", String.valueOf(id));
         uncheckAllMenuItems(navigationView);
         item.setChecked(true);
 

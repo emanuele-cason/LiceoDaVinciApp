@@ -21,7 +21,7 @@ import davi.liceodavinci.R;
  * Created by Emanuele on 15/03/2018 at 18:51!
  */
 
-public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private List<ScheduleEvent> scheduleEvents = new ArrayList<>();
     private Activity activity;

@@ -119,7 +119,6 @@ public class AgendaFragment extends Fragment {
 
     private void setToToday(){
         fetchAndStoreCurrentMonthEvents();
-        setResult(sortByBeginDate(ConfigurationManager.getIstance().getEvents()));
 
         calendar.setCurrentDate(new Date(System.currentTimeMillis()));
         calendar.setSelectedDate(new Date(System.currentTimeMillis()));
@@ -142,7 +141,14 @@ public class AgendaFragment extends Fragment {
 
                 @Override
                 public void onFailure(Exception e) {
-                    swipeRefreshLayout.setRefreshing(false);
+
+                    new Handler(activity.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+
                     Snackbar snackbar = Snackbar
                             .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
                             .setAction("RIPROVA", new View.OnClickListener() {
@@ -174,15 +180,31 @@ public class AgendaFragment extends Fragment {
         beforeDate.set(Calendar.MINUTE, 0);
         beforeDate.set(Calendar.SECOND, 0);
 
+        swipeRefreshLayout.setRefreshing(true);
+
         try {
             new AgendaDataFetcher(activity, this).fetchEvents(null, null, (int)(beforeDate.getTimeInMillis()/1000L), (int)(afterDate.getTimeInMillis()/1000L), new OnFetchCompleteListener<List<Event>>() {
                 @Override
-                public void onSuccess(List<Event> result) {
+                public void onSuccess(final List<Event> result) {
                     ConfigurationManager.getIstance().saveEvents(result);
+                    new Handler(activity.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            setResult(sortByBeginDate(result));
+                        }
+                    });
                 }
 
                 @Override
                 public void onFailure(Exception e) {
+
+                    new Handler(activity.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+
                     if (ConfigurationManager.getIstance().getEvents() != null) {
                         Snackbar snackbar = Snackbar
                                 .make(activity.findViewById(R.id.main_frame), "Errore di connessione. Impossibile aggiornare l'agenda", Snackbar.LENGTH_LONG)

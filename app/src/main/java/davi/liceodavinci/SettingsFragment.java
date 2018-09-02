@@ -91,6 +91,33 @@ public class SettingsFragment extends PreferenceFragment {
         ListPreference startupFragment = (ListPreference)findPreference("startup_fragment");
         startupFragment.setEntries(new String[]{"Agenda del Liceo", "Orario personale", "Comunicati studenti", "Comunicati genitori", "Comunicati docenti"});
         startupFragment.setEntryValues(new String[]{"5", "4", String.valueOf(Communication.COMM_STUDENTS), String.valueOf(Communication.COMM_PARENTS), String.valueOf(Communication.COMM_PROFS)});
+
+        /*Preference theme = findPreference(null);
+        theme.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+                ColorPickerPalette colorPickerPalette =
+                        (ColorPickerPalette) layoutInflater.inflate(R.layout.custom_color_picker, null);
+
+                final AlertDialog alert = new AlertDialog.Builder(getActivity())
+                        .setTitle("Seleziona un tema")
+                        .setView(colorPickerPalette)
+                        .create();
+
+                colorPickerPalette.init(getResources().getIntArray(R.array.picker_colors).length, 5, new ColorPickerSwatch.OnColorSelectedListener() {
+                    @Override
+                    public void onColorSelected(int color) {
+                        ConfigurationManager.getIstance().saveTheme(color);
+                        alert.dismiss();
+                    }
+                });
+                colorPickerPalette.drawPalette(getResources().getIntArray(R.array.picker_colors), ConfigurationManager.getIstance().getTheme());
+
+                alert.show();
+                return false;
+            }
+        });*/
     }
 
     @Override

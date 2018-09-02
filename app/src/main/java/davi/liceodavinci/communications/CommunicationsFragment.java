@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -68,10 +69,8 @@ public class CommunicationsFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Log.d("activityCreated", "ac");
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         commRecyclerView = activity.findViewById(R.id.com_recyclerview);
         swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
@@ -82,6 +81,12 @@ public class CommunicationsFragment extends Fragment {
                 if (section == Communication.COMM_SAVED) fetchSavedComms();
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("res", String.valueOf(section));
 
         if (section < Communication.COMM_SAVED) fetch();
         if (section == Communication.COMM_SAVED) fetchSavedComms();
@@ -214,7 +219,12 @@ public class CommunicationsFragment extends Fragment {
                 public void onFailure(Exception e) {
                     swipeRefreshCom = activity.findViewById(R.id.com_swipe_refresh_layout);
                     if (swipeRefreshCom != null) {
-                        swipeRefreshCom.setRefreshing(false);
+                        new Handler(activity.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                swipeRefreshCom.setRefreshing(false);
+                            }
+                        });
                         Snackbar snackbar = Snackbar
                                 .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
                                 .setAction("RIPROVA", new View.OnClickListener() {
