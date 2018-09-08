@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -106,7 +107,7 @@ public class AgendaFragment extends Fragment {
                 beforeDate.set(Calendar.MINUTE, 0);
                 beforeDate.set(Calendar.SECOND, 0);
 
-                Calendar afterDate = (Calendar)date.getCalendar().clone(); // Si prende gli eventi dal primo giorno del mese corrente
+                Calendar afterDate = (Calendar)date.getCalendar().clone(); // Si prende gli eventi da oggi
                 afterDate.add(Calendar.DAY_OF_MONTH,-1);
                 afterDate.set(Calendar.HOUR_OF_DAY, 23);
                 afterDate.set(Calendar.MINUTE, 59);
@@ -126,6 +127,7 @@ public class AgendaFragment extends Fragment {
 
     private void fetchEvents(final List<String> filterTitle, final List<String> filterContent, final int after, final int before){
         swipeRefreshLayout.setRefreshing(true);
+        eventsRecyclerView.setVisibility(View.INVISIBLE);
 
         try {
             new AgendaDataFetcher(activity, this).fetchEvents(filterTitle, filterContent, before, after, new OnFetchCompleteListener<List<Event>>() {
@@ -235,9 +237,32 @@ public class AgendaFragment extends Fragment {
 
     private void setResult(List<Event> events) {
         swipeRefreshLayout.setRefreshing(false);
-        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        if ((events != null) && (events.size() != 0))
-            eventsRecyclerView.setAdapter(new AgendaCardAdapter(activity, events));
+
+        if (events == null)return;
+        if (events.size() == 0)return;
+
+        eventsRecyclerView.setVisibility(View.VISIBLE);
+        LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(activity);
+        eventsRecyclerView.setLayoutManager(recyclerLayoutManager);
+
+        RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(activity) {
+            @Override protected int getVerticalSnapPreference() {
+                return LinearSmoothScroller.SNAP_TO_START;
+            }
+        };
+
+        int i = 0;
+
+        for (Event event : events){
+            if (event.getBeginCalendar().getTimeInMillis() > Calendar.getInstance().getTimeInMillis()){
+                smoothScroller.setTargetPosition(i);
+                recyclerLayoutManager.startSmoothScroll(smoothScroller);
+                break;
+            }
+            i++;
+        }
+
+        eventsRecyclerView.setAdapter(new AgendaCardAdapter(activity, events));
     }
 
     private List<Event> sortByBeginDate(List<Event> events){

@@ -11,7 +11,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -91,10 +90,6 @@ public class MainActivity extends AppCompatActivity
         else
             FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PROFS_TOPIC);
 
-        Log.d("comm-stu", String.valueOf(ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_STUDENTS)));
-        Log.d("comm-par", String.valueOf(ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PARENTS)));
-        Log.d("comm-pro", String.valueOf(ConfigurationManager.getIstance().isNotificationEnabled(Communication.COMM_PROFS)));
-
         switch (ConfigurationManager.getIstance().getStartupFragment()){
             case "0": {
                 selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
@@ -163,7 +158,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        Log.d("item", String.valueOf(id));
         uncheckAllMenuItems(navigationView);
         item.setChecked(true);
 

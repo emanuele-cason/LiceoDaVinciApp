@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -105,7 +104,6 @@ public class CommDownload extends AsyncTask<Void, Integer, String> {
                 path = new File(activity.getFilesDir(),communication.getName()).getPath();
                 this.communication.setStatus(DOWNLOADED);
             } else {
-                if (savingMode != CACHE) Log.d("Errore", "Il valore di savingMode non è valido");
                 path = new File(activity.getCacheDir(),communication.getName()).getPath();
                 this.communication.setStatus(CACHED);
             }

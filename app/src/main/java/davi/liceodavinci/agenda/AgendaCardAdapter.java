@@ -85,6 +85,22 @@ public class AgendaCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).month.setText(new SimpleDateFormat("MMM").format(events.get(position).getBeginCalendar().getTime()));
         }else ((Item)holder).date.setVisibility(View.INVISIBLE);
 
+        if (events.get(position).getEndCalendar().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()){ //Se l'evento è già finito
+            ((Item)holder).recycler_row.setEnabled(false);
+            ((Item)holder).date.setEnabled(false);
+            //((Item)holder).day.setEnabled(false);
+            //((Item)holder).month.setEnabled(false);
+            ((Item)holder).titleTV.setEnabled(false);
+            ((Item)holder).timeTV.setEnabled(false);
+        }else {
+            ((Item)holder).recycler_row.setEnabled(true);
+            ((Item)holder).date.setEnabled(true);
+            ((Item)holder).day.setEnabled(true);
+            ((Item)holder).month.setEnabled(true);
+            ((Item)holder).titleTV.setEnabled(true);
+            ((Item)holder).timeTV.setEnabled(true);
+        }
+
         ((Item)holder).recycler_row.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
