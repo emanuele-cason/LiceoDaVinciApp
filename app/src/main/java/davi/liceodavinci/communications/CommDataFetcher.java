@@ -1,6 +1,5 @@
 package davi.liceodavinci.communications;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -32,14 +31,10 @@ import okhttp3.ResponseBody;
 
 public class CommDataFetcher {
 
-    private CommunicationsFragment communicationsFragment;
     private final String requestUrls[] = new String[3];
     private OkHttpClient client = new OkHttpClient();
-    private Activity activity;
 
-    public CommDataFetcher(CommunicationsFragment communicationsFragment, Activity activity) {
-        this.communicationsFragment = communicationsFragment;
-        this.activity = activity;
+    CommDataFetcher() {
 
         requestUrls[Communication.COMM_STUDENTS] = "http://www.liceodavinci.tv/api/comunicati/studenti";
         requestUrls[Communication.COMM_PARENTS] = "http://www.liceodavinci.tv/api/comunicati/genitori";
@@ -61,7 +56,8 @@ public class CommDataFetcher {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                try (ResponseBody responseBody = response.body()) {
+                try {
+                    ResponseBody responseBody = response.body();
                     if (!response.isSuccessful()) {
                         callback.onFailure(new IOException("Unexpected code " + response));
                     }else{
@@ -69,9 +65,11 @@ public class CommDataFetcher {
                         Type listType = new TypeToken<ArrayList<Communication>>(){}.getType();
                         assert responseBody != null;
                         List<Communication> communicationsAPI = gson.fromJson(responseBody.string(), listType);
+
+                        for(Communication comm : communicationsAPI)if(!comm.getName().endsWith(".pdf"))communicationsAPI.remove(comm);
                         callback.onSuccess(communicationsAPI);
                     }
-                }
+                }catch (Exception ignored){}
             }
         });
     }
