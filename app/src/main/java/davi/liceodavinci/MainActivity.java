@@ -2,6 +2,7 @@ package davi.liceodavinci;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -200,6 +201,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDrawerClosed(@NonNull View drawerView) {
                 if (selection != null) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         getFragmentManager()
                                 .beginTransaction().setReorderingAllowed(false)

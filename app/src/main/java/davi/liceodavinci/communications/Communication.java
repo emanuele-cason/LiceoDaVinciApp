@@ -19,8 +19,6 @@ public class Communication {
     private String tipo;
     private String url;
 
-    private String regex = "(\\d*)\\s*-?\\s*(.*).pdf";
-
     public static final int COMM_STUDENTS = 0;
     public static final int COMM_PARENTS = 1;
     public static final int COMM_PROFS = 2;
@@ -72,6 +70,7 @@ public class Communication {
 
     public String getNameFormatted(){
 
+        String regex = "(\\d*)\\s*-?\\s*(.*).pdf";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(nome);
 
@@ -105,6 +104,7 @@ public class Communication {
     }
 
     public int getId() {
+        String regex = "(\\d*)\\s*-?\\s*(.*).pdf";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(nome);
 
