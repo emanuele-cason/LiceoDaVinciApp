@@ -15,7 +15,7 @@ public class ScheduleEvent {
     static final int FRI = 4;
     static final int SAT = 5;
 
-    private int num;
+    private String num;
     private String durata;
     private String mat_cod;
     private String materia;
@@ -27,14 +27,17 @@ public class ScheduleEvent {
     private String inizio;
     private String sede;
 
+    private String customName;
+    private String notes;
+
     ScheduleEvent(int hourNum, String duration){
         this.durata = duration;
         this.inizio = beginTimes[hourNum];
     }
 
-    String getSubject() {
-        return materia;
-    }
+    public String getSubject() {return materia;}
+
+    String getSubjectCode(){return mat_cod;}
 
     int getDuration() {
         return Integer.parseInt(String.valueOf(durata.charAt(0)));
@@ -42,6 +45,10 @@ public class ScheduleEvent {
 
     public int[] getBeginningTime() {
         return new int[]{Integer.valueOf(inizio.split("(\\d\\d):(\\d\\d)\\w\\w")[0]), Integer.valueOf(inizio.split("(\\d\\d):(\\d\\d)\\w\\w")[1])};
+    }
+
+    String getBeginningTimeString(){
+        return inizio;
     }
 
     int getHourNum() {
@@ -55,6 +62,8 @@ public class ScheduleEvent {
             if (giorno.toLowerCase().contains(dayKeywords[i])) return i;
         return -1;
     }
+
+    String getLocation(){return sede;}
 
     String getClassId() {
         return classe;
@@ -70,5 +79,29 @@ public class ScheduleEvent {
 
     String getProfSurname() {
         return doc_nome;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getCustomName() {
+        return customName;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public int getId(){
+        try {
+            return Integer.parseInt(this.num);
+        }catch (NumberFormatException e){
+            return -1;
+        }
     }
 }

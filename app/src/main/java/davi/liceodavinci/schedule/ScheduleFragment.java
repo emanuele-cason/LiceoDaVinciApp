@@ -24,7 +24,6 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -40,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import davi.liceodavinci.ConfigurationManager;
@@ -97,12 +95,9 @@ public class ScheduleFragment extends Fragment {
                     inflater.inflate(R.menu.schedule_personal_actionbar, menu);
 
                     MenuItem selectNew = menu.findItem(R.id.action_new_schedule);
-                    selectNew.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem menuItem) {
-                            selectPersonalSchedule();
-                            return false;
-                        }
+                    selectNew.setOnMenuItemClickListener(menuItem -> {
+                        selectPersonalSchedule();
+                        return false;
                     });
                 }
                 break;
@@ -227,16 +222,13 @@ public class ScheduleFragment extends Fragment {
         bar.setAccentColor(Color.parseColor("#3F51B5"));
         bar.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
 
-        bar.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
-            @Override
-            public boolean onTabSelected(int position, boolean wasSelected) {
+        bar.setOnTabSelectedListener((position, wasSelected) -> {
 
-                currentSchedule = position;
-                refreshTableContent(position);
-                getActivity().invalidateOptionsMenu();
+            currentSchedule = position;
+            refreshTableContent(position);
+            getActivity().invalidateOptionsMenu();
 
-                return true;
-            }
+            return true;
         });
 
         refreshTableContent(PERSONAL_SCHEDULE);
@@ -282,11 +274,8 @@ public class ScheduleFragment extends Fragment {
                         @Override
                         public void onSuccess(List<Prof> result) {
                             ConfigurationManager.getIstance().saveProfsList(result);
-                            new Handler(activity.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(ConfigurationManager.getIstance().getClassesList() != null && ConfigurationManager.getIstance().getProfsList() != null)refreshTableContent(position);
-                                }
+                            new Handler(activity.getMainLooper()).post(() -> {
+                                if(ConfigurationManager.getIstance().getClassesList() != null && ConfigurationManager.getIstance().getProfsList() != null)refreshTableContent(position);
                             });                        }
 
                         @Override
@@ -300,12 +289,7 @@ public class ScheduleFragment extends Fragment {
                     sContainer.setVisibility(View.GONE);
                     noPersonal.setVisibility(View.VISIBLE);
 
-                    select.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            selectPersonalSchedule();
-                        }
-                    });
+                    select.setOnClickListener(view -> selectPersonalSchedule());
                 } else {
                     sContainer.setVisibility(View.VISIBLE);
                     noPersonal.setVisibility(View.GONE);
@@ -335,20 +319,10 @@ public class ScheduleFragment extends Fragment {
                         if (ConfigurationManager.getIstance().getProfsList() == null) {
                             ConfigurationManager.getIstance().saveProfsList(result);
 
-                            new Handler(activity.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    prepareProfsSelector(result);
-                                }
-                            });
+                            new Handler(activity.getMainLooper()).post(() -> prepareProfsSelector(result));
                         }
 
-                        new Handler(activity.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                ConfigurationManager.getIstance().saveProfsList(result);
-                            }
-                        });
+                        new Handler(activity.getMainLooper()).post(() -> ConfigurationManager.getIstance().saveProfsList(result));
                     }
 
                     @Override
@@ -372,21 +346,15 @@ public class ScheduleFragment extends Fragment {
                         .build();
 
         final RadioButton studentRadio = (RadioButton) dialog.findViewById(R.id.schedule_select_dialog_radio_studente);
-        studentRadio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.GONE);
-                dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.VISIBLE);
-            }
+        studentRadio.setOnClickListener(view -> {
+            dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.GONE);
+            dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.VISIBLE);
         });
 
         final RadioButton profRadio = (RadioButton) dialog.findViewById(R.id.schedule_select_dialog_radio_docente);
-        profRadio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.GONE);
-                dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.VISIBLE);
-            }
+        profRadio.setOnClickListener(view -> {
+            dialog.findViewById(R.id.schedule_select_dialog_studente_wrapper).setVisibility(View.GONE);
+            dialog.findViewById(R.id.schedule_select_dialog_docente_wrapper).setVisibility(View.VISIBLE);
         });
 
         final Spinner classId = (Spinner) dialog.findViewById(R.id.schedule_select_dialog_class);
@@ -422,12 +390,7 @@ public class ScheduleFragment extends Fragment {
         final List<Prof> profsList = ConfigurationManager.getIstance().getProfsList();
         List<String> profsListString = new ArrayList<>();
 
-        Collections.sort(profsList, new Comparator<Prof>() {
-            @Override
-            public int compare(Prof s1, Prof s2) {
-                return String.valueOf(s1.getSurname()).compareTo(s2.getSurname());
-            }
-        });
+        Collections.sort(profsList, (s1, s2) -> String.valueOf(s1.getSurname()).compareTo(s2.getSurname()));
 
         for (Prof prof : profsList) {
             if (prof != null)
@@ -443,36 +406,23 @@ public class ScheduleFragment extends Fragment {
         final View positive = dialog.getActionButton(DialogAction.POSITIVE);
         positive.setEnabled(false);
 
-        studentRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                positive.setEnabled(true);
+        studentRadio.setOnCheckedChangeListener((compoundButton, b) -> positive.setEnabled(true));
+
+        profRadio.setOnCheckedChangeListener((compoundButton, b) -> positive.setEnabled(true));
+
+        positive.setOnClickListener(view -> {
+            if (studentRadio.isChecked()) {
+
+                ConfigurationManager.getIstance().saveMyStatus(new Pair<>(Integer.parseInt(classId.getSelectedItem().toString()), section.getSelectedItem().toString()));
+                refreshTableContent(PERSONAL_SCHEDULE);
+
             }
-        });
+            if (profRadio.isChecked()) {
 
-        profRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                positive.setEnabled(true);
+                ConfigurationManager.getIstance().saveMyStatus(profsList.get((int) profS.getSelectedItemId()));
+                refreshTableContent(PERSONAL_SCHEDULE);
             }
-        });
-
-        positive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (studentRadio.isChecked()) {
-
-                    ConfigurationManager.getIstance().saveMyStatus(new Pair<>(Integer.parseInt(classId.getSelectedItem().toString()), section.getSelectedItem().toString()));
-                    refreshTableContent(PERSONAL_SCHEDULE);
-
-                }
-                if (profRadio.isChecked()) {
-
-                    ConfigurationManager.getIstance().saveMyStatus(profsList.get((int) profS.getSelectedItemId()));
-                    refreshTableContent(PERSONAL_SCHEDULE);
-                }
-                dialog.dismiss();
-            }
+            dialog.dismiss();
         });
         dialog.show();
     }
@@ -534,12 +484,7 @@ public class ScheduleFragment extends Fragment {
         if (profsList == null) return;
         List<String> profsListString = new ArrayList<>();
 
-        Collections.sort(profsList, new Comparator<Prof>() {
-            @Override
-            public int compare(Prof s1, Prof s2) {
-                return String.valueOf(s1.getSurname()).compareTo(s2.getSurname());
-            }
-        });
+        Collections.sort(profsList, (s1, s2) -> String.valueOf(s1.getSurname()).compareTo(s2.getSurname()));
 
         for (Prof prof : profsList) {
             if (prof != null)
@@ -573,17 +518,12 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onSuccess(final List<ScheduleEvent> result) {
                 if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
-                    ConfigurationManager.getIstance().saveSchedule(result, classId);
-                    new Handler(activity.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            renderSchedule(classId);
-                        }
-                    });
+                    ConfigurationManager.getIstance().saveSchedule(result, classId, false);
+                    new Handler(activity.getMainLooper()).post(() -> renderSchedule(classId));
 
                 }
 
-                ConfigurationManager.getIstance().saveSchedule(result, classId);
+                ConfigurationManager.getIstance().saveSchedule(result, classId, false);
             }
 
             @Override
@@ -591,12 +531,7 @@ public class ScheduleFragment extends Fragment {
                 if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
                     Snackbar snackbar = Snackbar
                             .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                            .setAction("RIPROVA", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    renderSchedule(classId);
-                                }
-                            });
+                            .setAction("RIPROVA", view -> renderSchedule(classId));
                     snackbar.show();
                 }
             }
@@ -628,7 +563,7 @@ public class ScheduleFragment extends Fragment {
 
                     scheduleRecyclerViews[i].setVisibility(View.VISIBLE);
                     scheduleContainer.setVisibility(View.VISIBLE);
-                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, CLASSES_SCHEDULE);
+                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, CLASSES_SCHEDULE, currentSchedule == PERSONAL_SCHEDULE);
                     scheduleRecyclerViews[i].setAdapter(adapter);
                     runLayoutAnimation(scheduleRecyclerViews[i]);
                 } else {
@@ -648,17 +583,12 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onSuccess(List<ScheduleEvent> result) {
                 if (ConfigurationManager.getIstance().getScheduleList(prof) == null) {
-                    ConfigurationManager.getIstance().saveSchedule(result, prof);
+                    ConfigurationManager.getIstance().saveSchedule(result, prof, false);
 
-                    new Handler(activity.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            renderSchedule(prof);
-                        }
-                    });
+                    new Handler(activity.getMainLooper()).post(() -> renderSchedule(prof));
                 }
 
-                ConfigurationManager.getIstance().saveSchedule(result, prof);
+                ConfigurationManager.getIstance().saveSchedule(result, prof, false);
             }
 
             @Override
@@ -703,7 +633,7 @@ public class ScheduleFragment extends Fragment {
 
                     scheduleRecyclerViews[i].setVisibility(View.VISIBLE);
                     scheduleContainer.setVisibility(View.VISIBLE);
-                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, PROFS_SCHEDULE);
+                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, PROFS_SCHEDULE, currentSchedule == PERSONAL_SCHEDULE);
                     scheduleRecyclerViews[i].setAdapter(adapter);
                     runLayoutAnimation(scheduleRecyclerViews[i]);
                 } else {
@@ -734,12 +664,7 @@ public class ScheduleFragment extends Fragment {
             }
         }
 
-        Collections.sort(resultSchedule, new Comparator<ScheduleEvent>() {
-            @Override
-            public int compare(ScheduleEvent s1, ScheduleEvent s2) {
-                return Integer.valueOf(s1.getHourNum()).compareTo(s2.getHourNum());
-            }
-        });
+        Collections.sort(resultSchedule, (s1, s2) -> Integer.valueOf(s1.getHourNum()).compareTo(s2.getHourNum()));
 
         return resultSchedule;
     }

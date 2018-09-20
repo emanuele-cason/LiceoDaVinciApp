@@ -2,34 +2,47 @@ package davi.liceodavinci.schedule;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Pair;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import davi.liceodavinci.ConfigurationManager;
 import davi.liceodavinci.R;
 
 /**
  * Created by Emanuele on 15/03/2018 at 18:51!
  */
 
-public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<ScheduleEvent> scheduleEvents = new ArrayList<>();
     private Activity activity;
     private int section;
+    private boolean personal;
 
-    ScheduleCardAdapter(Activity activity, List<ScheduleEvent> scheduleEvents, int section) {
+    ScheduleCardAdapter(Activity activity, List<ScheduleEvent> scheduleEvents, int section, boolean personal) {
         this.activity = activity;
         this.section = section;
+        this.personal = personal;
 
         //Questi cicli for annidati servono a skippare gli spazi vuoti in una colonna, se la prima ora è vuota ad esempio essa viene indicata con una card vuota
         for (int i = 0; i < scheduleEvents.get(scheduleEvents.size() - 1).getHourNum() + scheduleEvents.get(scheduleEvents.size() - 1).getDuration(); i++) {
@@ -70,7 +83,8 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         if (section == ScheduleFragment.CLASSES_SCHEDULE)
-            ((ViewHolder) holder).titleTextView.setText(scheduleEvents.get(position).getSubject());
+            if (personal && scheduleEvents.get(position).getCustomName() != null) ((ViewHolder) holder).titleTextView.setText(scheduleEvents.get(position).getCustomName());
+            else ((ViewHolder) holder).titleTextView.setText(scheduleEvents.get(position).getSubject());
         if (section == ScheduleFragment.PROFS_SCHEDULE) {
             String title = "";
             if (scheduleEvents.get(position).getClassId() != null) {
@@ -106,23 +120,197 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         @Override
         public void onClick(View view) {
-            MaterialDialog dialog =
+            final MaterialDialog dialog =
                     new MaterialDialog.Builder(activity)
-                            .title(scheduleEvents.get(this.getLayoutPosition()).getSubject())
                             .customView(R.layout.schedule_dialog, true)
                             .build();
 
-            TextView profOrClassFieldName = (TextView) dialog.findViewById(R.id.schedule_dialog_prof_or_class_field_name);
-            TextView profOrClass = (TextView) dialog.findViewById(R.id.schedule_dialog_prof_or_class);
-            TextView classroom = (TextView) dialog.findViewById(R.id.schedule_dialog_classroom);
-            TextView duration = (TextView) dialog.findViewById(R.id.schedule_dialog_duration);
+            final EditText title = (EditText) dialog.findViewById(R.id.title);
+            final ImageButton edit = (ImageButton) dialog.findViewById(R.id.edit);
+            TextView profOrClassFieldName = (TextView) dialog.findViewById(R.id.prof_or_class_field_name);
+            TextView profOrClass = (TextView) dialog.findViewById(R.id.prof_or_class);
+            TextView classroom = (TextView) dialog.findViewById(R.id.classroom);
+            TextView duration = (TextView) dialog.findViewById(R.id.duration);
+            TextView notesFieldName = (TextView) dialog.findViewById(R.id.notes_field_name);
+            EditText notes = (EditText)dialog.findViewById(R.id.notes);
 
-            if (section == ScheduleFragment.CLASSES_SCHEDULE){
+            final int position = this.getLayoutPosition();
+            final String titleText = scheduleEvents.get(position).getSubject();
+            final String notesText = scheduleEvents.get(position).getNotes();
+
+            if(personal){
+                edit.setVisibility(View.VISIBLE);
+            }
+            else {
+                edit.setVisibility(View.GONE);
+                notesFieldName.setVisibility(View.GONE);
+                notes.setVisibility(View.GONE);
+            }
+
+            if (personal && (scheduleEvents.get(position).getNotes() != null)){
+                notesFieldName.setVisibility(View.VISIBLE);
+                notes.setVisibility(View.VISIBLE);
+
+                notes.setText(scheduleEvents.get(position).getNotes());
+            }
+
+            if (personal && (scheduleEvents.get(position).getCustomName() != null)) {
+                title.setText(scheduleEvents.get(position).getCustomName());
+            } else title.setText(titleText);
+
+            edit.setOnClickListener(view13 -> {
+
+                PopupMenu popup = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                    popup = new PopupMenu(activity, edit, Gravity.END);
+                } else popup = new PopupMenu(activity, edit);
+
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.schedule_edit_personal, popup.getMenu());
+                popup.show();
+
+                popup.setOnMenuItemClickListener(menuItem -> {
+
+                    if (menuItem.getItemId() == R.id.add_note) {
+                        notesFieldName.setVisibility(View.VISIBLE);
+                        notes.setVisibility(View.VISIBLE);
+                        notes.setEnabled(true);
+                        notes.setBackground(null);
+                        notes.requestFocus();
+                        dialog.setActionButton(DialogAction.POSITIVE, "SALVA");
+                        dialog.setActionButton(DialogAction.NEGATIVE, "REIMPOSTA");
+
+                        final View positive = dialog.getActionButton(DialogAction.POSITIVE);
+                        final View negative = dialog.getActionButton(DialogAction.NEGATIVE);
+
+                        positive.setEnabled(false);
+
+                        positive.setOnClickListener(view1 -> {
+                            notes.setEnabled(false);
+                            notes.setBackgroundColor(Color.TRANSPARENT);
+                            negative.setVisibility(View.GONE);
+                            positive.setVisibility(View.GONE);
+
+                            ScheduleEvent editEvent = scheduleEvents.get(position);
+                            editEvent.setNotes(notes.getText().toString());
+                            if (section == ScheduleFragment.CLASSES_SCHEDULE) {
+                                ConfigurationManager.getIstance().editSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
+                            }
+                            if (section == ScheduleFragment.PROFS_SCHEDULE) {
+                                ConfigurationManager.getIstance().editSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
+                            }
+                        });
+
+                        negative.setOnClickListener(view12 -> {
+                            notesFieldName.setVisibility(View.GONE);
+                            notes.setVisibility(View.GONE);
+                            negative.setVisibility(View.GONE);
+                            positive.setVisibility(View.GONE);
+
+                            ScheduleEvent editEvent = scheduleEvents.get(position);
+                            editEvent.setNotes(null);
+                            if (section == ScheduleFragment.CLASSES_SCHEDULE) {
+                                ConfigurationManager.getIstance().editSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
+                            }
+                            if (section == ScheduleFragment.PROFS_SCHEDULE) {
+                                ConfigurationManager.getIstance().editSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
+                            }
+                        });
+
+                        notes.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                if (!notes.getText().equals(notesText)) {
+                                    positive.setEnabled(true);
+                                }
+                            }
+                        });
+                    }
+
+                    if (menuItem.getItemId() == R.id.edit_name){
+                        title.setEnabled(true);
+                        title.setBackground(null);
+                        title.requestFocus();
+                        dialog.setActionButton(DialogAction.POSITIVE, "SALVA");
+                        dialog.setActionButton(DialogAction.NEGATIVE, "REIMPOSTA");
+
+                        final View positive = dialog.getActionButton(DialogAction.POSITIVE);
+                        final View negative = dialog.getActionButton(DialogAction.NEGATIVE);
+
+                        positive.setEnabled(false);
+
+                        positive.setOnClickListener(view1 -> {
+                            title.setEnabled(false);
+                            title.setBackgroundColor(Color.TRANSPARENT);
+                            negative.setVisibility(View.GONE);
+                            positive.setVisibility(View.GONE);
+
+                            ScheduleEvent editEvent = scheduleEvents.get(position);
+                            editEvent.setCustomName(title.getText().toString());
+                            if (section == ScheduleFragment.CLASSES_SCHEDULE) {
+                                ConfigurationManager.getIstance().editSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
+                            }
+                            if (section == ScheduleFragment.PROFS_SCHEDULE) {
+                                ConfigurationManager.getIstance().editSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
+                            }
+                        });
+
+                        negative.setOnClickListener(view12 -> {
+                            title.setText(titleText);
+                            title.setEnabled(false);
+                            title.setBackgroundColor(Color.TRANSPARENT);
+                            negative.setVisibility(View.GONE);
+                            positive.setVisibility(View.GONE);
+
+                            ScheduleEvent editEvent = scheduleEvents.get(position);
+                            editEvent.setCustomName(null);
+                            if (section == ScheduleFragment.CLASSES_SCHEDULE) {
+                                ConfigurationManager.getIstance().editSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
+                            }
+                            if (section == ScheduleFragment.PROFS_SCHEDULE) {
+                                ConfigurationManager.getIstance().editSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
+                            }
+                        });
+
+                        title.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                if (!title.getText().equals(titleText)) {
+                                    positive.setEnabled(true);
+                                }
+                            }
+                        });
+                    }
+                    return false;
+                });
+            });
+
+            if (section == ScheduleFragment.CLASSES_SCHEDULE) {
                 profOrClassFieldName.setText("Docente");
                 profOrClass.setText(scheduleEvents.get(this.getLayoutPosition()).getProfSurname().concat(" ").concat(scheduleEvents.get(this.getLayoutPosition()).getProfName()));
             }
 
-            if (section == ScheduleFragment.PROFS_SCHEDULE){
+            if (section == ScheduleFragment.PROFS_SCHEDULE) {
                 profOrClassFieldName.setText("Classe");
                 profOrClass.setText(scheduleEvents.get(this.getLayoutPosition()).getClassId());
             }

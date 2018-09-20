@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.util.Pair;
 
 import com.google.gson.Gson;
@@ -50,7 +51,8 @@ public class ConfigurationManager {
             communications = getCommList();
             for (Communication.LocalCommunication comm : communications) {
                 if (comm.getName().equals(communication.getName())) {
-                    if (comm.getStatus() == Communication.DOWNLOADED) communication.setStatus(Communication.DOWNLOADED);
+                    if (comm.getStatus() == Communication.DOWNLOADED)
+                        communication.setStatus(Communication.DOWNLOADED);
                     communications.remove(communications.indexOf(comm));
                     break;
                 }
@@ -93,7 +95,7 @@ public class ConfigurationManager {
         saveCommJSONFromList(communications);
     }
 
-    public void setCommStatus(Communication.LocalCommunication communication, int status){
+    public void setCommStatus(Communication.LocalCommunication communication, int status) {
 
         List<Communication.LocalCommunication> communications = new ArrayList<>();
 
@@ -110,7 +112,7 @@ public class ConfigurationManager {
         saveCommJSONFromList(communications);
     }
 
-    void setCommNotificationEnabled(int commType, boolean enabled){
+    void setCommNotificationEnabled(int commType, boolean enabled) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
 
@@ -165,11 +167,11 @@ public class ConfigurationManager {
         return gson.fromJson(json, listType);
     }
 
-    public void saveClassesList(List<Pair<Integer, String>> classes){
+    public void saveClassesList(List<Pair<Integer, String>> classes) {
 
         List<String> classesStr = new ArrayList<>();
 
-        for (Pair<Integer, String> classId : classes){
+        for (Pair<Integer, String> classId : classes) {
             classesStr.add(classId.first.toString().concat(classId.second));
         }
 
@@ -180,23 +182,37 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    public List<Pair<Integer, String>> getClassesList(){
+    public List<Pair<Integer, String>> getClassesList() {
 
         String json = sharedPreferences.getString(activity.getString(R.string.stored_class_list_key), "");
         Gson gson = new Gson();
-        Type listType = new TypeToken<List<String>>(){}.getType();
+        Type listType = new TypeToken<List<String>>() {
+        }.getType();
         if (gson.fromJson(json, listType) == null) return null;
 
         List<Pair<Integer, String>> classes = new ArrayList<>();
         List<String> classesStr = gson.fromJson(json, listType);
-        for (String classId : classesStr){
+        for (String classId : classesStr) {
             classes.add(new Pair<Integer, String>(Integer.parseInt(String.valueOf(classId.charAt(0))), String.valueOf(classId.charAt(1))));
         }
 
         return classes;
     }
 
-    public void saveSchedule(List<ScheduleEvent> scheduleActivities, Pair<Integer, String> classId){
+    public void saveSchedule(List<ScheduleEvent> scheduleActivities, Pair<Integer, String> classId, boolean overrideCustomization) {
+
+        List<ScheduleEvent> scheduleEvents = scheduleActivities;
+
+        if (getScheduleList(classId) != null) {
+            int i = 0;
+            for (ScheduleEvent newEvent : scheduleEvents) {
+                for (ScheduleEvent oldEvent : getScheduleList(classId)) {
+                    if (oldEvent.getId() == newEvent.getId() && !overrideCustomization)
+                        scheduleEvents.set(i, oldEvent);
+                }
+                i++;
+            }
+        }
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -205,7 +221,20 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    public void saveSchedule(List<ScheduleEvent> scheduleActivities, Prof prof){
+    public void saveSchedule(List<ScheduleEvent> scheduleActivities, Prof prof, boolean overrideCustomization) {
+
+        List<ScheduleEvent> scheduleEvents = scheduleActivities;
+
+        if (getScheduleList(prof) != null){
+            int i = 0;
+            for (ScheduleEvent newEvent : scheduleEvents) {
+                for (ScheduleEvent oldEvent : getScheduleList(prof)) {
+                    if (oldEvent.getId()== newEvent.getId() && !overrideCustomization)
+                        scheduleEvents.set(i, oldEvent);
+                }
+                i++;
+            }
+        }
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -214,7 +243,39 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    public List<ScheduleEvent> getScheduleList(Pair<Integer, String> classId){
+    public void editSchedule(Pair<Integer, String> classId, ScheduleEvent oldEvent, ScheduleEvent newEvent) {
+        List<ScheduleEvent> scheduleEvents = new ArrayList<>(getScheduleList(classId));
+
+        int i = 0;
+        for (ScheduleEvent event : getScheduleList(classId)) {
+
+            if (event.getId()== oldEvent.getId()) {
+                Log.d(event.getSubject(), "woo");
+                scheduleEvents.set(i, newEvent);
+            }
+            i++;
+        }
+
+        saveSchedule(scheduleEvents, classId, true);
+    }
+
+    public void editSchedule(Prof prof, ScheduleEvent oldEvent, ScheduleEvent newEvent) {
+        List<ScheduleEvent> scheduleEvents = getScheduleList(prof);
+
+        int i = 0;
+        for (ScheduleEvent event : getScheduleList(prof)) {
+
+            if (event.getId()== oldEvent.getId()) {
+                Log.d(event.getSubject(), "woo");
+                scheduleEvents.set(i, newEvent);
+            }
+            i++;
+        }
+
+        saveSchedule(scheduleEvents, prof, true);
+    }
+
+    public List<ScheduleEvent> getScheduleList(Pair<Integer, String> classId) {
 
         String json = sharedPreferences.getString(classId.first.toString().concat(classId.second).toLowerCase(), "");
         Gson gson = new Gson();
@@ -224,7 +285,7 @@ public class ConfigurationManager {
         return gson.fromJson(json, listType);
     }
 
-    public List<ScheduleEvent> getScheduleList(Prof prof){
+    public List<ScheduleEvent> getScheduleList(Prof prof) {
 
         String json = sharedPreferences.getString((prof.getSurname().concat(prof.getName())).toLowerCase(), "");
         Gson gson = new Gson();
@@ -234,7 +295,7 @@ public class ConfigurationManager {
         return gson.fromJson(json, listType);
     }
 
-    public void saveProfsList (List<Prof> profsList){
+    public void saveProfsList(List<Prof> profsList) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -243,7 +304,7 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    public List<Prof> getProfsList(){
+    public List<Prof> getProfsList() {
 
         String json = sharedPreferences.getString(activity.getString(R.string.stored_profs_list_key), "");
         Gson gson = new Gson();
@@ -253,7 +314,7 @@ public class ConfigurationManager {
         return gson.fromJson(json, listType);
     }
 
-    public void saveMyStatus(Pair<Integer, String> classId){
+    public void saveMyStatus(Pair<Integer, String> classId) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -263,7 +324,7 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    public void saveMyStatus(Prof prof){
+    public void saveMyStatus(Prof prof) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -273,19 +334,19 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    public Object getMyStatus(){
+    public Object getMyStatus() {
 
         String json = sharedPreferences.getString(activity.getString(R.string.stored_status_key), "");
         if (json == null) return null;
         Gson gson = new Gson();
 
-        if (sharedPreferences.getString(activity.getString(R.string.stored_user_status_type), "").equals(STATUS_STUDENT)){
+        if (sharedPreferences.getString(activity.getString(R.string.stored_user_status_type), "").equals(STATUS_STUDENT)) {
             Type classType = new TypeToken<Pair<Integer, String>>() {
             }.getType();
             return gson.fromJson(json, classType);
         }
 
-        if (sharedPreferences.getString(activity.getString(R.string.stored_user_status_type), "").equals(STATUS_PROF)){
+        if (sharedPreferences.getString(activity.getString(R.string.stored_user_status_type), "").equals(STATUS_PROF)) {
             Type profType = new TypeToken<Prof>() {
             }.getType();
             return gson.fromJson(json, profType);
@@ -294,7 +355,7 @@ public class ConfigurationManager {
         return null;
     }
 
-    public void saveEvents(List<Event> events){
+    public void saveEvents(List<Event> events) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -303,7 +364,7 @@ public class ConfigurationManager {
         prefsEditor.apply();
     }
 
-    public List<Event> getEvents(){
+    public List<Event> getEvents() {
 
         String json = sharedPreferences.getString(activity.getString(R.string.stored_events), "");
         Gson gson = new Gson();
@@ -313,7 +374,7 @@ public class ConfigurationManager {
         return gson.fromJson(json, listType);
     }
 
-    public String getStartupFragment(){
+    public String getStartupFragment() {
 
         return sharedPreferences.getString("startup_fragment", "0");
     }

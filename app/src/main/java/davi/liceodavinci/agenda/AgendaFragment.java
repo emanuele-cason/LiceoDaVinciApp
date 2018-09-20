@@ -6,7 +6,6 @@ import android.app.Fragment;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,15 +19,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
-import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import org.json.JSONException;
 
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -67,14 +63,11 @@ public class AgendaFragment extends Fragment {
         inflater.inflate(R.menu.agenda_actionbar_menu, menu);
 
         final MenuItem selectToday = menu.findItem(R.id.selectToday);
-        selectToday.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                if (calendar != null){
-                    setToToday();
-                }
-                return false;
+        selectToday.setOnMenuItemClickListener(menuItem -> {
+            if (calendar != null){
+                setToToday();
             }
+            return false;
         });
     }
 
@@ -98,25 +91,22 @@ public class AgendaFragment extends Fragment {
         super.onStart();
         setToToday();
 
-        this.calendar.setOnDateChangedListener(new OnDateSelectedListener() {
-            @Override
-            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull final CalendarDay date, boolean selected) {
+        this.calendar.setOnDateChangedListener((widget, date, selected) -> {
 
-                Calendar beforeDate = (Calendar)date.getCalendar().clone(); // All'ultimo giorno del mese prossimo
-                beforeDate.add(Calendar.MONTH, 1);
-                beforeDate.set(Calendar.DAY_OF_MONTH,1);
-                beforeDate.set(Calendar.HOUR_OF_DAY, 0);
-                beforeDate.set(Calendar.MINUTE, 0);
-                beforeDate.set(Calendar.SECOND, 0);
+            Calendar beforeDate = (Calendar)date.getCalendar().clone(); // All'ultimo giorno del mese prossimo
+            beforeDate.add(Calendar.MONTH, 1);
+            beforeDate.set(Calendar.DAY_OF_MONTH,1);
+            beforeDate.set(Calendar.HOUR_OF_DAY, 0);
+            beforeDate.set(Calendar.MINUTE, 0);
+            beforeDate.set(Calendar.SECOND, 0);
 
-                Calendar afterDate = (Calendar)date.getCalendar().clone(); // Si prende gli eventi da oggi
-                afterDate.add(Calendar.DAY_OF_MONTH,-1);
-                afterDate.set(Calendar.HOUR_OF_DAY, 23);
-                afterDate.set(Calendar.MINUTE, 59);
-                afterDate.set(Calendar.SECOND, 58);
+            Calendar afterDate = (Calendar)date.getCalendar().clone(); // Si prende gli eventi da oggi
+            afterDate.add(Calendar.DAY_OF_MONTH,-1);
+            afterDate.set(Calendar.HOUR_OF_DAY, 23);
+            afterDate.set(Calendar.MINUTE, 59);
+            afterDate.set(Calendar.SECOND, 58);
 
-                fetchEvents(null, null, ((int)(afterDate.getTimeInMillis()/1000L)), ((int)(beforeDate.getTimeInMillis()/1000L)));
-            }
+            fetchEvents(null, null, ((int)(afterDate.getTimeInMillis()/1000L)), ((int)(beforeDate.getTimeInMillis()/1000L)));
         });
     }
 
@@ -135,32 +125,17 @@ public class AgendaFragment extends Fragment {
             new AgendaDataFetcher(activity, this).fetchEvents(filterTitle, filterContent, before, after, new OnFetchCompleteListener<List<Event>>() {
                 @Override
                 public void onSuccess(final List<Event> result) {
-                    new Handler(activity.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            setResult(sortByBeginDate(result));
-                        }
-                    });
+                    new Handler(activity.getMainLooper()).post(() -> setResult(sortByBeginDate(result)));
                 }
 
                 @Override
                 public void onFailure(Exception e) {
 
-                    new Handler(activity.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                    });
+                    new Handler(activity.getMainLooper()).post(() -> swipeRefreshLayout.setRefreshing(false));
 
                     Snackbar snackbar = Snackbar
                             .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                            .setAction("RIPROVA", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    fetchEvents(filterTitle, filterContent, before, after);
-                                }
-                            });
+                            .setAction("RIPROVA", view -> fetchEvents(filterTitle, filterContent, before, after));
                     snackbar.show();
                 }
             });
@@ -191,43 +166,23 @@ public class AgendaFragment extends Fragment {
                 @Override
                 public void onSuccess(final List<Event> result) {
                     ConfigurationManager.getIstance().saveEvents(result);
-                    new Handler(activity.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            setResult(sortByBeginDate(result));
-                        }
-                    });
+                    new Handler(activity.getMainLooper()).post(() -> setResult(sortByBeginDate(result)));
                 }
 
                 @Override
                 public void onFailure(Exception e) {
 
-                    new Handler(activity.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                    });
+                    new Handler(activity.getMainLooper()).post(() -> swipeRefreshLayout.setRefreshing(false));
 
                     if (ConfigurationManager.getIstance().getEvents() != null) {
                         Snackbar snackbar = Snackbar
                                 .make(activity.findViewById(R.id.main_frame), "Errore di connessione. Impossibile aggiornare l'agenda", Snackbar.LENGTH_LONG)
-                                .setAction("RIPROVA", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        fetchAndStoreCurrentMonthEvents();
-                                    }
-                                });
+                                .setAction("RIPROVA", view -> fetchAndStoreCurrentMonthEvents());
                         snackbar.show();
                     } else{
                         Snackbar snackbar = Snackbar
                                 .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                                .setAction("RIPROVA", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        fetchAndStoreCurrentMonthEvents();
-                                    }
-                                });
+                                .setAction("RIPROVA", view -> fetchAndStoreCurrentMonthEvents());
                         snackbar.show();
                     }
                 }
@@ -269,12 +224,7 @@ public class AgendaFragment extends Fragment {
 
     private List<Event> sortByBeginDate(List<Event> events){
         if (!(events == null)) if (!events.isEmpty()) {
-            Collections.sort(events, new Comparator<Event>() {
-                @Override
-                public int compare(Event e1, Event e2) {
-                    return e1.getBeginCalendar().getTime().compareTo(e2.getBeginCalendar().getTime());
-                }
-            });
+            Collections.sort(events, (e1, e2) -> e1.getBeginCalendar().getTime().compareTo(e2.getBeginCalendar().getTime()));
         }
 
         return events;
