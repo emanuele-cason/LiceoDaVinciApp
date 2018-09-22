@@ -139,7 +139,11 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (selection instanceof SettingsFragment){
+                super.onBackPressed();
+            }else {
+                onDestroy();
+            }
         }
     }
 
@@ -181,7 +185,7 @@ public class MainActivity extends AppCompatActivity
             selection = new CommunicationsFragment(this, Communication.COMM_SAVED);
             getSupportActionBar().setTitle("Comunicati salvati");
         } else if (id == R.id.drawer_settings) {
-            selection = new SettingsFragment();
+            selection = new SettingsFragment(this);
             getSupportActionBar().setTitle("Impostazioni");
         }
 

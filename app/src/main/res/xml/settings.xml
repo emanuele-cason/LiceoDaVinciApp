@@ -13,4 +13,16 @@
             android:title="Sezione all'avvio" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Informazioni">
+        <Preference
+            android:key="review"
+            android:summary="Facci sapere cosa ne pensi!"
+            android:title="Scrivi una recensione" />
+
+        <Preference
+            android:key="developers"
+            android:summary="In poche parole quei due fuori di testa che hanno deciso di lavorare gratis per sviluppare questa applicazione."
+            android:title="Gli sviluppatori" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

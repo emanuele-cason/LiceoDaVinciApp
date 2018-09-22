@@ -21,7 +21,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            shrinkResources true
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -47,6 +47,7 @@ dependencies {
     implementation 'com.aurelhubert:ahbottomnavigation:2.1.0'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.prolificinteractive:material-calendarview:1.4.3'
+    implementation 'com.github.jrvansuita:MaterialAbout:0.2.3'
 }
 
 apply plugin: 'com.google.gms.google-services'

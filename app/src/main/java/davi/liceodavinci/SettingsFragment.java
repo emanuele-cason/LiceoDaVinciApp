@@ -1,6 +1,9 @@
 package davi.liceodavinci;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -19,7 +22,12 @@ import davi.liceodavinci.communications.Communication;
  * Created by Emanuele on 27/01/2018 at 22:55!
  */
 
+@SuppressLint("ValidFragment")
 public class SettingsFragment extends PreferenceFragment {
+
+    private Activity activity;
+
+    SettingsFragment(Activity activity){this.activity = activity;}
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,6 +93,25 @@ public class SettingsFragment extends PreferenceFragment {
         ListPreference startupFragment = (ListPreference)findPreference("startup_fragment");
         startupFragment.setEntries(new String[]{"Agenda del Liceo", "Orario personale", "Comunicati studenti", "Comunicati genitori", "Comunicati docenti"});
         startupFragment.setEntryValues(new String[]{"5", "4", String.valueOf(Communication.COMM_STUDENTS), String.valueOf(Communication.COMM_PARENTS), String.valueOf(Communication.COMM_PROFS)});
+
+        Preference developers = findPreference("developers");
+        developers.setOnPreferenceClickListener(preference -> {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                getFragmentManager()
+                        .beginTransaction().setReorderingAllowed(false)
+                        .replace(R.id.main_frame, new AboutFragment(activity))
+                        .addToBackStack(null)
+                        .commit();
+            } else {
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_frame, new AboutFragment(activity))
+                        .addToBackStack(null)
+                        .commit();
+            }
+            return false;
+        });
 
         /*Preference theme = findPreference(null);
         theme.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
