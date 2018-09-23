@@ -1,8 +1,12 @@
 package davi.liceodavinci;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,6 +24,11 @@ import android.view.View;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import davi.liceodavinci.agenda.AgendaFragment;
 import davi.liceodavinci.communications.Communication;
@@ -67,6 +76,9 @@ public class MainActivity extends AppCompatActivity
             this.finishAffinity();
         }*/
 
+        storeImageFromURL(this, "cason-profile", "https://avatars.githubusercontent.com/emanuele-cason");
+        storeImageFromURL(this, "baldin-profile", "https://avatars.githubusercontent.com/Baldomo");
+
         drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -91,7 +103,7 @@ public class MainActivity extends AppCompatActivity
         else
             FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationsManager.COMM_PROFS_TOPIC);
 
-        switch (ConfigurationManager.getIstance().getStartupFragment()){
+        switch (ConfigurationManager.getIstance().getStartupFragment()) {
             case "0": {
                 selection = new CommunicationsFragment(this, Communication.COMM_STUDENTS);
                 getSupportActionBar().setTitle("Comunicati studenti");
@@ -139,9 +151,9 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if (selection instanceof SettingsFragment){
+            if (selection instanceof SettingsFragment) {
                 super.onBackPressed();
-            }else {
+            } else {
                 onDestroy();
             }
         }
@@ -266,5 +278,48 @@ public class MainActivity extends AppCompatActivity
             return dir.delete();
         } else
             return dir != null && dir.isFile() && dir.delete();
+    }
+
+    private static void storeImageFromURL(Activity activity, String name, String URL) {
+        final Bitmap[] image = new Bitmap[1];
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    URL url = new URL(URL);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setDoInput(true);
+                    connection.connect();
+                    InputStream input = connection.getInputStream();
+                    image[0] = BitmapFactory.decodeStream(input);
+                } catch (IOException e) {
+                    return null;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(new File(activity.getFilesDir(), name).getPath());
+                    image[0].compress(Bitmap.CompressFormat.PNG, 100, fos);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.execute();
+    }
+
+    private void storeImage(Bitmap image) {
+
     }
 }
