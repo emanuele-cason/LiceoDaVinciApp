@@ -2,6 +2,7 @@ package davi.liceodavinci;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -148,15 +150,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            if (selection instanceof SettingsFragment) {
-                super.onBackPressed();
-            } else {
-                onDestroy();
-            }
-        }
+        super.onBackPressed();
     }
 
     @Override
@@ -177,6 +171,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         uncheckAllMenuItems(navigationView);
         item.setChecked(true);
+
+        FragmentManager fm = this.getFragmentManager();
+        for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            fm.popBackStack();
+        }
 
         if (id == R.id.drawer_agenda) {
             selection = new AgendaFragment(this);
@@ -302,6 +301,7 @@ public class MainActivity extends AppCompatActivity
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
 
+                if (image[0] == null) return;
                 FileOutputStream fos = null;
                 try {
                     fos = new FileOutputStream(new File(activity.getFilesDir(), name).getPath());
@@ -317,9 +317,5 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }.execute();
-    }
-
-    private void storeImage(Bitmap image) {
-
     }
 }
