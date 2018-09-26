@@ -15,7 +15,7 @@
         android:title="Orari">
     </item>
 
-    <group android:title="Comunicati">
+    <item android:title="Comunicati">
         <menu>
             <item
                 android:id="@+id/com_students"
@@ -34,7 +34,7 @@
                 android:icon="@drawable/ic_com_saved"
                 android:title="Salvati" />
         </menu>
-    </group>
+    </item>
 
     <item android:title="Utilità">
         <menu>

@@ -33,6 +33,17 @@ android {
     }
 }
 
+ext.versionCodes = ['armeabi-v7a':1, 'arm64-v8a':2, x86:3, 'x86_64':4, 'mips':5]
+
+import com.android.build.OutputFile
+
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        output.versionCodeOverride =
+                project.ext.versionCodes.get(output.getFilter(OutputFile.ABI)) * 1000000 + android.defaultConfig.versionCode
+    }
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'

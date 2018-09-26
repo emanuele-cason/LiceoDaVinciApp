@@ -14,10 +14,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Informazioni">
-        <Preference
-            android:key="review"
-            android:summary="Facci sapere cosa ne pensi!"
-            android:title="Scrivi una recensione" />
 
         <Preference
             android:key="developers"
