@@ -6,7 +6,7 @@ package davi.liceodavinci.schedule;
 
 public class ScheduleEvent {
 
-    private static String[] beginTimes = {"08:05AM", "09:05AM", "10:00AM", "11:10AM", "12:05PM", "13:00PM"};
+    private static String[] beginTimes = {"08h05", "09h05", "10h00", "11h10", "12h05", "13h00"};
 
     static final int MON = 0;
     static final int TUE = 1;

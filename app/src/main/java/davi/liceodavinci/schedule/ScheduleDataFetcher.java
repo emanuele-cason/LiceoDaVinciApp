@@ -2,6 +2,7 @@ package davi.liceodavinci.schedule;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.util.Pair;
 
 import com.google.gson.Gson;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import davi.liceodavinci.OnFetchCompleteListener;
+import davi.liceodavinci.R;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -85,8 +87,10 @@ class ScheduleDataFetcher {
                     List<Prof> profsListAPI = gson.fromJson(responseBody.string(), listType);
 
                     callback.onSuccess(profsListAPI);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    Snackbar snackbar = Snackbar
+                            .make(activity.findViewById(R.id.main_frame), "Oh oh! Il server ha qualcosa che non va :(", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }
             }
         });

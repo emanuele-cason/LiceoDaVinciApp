@@ -195,7 +195,7 @@ public class CommunicationsFragment extends Fragment {
 
     protected void fetch() {
         swipeRefreshCom.setRefreshing(true);
-        CommDataFetcher df = new CommDataFetcher();
+        CommDataFetcher df = new CommDataFetcher(activity);
 
         try {
             df.fetchCommunicationsJson(section, new OnFetchCompleteListener<List<Communication>>() {

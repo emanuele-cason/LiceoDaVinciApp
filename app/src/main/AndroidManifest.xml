@@ -33,7 +33,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_search" />
+            android:resource="@drawable/ic_communication" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"

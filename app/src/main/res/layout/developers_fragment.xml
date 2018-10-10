@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:textAlignment="center"
-                android:text="Un grazie speciale alla professoressa Zangiacomi per il supporto e la fiducia accordataci e a tutti gli insegnanti che ci hanno permesso di eseguire le operazioni di aggiornamento e manutenzione necessarie." />
+                android:text="Un grazie speciale alla professoressa Zangiacomi per il supporto e la fiducia e a tutti gli insegnanti che ci hanno permesso di eseguire le operazioni di aggiornamento e manutenzione necessarie." />
 
         </LinearLayout>
 

@@ -41,7 +41,7 @@ public class NotificationsManager extends FirebaseMessagingService {
         if (topicID != -1){
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this, "comunicati")
-                            .setSmallIcon(R.drawable.ic_menu_send)
+                            .setSmallIcon(R.drawable.ic_communication)
                             .setContentTitle(remoteMessage.getNotification().getTitle() == null ? "" : remoteMessage.getNotification().getTitle())
                             .setGroup(String.valueOf(topicID))
                             .setGroupSummary(true)
