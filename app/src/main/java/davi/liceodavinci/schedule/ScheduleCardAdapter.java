@@ -78,7 +78,7 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         layoutParams.setMargins(margin, margin, margin, margin);
         ((ViewHolder) holder).cardCell.setLayoutParams(layoutParams);
 
-        if (scheduleEvents.get(position).getSubject() == null) {
+        if (scheduleEvents.get(position).getSubject().equals("")) {
             ((ViewHolder) holder).cardCell.setVisibility(View.INVISIBLE);
         }
 
@@ -87,12 +87,12 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             else ((ViewHolder) holder).titleTextView.setText(scheduleEvents.get(position).getSubject());
         if (section == ScheduleFragment.PROFS_SCHEDULE) {
             String title = "";
-            if (scheduleEvents.get(position).getClassId() != null) {
+            if (!scheduleEvents.get(position).getClassId().equals("")) {
                 title = title.concat(scheduleEvents.get(position).getClassId());
-                if (scheduleEvents.get(position).getClassroom() != null)
+                if (!scheduleEvents.get(position).getClassroom().equals(""))
                     title = title.concat(" - ".concat(scheduleEvents.get(position).getClassroom()));
             } else {
-                if (scheduleEvents.get(position).getSubject() != null)
+                if (!scheduleEvents.get(position).getSubject().equals(""))
                     title = title.concat(scheduleEvents.get(position).getSubject());
             }
 

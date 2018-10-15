@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity
             case "2": {
                 selection = new CommunicationsFragment(this, Communication.COMM_PROFS);
                 getSupportActionBar().setTitle("Comunicati docenti");
-                navigationView.getMenu().getItem(R.id.com_profs).setChecked(true);
+                navigationView.getMenu().findItem(R.id.com_profs).setChecked(true);
                 break;
             }
             case "4": {

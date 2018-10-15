@@ -35,12 +35,19 @@ public class ScheduleEvent {
         this.inizio = beginTimes[hourNum];
     }
 
-    public String getSubject() {return materia;}
+    public String getSubject() {
+        if (materia != null)return materia;
+        else return "";
+    }
 
     String getSubjectCode(){return mat_cod;}
 
     int getDuration() {
-        return Integer.parseInt(String.valueOf(durata.charAt(0)));
+        try {
+            return Integer.parseInt(String.valueOf(durata.charAt(0)));
+        }catch (Exception e){
+            return 0;
+        }
     }
 
     public int[] getBeginningTime() {
@@ -59,26 +66,30 @@ public class ScheduleEvent {
     int getDay() {
         String[] dayKeywords = {"lun", "mar", "mer", "gio", "ven", "sab"};
         for (int i = 0; i < dayKeywords.length; i++)
-            if (giorno.toLowerCase().contains(dayKeywords[i])) return i;
+            if (giorno != null) if (giorno.toLowerCase().contains(dayKeywords[i])) return i;
         return -1;
     }
 
     String getLocation(){return sede;}
 
     String getClassId() {
-        return classe;
+        if (classe != null)return classe;
+        else return "";
     }
 
     String getClassroom() {
-        return aula;
+        if (aula != null)return aula;
+        else return "";
     }
 
     String getProfName() {
-        return doc_cognome;
+        if (doc_nome != null)return doc_nome;
+        else return "";
     }
 
     String getProfSurname() {
-        return doc_nome;
+        if (doc_cognome != null)return doc_cognome;
+        else return "";
     }
 
     public void setCustomName(String customName) {

@@ -126,8 +126,10 @@ class ScheduleDataFetcher {
                     assert responseBody != null;
                     List<ScheduleEvent> profScheduleAPI = gson.fromJson(responseBody.string(), listType);
                     callback.onSuccess(profScheduleAPI);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    Snackbar snackbar = Snackbar
+                            .make(activity.findViewById(R.id.main_frame), "Oh oh! Il server ha qualcosa che non va :(", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }
             }
         });
@@ -165,8 +167,10 @@ class ScheduleDataFetcher {
                     }
 
                     callback.onSuccess(classListAPI);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    Snackbar snackbar = Snackbar
+                            .make(activity.findViewById(R.id.main_frame), "Oh oh! Il server ha qualcosa che non va :(", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }
             }
         });
@@ -198,8 +202,10 @@ class ScheduleDataFetcher {
                     assert responseBody != null;
                     List<ScheduleEvent> classScheduleAPI = gson.fromJson(responseBody.string(), listType);
                     callback.onSuccess(classScheduleAPI);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    Snackbar snackbar = Snackbar
+                            .make(activity.findViewById(R.id.main_frame), "Oh oh! Il server ha qualcosa che non va :(", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }
             }
         });

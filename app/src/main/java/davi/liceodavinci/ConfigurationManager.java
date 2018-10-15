@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.util.Pair;
 
 import com.google.gson.Gson;
@@ -201,6 +200,7 @@ public class ConfigurationManager {
 
     public void saveSchedule(List<ScheduleEvent> scheduleActivities, Pair<Integer, String> classId, boolean overrideCustomization) {
 
+        if (scheduleActivities == null) return;
         List<ScheduleEvent> scheduleEvents = scheduleActivities;
 
         if (getScheduleList(classId) != null) {
@@ -223,6 +223,7 @@ public class ConfigurationManager {
 
     public void saveSchedule(List<ScheduleEvent> scheduleActivities, Prof prof, boolean overrideCustomization) {
 
+        if (scheduleActivities == null)return;
         List<ScheduleEvent> scheduleEvents = scheduleActivities;
 
         if (getScheduleList(prof) != null){
@@ -250,7 +251,6 @@ public class ConfigurationManager {
         for (ScheduleEvent event : getScheduleList(classId)) {
 
             if (event.getId()== oldEvent.getId()) {
-                Log.d(event.getSubject(), "woo");
                 scheduleEvents.set(i, newEvent);
             }
             i++;
@@ -266,7 +266,6 @@ public class ConfigurationManager {
         for (ScheduleEvent event : getScheduleList(prof)) {
 
             if (event.getId()== oldEvent.getId()) {
-                Log.d(event.getSubject(), "woo");
                 scheduleEvents.set(i, newEvent);
             }
             i++;
