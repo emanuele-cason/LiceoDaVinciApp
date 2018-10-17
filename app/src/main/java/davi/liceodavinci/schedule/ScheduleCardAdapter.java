@@ -39,11 +39,13 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private Activity activity;
     private int section;
     private boolean personal;
+    private OnDataSetChanged callback;
 
-    ScheduleCardAdapter(Activity activity, List<ScheduleEvent> scheduleEvents, int section, boolean personal) {
+    ScheduleCardAdapter(Activity activity, List<ScheduleEvent> scheduleEvents, int section, boolean personal, OnDataSetChanged callback) {
         this.activity = activity;
         this.section = section;
         this.personal = personal;
+        this.callback = callback;
 
         //Questi cicli for annidati servono a skippare gli spazi vuoti in una colonna, se la prima ora è vuota ad esempio essa viene indicata con una card vuota
         for (int i = 0; i < scheduleEvents.get(scheduleEvents.size() - 1).getHourNum() + scheduleEvents.get(scheduleEvents.size() - 1).getDuration(); i++) {
@@ -198,12 +200,16 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                             ScheduleEvent editEvent = scheduleEvents.get(position);
                             editEvent.setNotes(notes.getText().toString());
+                            if (notes.getText().toString().equals(""))editEvent.setNotes(null);
                             if (section == ScheduleFragment.CLASSES_SCHEDULE) {
                                 ConfigurationManager.getIstance().editSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
                             }
                             if (section == ScheduleFragment.PROFS_SCHEDULE) {
                                 ConfigurationManager.getIstance().editSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
                             }
+
+                            dialog.dismiss();
+                            callback.onDataChanged();
                         });
 
                         negative.setOnClickListener(view12 -> {
@@ -220,6 +226,9 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             if (section == ScheduleFragment.PROFS_SCHEDULE) {
                                 ConfigurationManager.getIstance().editSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
                             }
+
+                            dialog.dismiss();
+                            callback.onDataChanged();
                         });
 
                         notes.addTextChangedListener(new TextWatcher() {
@@ -268,6 +277,9 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             if (section == ScheduleFragment.PROFS_SCHEDULE) {
                                 ConfigurationManager.getIstance().editSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
                             }
+
+                            dialog.dismiss();
+                            callback.onDataChanged();
                         });
 
                         negative.setOnClickListener(view12 -> {
@@ -285,6 +297,9 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             if (section == ScheduleFragment.PROFS_SCHEDULE) {
                                 ConfigurationManager.getIstance().editSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), scheduleEvents.get(position), editEvent);
                             }
+
+                            dialog.dismiss();
+                            callback.onDataChanged();
                         });
 
                         title.addTextChangedListener(new TextWatcher() {

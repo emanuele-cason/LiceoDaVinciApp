@@ -173,7 +173,7 @@ public class ScheduleFragment extends Fragment {
                         } catch (Exception ignored) {
                         }
 
-                        renderSchedule(new Pair<>(Integer.parseInt(firstSpinner.getSelectedItem().toString()), secondSpinner.getSelectedItem().toString()), true);
+                        renderSchedule(new Pair<>(Integer.parseInt(firstSpinner.getSelectedItem().toString()), secondSpinner.getSelectedItem().toString()), true,true);
                     }
 
                     @Override
@@ -297,9 +297,9 @@ public class ScheduleFragment extends Fragment {
                     noPersonal.setVisibility(View.GONE);
 
                     if (ConfigurationManager.getIstance().getMyStatus() instanceof Pair)
-                        renderSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus(), true);
+                        renderSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus(), true,true);
                     if (ConfigurationManager.getIstance().getMyStatus() instanceof Prof)
-                        renderSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), true);
+                        renderSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), true, true);
                 }
 
                 break;
@@ -502,7 +502,7 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 scheduleContainer.setVisibility(View.GONE);
-                renderSchedule(profsList.get(profsSpinner.getSelectedItemPosition()), true);
+                renderSchedule(profsList.get(profsSpinner.getSelectedItemPosition()), true, true);
             }
 
             @Override
@@ -512,7 +512,7 @@ public class ScheduleFragment extends Fragment {
         });
     }
 
-    public void renderSchedule(final Pair<Integer, String> classId, boolean refreshUI) { //refreshUI serve ad evitare che ci siano loop quando la funzione viene chiamata dal suo interno (getMainLooper) qualora i risultati della richiesta fossero per qualche ragione sempre diversi da quelli salvati
+    public void renderSchedule(final Pair<Integer, String> classId, boolean animate, boolean refreshUI) { //refreshUI serve ad evitare che ci siano loop quando la funzione viene chiamata dal suo interno (getMainLooper) qualora i risultati della richiesta fossero per qualche ragione sempre diversi da quelli salvati
 
         if (currentSchedule != CLASSES_SCHEDULE && currentSchedule != PERSONAL_SCHEDULE) return;
 
@@ -522,7 +522,7 @@ public class ScheduleFragment extends Fragment {
 
                 if (ConfigurationManager.getIstance().getScheduleList(classId) == null || !(sameSchedule(ConfigurationManager.getIstance().getScheduleList(classId), result))) {
                     ConfigurationManager.getIstance().saveSchedule(result, classId, true);
-                    if (refreshUI) new Handler(activity.getMainLooper()).post(() -> renderSchedule(classId, false));
+                    if (refreshUI) new Handler(activity.getMainLooper()).post(() -> renderSchedule(classId, true, false));
                 }
             }
 
@@ -531,7 +531,7 @@ public class ScheduleFragment extends Fragment {
                 if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
                     Snackbar snackbar = Snackbar
                             .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                            .setAction("RIPROVA", view -> renderSchedule(classId, true));
+                            .setAction("RIPROVA", view -> renderSchedule(classId, true, true));
                     snackbar.show();
                 }
             }
@@ -563,9 +563,14 @@ public class ScheduleFragment extends Fragment {
 
                     scheduleRecyclerViews[i].setVisibility(View.VISIBLE);
                     scheduleContainer.setVisibility(View.VISIBLE);
-                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, CLASSES_SCHEDULE, currentSchedule == PERSONAL_SCHEDULE);
+                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, CLASSES_SCHEDULE, currentSchedule == PERSONAL_SCHEDULE, new OnDataSetChanged() {
+                        @Override
+                        public void onDataChanged() {
+                            renderSchedule(classId, false,false);
+                        }
+                    });
                     scheduleRecyclerViews[i].setAdapter(adapter);
-                    runLayoutAnimation(scheduleRecyclerViews[i]);
+                    if (animate) runLayoutAnimation(scheduleRecyclerViews[i]);
                 } else {
                     scheduleRecyclerViews[i].setVisibility(View.INVISIBLE);
                 }
@@ -575,7 +580,7 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
-    public void renderSchedule(final Prof prof, boolean refreshUI) {
+    public void renderSchedule(final Prof prof, boolean animate, boolean refreshUI) {
 
         if (currentSchedule != PROFS_SCHEDULE && currentSchedule != PERSONAL_SCHEDULE) return;
 
@@ -585,7 +590,7 @@ public class ScheduleFragment extends Fragment {
 
                 if (ConfigurationManager.getIstance().getScheduleList(prof) == null || !(sameSchedule(ConfigurationManager.getIstance().getScheduleList(prof), result))) {
                     ConfigurationManager.getIstance().saveSchedule(result, prof, true);
-                    if (refreshUI) new Handler(activity.getMainLooper()).post(() -> renderSchedule(prof, false));
+                    if (refreshUI) new Handler(activity.getMainLooper()).post(() -> renderSchedule(prof, true, false));
                 }
 
             }
@@ -598,7 +603,7 @@ public class ScheduleFragment extends Fragment {
                             .setAction("RIPROVA", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    renderSchedule(prof, true);
+                                    renderSchedule(prof, true,true);
                                 }
                             });
                     snackbar.show();
@@ -632,9 +637,14 @@ public class ScheduleFragment extends Fragment {
 
                     scheduleRecyclerViews[i].setVisibility(View.VISIBLE);
                     scheduleContainer.setVisibility(View.VISIBLE);
-                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, PROFS_SCHEDULE, currentSchedule == PERSONAL_SCHEDULE);
+                    ScheduleCardAdapter adapter = new ScheduleCardAdapter(getActivity(), scheduleActivities, PROFS_SCHEDULE, currentSchedule == PERSONAL_SCHEDULE, new OnDataSetChanged() {
+                        @Override
+                        public void onDataChanged() {
+                            renderSchedule(prof, false,false);
+                        }
+                    });
                     scheduleRecyclerViews[i].setAdapter(adapter);
-                    runLayoutAnimation(scheduleRecyclerViews[i]);
+                    if (animate) runLayoutAnimation(scheduleRecyclerViews[i]);
                 } else {
                     scheduleRecyclerViews[i].setVisibility(View.INVISIBLE);
                 }
