@@ -299,7 +299,7 @@ public class ScheduleFragment extends Fragment {
                     if (ConfigurationManager.getIstance().getMyStatus() instanceof Pair)
                         renderSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus(), true);
                     if (ConfigurationManager.getIstance().getMyStatus() instanceof Prof)
-                        renderSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), false);
+                        renderSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), true);
                 }
 
                 break;
@@ -502,7 +502,7 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 scheduleContainer.setVisibility(View.GONE);
-                renderSchedule(profsList.get(profsSpinner.getSelectedItemPosition()), false);
+                renderSchedule(profsList.get(profsSpinner.getSelectedItemPosition()), true);
             }
 
             @Override
@@ -598,7 +598,7 @@ public class ScheduleFragment extends Fragment {
                             .setAction("RIPROVA", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    renderSchedule(prof, false);
+                                    renderSchedule(prof, true);
                                 }
                             });
                     snackbar.show();
