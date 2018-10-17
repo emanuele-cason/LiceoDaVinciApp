@@ -173,7 +173,7 @@ public class ScheduleFragment extends Fragment {
                         } catch (Exception ignored) {
                         }
 
-                        renderSchedule(new Pair<>(Integer.parseInt(firstSpinner.getSelectedItem().toString()), secondSpinner.getSelectedItem().toString()));
+                        renderSchedule(new Pair<>(Integer.parseInt(firstSpinner.getSelectedItem().toString()), secondSpinner.getSelectedItem().toString()), true);
                     }
 
                     @Override
@@ -275,8 +275,10 @@ public class ScheduleFragment extends Fragment {
                         public void onSuccess(List<Prof> result) {
                             ConfigurationManager.getIstance().saveProfsList(result);
                             new Handler(activity.getMainLooper()).post(() -> {
-                                if(ConfigurationManager.getIstance().getClassesList() != null && ConfigurationManager.getIstance().getProfsList() != null)refreshTableContent(position);
-                            });                        }
+                                if (ConfigurationManager.getIstance().getClassesList() != null && ConfigurationManager.getIstance().getProfsList() != null)
+                                    refreshTableContent(position);
+                            });
+                        }
 
                         @Override
                         public void onFailure(Exception e) {
@@ -295,9 +297,9 @@ public class ScheduleFragment extends Fragment {
                     noPersonal.setVisibility(View.GONE);
 
                     if (ConfigurationManager.getIstance().getMyStatus() instanceof Pair)
-                        renderSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus());
+                        renderSchedule((Pair<Integer, String>) ConfigurationManager.getIstance().getMyStatus(), true);
                     if (ConfigurationManager.getIstance().getMyStatus() instanceof Prof)
-                        renderSchedule((Prof) ConfigurationManager.getIstance().getMyStatus());
+                        renderSchedule((Prof) ConfigurationManager.getIstance().getMyStatus(), false);
                 }
 
                 break;
@@ -500,7 +502,7 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 scheduleContainer.setVisibility(View.GONE);
-                renderSchedule(profsList.get(profsSpinner.getSelectedItemPosition()));
+                renderSchedule(profsList.get(profsSpinner.getSelectedItemPosition()), false);
             }
 
             @Override
@@ -510,20 +512,18 @@ public class ScheduleFragment extends Fragment {
         });
     }
 
-    public void renderSchedule(final Pair<Integer, String> classId) {
+    public void renderSchedule(final Pair<Integer, String> classId, boolean refreshUI) { //refreshUI serve ad evitare che ci siano loop quando la funzione viene chiamata dal suo interno (getMainLooper) qualora i risultati della richiesta fossero per qualche ragione sempre diversi da quelli salvati
 
         if (currentSchedule != CLASSES_SCHEDULE && currentSchedule != PERSONAL_SCHEDULE) return;
 
         new ScheduleDataFetcher(activity, thisFragment).fetchClassSchedule(classId, new OnFetchCompleteListener<List<ScheduleEvent>>() {
             @Override
             public void onSuccess(final List<ScheduleEvent> result) {
-                if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
-                    ConfigurationManager.getIstance().saveSchedule(result, classId, false);
-                    new Handler(activity.getMainLooper()).post(() -> renderSchedule(classId));
 
+                if (ConfigurationManager.getIstance().getScheduleList(classId) == null || !(sameSchedule(ConfigurationManager.getIstance().getScheduleList(classId), result))) {
+                    ConfigurationManager.getIstance().saveSchedule(result, classId, true);
+                    if (refreshUI) new Handler(activity.getMainLooper()).post(() -> renderSchedule(classId, false));
                 }
-
-                ConfigurationManager.getIstance().saveSchedule(result, classId, false);
             }
 
             @Override
@@ -531,7 +531,7 @@ public class ScheduleFragment extends Fragment {
                 if (ConfigurationManager.getIstance().getScheduleList(classId) == null) {
                     Snackbar snackbar = Snackbar
                             .make(activity.findViewById(R.id.main_frame), "Errore di connessione", Snackbar.LENGTH_LONG)
-                            .setAction("RIPROVA", view -> renderSchedule(classId));
+                            .setAction("RIPROVA", view -> renderSchedule(classId, true));
                     snackbar.show();
                 }
             }
@@ -575,20 +575,19 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
-    public void renderSchedule(final Prof prof) {
+    public void renderSchedule(final Prof prof, boolean refreshUI) {
 
         if (currentSchedule != PROFS_SCHEDULE && currentSchedule != PERSONAL_SCHEDULE) return;
 
         new ScheduleDataFetcher(activity, thisFragment).fetchProfSchedule(prof, new OnFetchCompleteListener<List<ScheduleEvent>>() {
             @Override
             public void onSuccess(List<ScheduleEvent> result) {
-                if (ConfigurationManager.getIstance().getScheduleList(prof) == null) {
-                    ConfigurationManager.getIstance().saveSchedule(result, prof, false);
 
-                    new Handler(activity.getMainLooper()).post(() -> renderSchedule(prof));
+                if (ConfigurationManager.getIstance().getScheduleList(prof) == null || !(sameSchedule(ConfigurationManager.getIstance().getScheduleList(prof), result))) {
+                    ConfigurationManager.getIstance().saveSchedule(result, prof, true);
+                    if (refreshUI) new Handler(activity.getMainLooper()).post(() -> renderSchedule(prof, false));
                 }
 
-                ConfigurationManager.getIstance().saveSchedule(result, prof, false);
             }
 
             @Override
@@ -599,7 +598,7 @@ public class ScheduleFragment extends Fragment {
                             .setAction("RIPROVA", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    renderSchedule(prof);
+                                    renderSchedule(prof, false);
                                 }
                             });
                     snackbar.show();
@@ -667,5 +666,17 @@ public class ScheduleFragment extends Fragment {
         Collections.sort(resultSchedule, (s1, s2) -> Integer.valueOf(s1.getHourNum()).compareTo(s2.getHourNum()));
 
         return resultSchedule;
+    }
+
+    private boolean sameSchedule(List<ScheduleEvent> a, List<ScheduleEvent> b){
+
+        int same = 0;
+        for (ScheduleEvent x : a){
+            for (ScheduleEvent y : b){
+                if (x.getId() == y.getId()) same++;
+            }
+        }
+
+        return same == a.size() && same == b.size();
     }
 }

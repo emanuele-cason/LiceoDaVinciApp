@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -82,6 +83,8 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             ((ViewHolder) holder).cardCell.setVisibility(View.INVISIBLE);
         }
 
+        if (scheduleEvents.get(position).getNotes() != null && personal) ((ViewHolder)holder).dot.setVisibility(View.VISIBLE);
+
         if (section == ScheduleFragment.CLASSES_SCHEDULE)
             if (personal && scheduleEvents.get(position).getCustomName() != null) ((ViewHolder) holder).titleTextView.setText(scheduleEvents.get(position).getCustomName());
             else ((ViewHolder) holder).titleTextView.setText(scheduleEvents.get(position).getSubject());
@@ -110,11 +113,13 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         CardView cardCell;
         TextView titleTextView;
+        ImageView dot;
 
         ViewHolder(View itemView) {
             super(itemView);
             cardCell = itemView.findViewById(R.id.schedule_cardview);
             titleTextView = itemView.findViewById(R.id.schedule_activity_title);
+            dot = itemView.findViewById(R.id.schedule_activity_dot);
             itemView.setOnClickListener(this);
         }
 
