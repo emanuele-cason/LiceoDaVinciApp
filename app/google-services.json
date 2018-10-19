@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1092737851596",
+    "firebase_url": "https://webapi-dav.firebaseio.com",
+    "project_id": "webapi-dav",
+    "storage_bucket": "webapi-dav.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092737851596:android:9ab9290ce013d211",
+        "android_client_info": {
+          "package_name": "davi.liceodavinci"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1092737851596-jdk508ljb9e96v5t26ldrg9bmcloj4ff.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "davi.liceodavinci",
+            "certificate_hash": "c61efa19b75c214998772842ec051e6d8c4d9082"
+          }
+        },
+        {
+          "client_id": "1092737851596-9svqi5cmjkf3va70rbl5t61epep4jdi7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeGRS7wSdaLMalzLa-BEh6eHEF7EvhZWo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092737851596-9svqi5cmjkf3va70rbl5t61epep4jdi7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
