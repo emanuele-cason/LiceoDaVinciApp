@@ -29,7 +29,8 @@
 # Introduzione
 
 Questa repository contiene il codice sorgente dell'applicazione Android LiceoDaVinciApp, sviluppata dal sottoscritto in collaborazione con [Baldomo](https://github.com/Baldomo), artefice invece dello sviluppo dell'[API](https://github.com/Baldomo/webapi-dav) installata nel server del liceo, che fornisce al client i dati JSON relativi a comunicati, orari e agenda del Liceo.
-Allo stato attuale, in quanto non più studenti del Liceo, l'applicazione (client) e l'API (server) non sono più mantenute, ma rimaniamo disponibili per facilitare un eventuale passaggio di incarico a studenti capaci di aggiornare i relativi software e seguire il processo produttivo.
+
+**Allo stato attuale, in quanto non più studenti del Liceo, l'applicazione (client) e l'API (server) non sono più mantenute, ma rimaniamo disponibili per facilitare un eventuale passaggio di incarico a studenti volenterosi e capaci di aggiornare i relativi software e seguire il processo produttivo.**
 
 # Installazione
 
