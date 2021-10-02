@@ -13,8 +13,7 @@
       <img alt="GitHub release (latest SemVer)"
       src="https://img.shields.io/badge/release-LiceoDaVinciApp--1.0.5Stable-blue">
     </a>
-    <!-- CoC -->
-		<a href="">
+      <a href="#">
       <img src="https://img.shields.io/badge/-DISCONTINUED-red" />
     </a>
 </div>
