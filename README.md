@@ -33,7 +33,7 @@ Questa repository contiene il codice sorgente dell'applicazione Android LiceoDaV
 
 # Installazione
 
-A causa del mancato aggiornamento sopra citato, il download dell'applicazione è stato da noi sospeso dal Play Store, ma rimane disponibile nelle release di questa repository come demo/anteprima, sotto forma di apk. Si noti tuttavia che il server potrebbe essere offline, coperto da polvere e ragnatele e in attesa di essere spolverato da qualche studente volenteroso, quindi non è sottointeso che l'applicazione riceva i dati necessari.
+A causa del mancato aggiornamento sopra citato, il download dell'applicazione è stato da noi sospeso dal Play Store, ma rimane disponibile nelle release di questa repository come demo/anteprima, sotto forma di apk. Si noti tuttavia che il server è offline, quindi l'applicazione non riceverà i dati necessari.
 
 # Funzioni
 
